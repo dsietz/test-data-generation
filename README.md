@@ -1,3 +1,7 @@
-# misc
-used for storing various items
+# 
+
+### Archtecture
+Inline-style: 
+![Architectural Diagram](./docs/img/test-data-generation-architecture.png "Architectural Diagram")
+
 
