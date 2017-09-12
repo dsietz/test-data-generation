@@ -17,3 +17,5 @@ or production environment (option #1 above)
 ![Architectural Diagram](./docs/img/test-data-generation-architecture.png "Architectural Diagram")
 
 
+
+### Creating an Algorithm from Sample Data
