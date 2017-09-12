@@ -11,7 +11,7 @@
 //Internal
 #[macro_use]
 //mod params;
-mod test_data_generator;
+pub mod test_data_generator;
 
 //use std::env;
 
