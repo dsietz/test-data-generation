@@ -17,6 +17,7 @@ mod tests {
 	use data_sample_parser::DataSampleParser;
     
     #[test]
+    //the data sample parser starts up without issues
     fn initialization() {
     	let mut dsp = DataSampleParser::new();
         assert!(!dsp.runing_with_issues());
