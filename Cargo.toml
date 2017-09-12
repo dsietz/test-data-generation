@@ -1,3 +1,14 @@
 [package]
 name = "test-data-generation"
-version = "0.0.1"
+version = "0.1.0"
+authors = ["dsietz <davidsietz@yahoo.com>"]
+repository = "https://github.com/dsietz/test-data-generation.git"
+license = "Apache 2.0"
+readme = "README.md"
+
+[dependencies]
+clap = "*"
+config = "*"
+lazy_static = "0.2"
+log = "0.3"
+log4rs = "*"

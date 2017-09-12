@@ -1,0 +1,74 @@
+/*
+** Test Data Generation 
+*/
+
+#[macro_use]
+extern crate log;
+extern crate log4rs;
+extern crate clap;
+
+use std::env;
+use clap::{Arg, App};
+
+// application options (arguments) class
+pub struct Params <'a, 'b>
+{
+	opts: &'a clap::App<'a, 'b>,
+}
+/*
+impl<'a, 'b> Params<'a, 'b> {
+	pub fn new<'a, 'b>() -> Params<'a, 'b> {
+		Params {
+			opts: App::new("Test Data Generation")
+                          .version("1.0")
+                          .author("dsietz")
+                          .about("Made just for you!")
+                          .arg(Arg::with_name("config")
+                               .short("c")
+                               .long("config")
+                               .value_name("FILE")
+                               .help("Sets a custom config file")
+                               .takes_value(true)
+                               .default_value("./config/tdg.yaml"))
+                          .arg(Arg::with_name("log")
+                               .short("l")
+                               .long("log")
+                               .value_name("FILE")
+                               .help("set a custom logging configuration file - format YAML")
+                               .takes_value(true)
+                               .default_value("./config/log4rs.yaml"))     
+                          .arg(Arg::with_name("verbose")
+                               .short("v")
+                               .long("verbose")
+                               .help("explain what is being done"))
+                          .get_matches();
+       }
+*/
+
+/*
+pub fn get(opt: str) -> str {
+        opts.value_of(opt).unwrap_or("../../src/bin/config/log4rs.yaml")
+    }
+*/
+//}
+
+// This is the main function
+fn main() {
+	//parse arguments
+	let mut app_opts = Params::new();
+                          
+    //let cfg_log = opts.value_of("log").unwrap_or("../../src/bin/config/log4rs.yaml");
+    //println!("Value for cfg_log: {}", app_opts.get("log"));
+                          
+    // setup logging
+    //log4rs::init_file(cfg_log, Default::default()).unwrap();
+    
+    // Prints each argument on a separate line
+	for argument in env::args() {
+    	println!("{}", argument);
+	}
+    
+    // Print text to the console
+    //info!("starting up...");
+    println!("Hello World!");
+}
