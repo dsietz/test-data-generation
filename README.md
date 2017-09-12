@@ -11,8 +11,9 @@ or production environment (option #1 above)
  By analyzing a sample data set (e.g.: 2016 Census of top 200 male first names), we are able to recreate an algorithm based on that data profile. 
  This algorithm can be easily stored (data file) and used to generate "realistic" test data as desired. 
 
-### Archtecture
-Inline-style: 
+---
+
+### Archtecture 
 ![Architectural Diagram](./docs/img/test-data-generation-architecture.png "Architectural Diagram")
 
 
