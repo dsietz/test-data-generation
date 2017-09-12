@@ -31,4 +31,4 @@ See [CONTRIBUTING](./CONTRIBUTING.md) for more information on technical details.
 
 test-data-generation is primarily distributed under the terms of the Apache License (Version 2.0).
 
-See LICENSE-APACHE for details.
+See ![LICENSE-APACHE](.:LICENSE-APACHE "Apache License") for details.
