@@ -23,7 +23,7 @@ or production environment (option #1 above)
 ### Creating an Algorithm from Sample Data
 
 
-### Contributing
+## Contributing
 
 See [CONTRIBUTING](./CONTRIBUTING.md) for more information on technical details.
 
