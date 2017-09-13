@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate test_data_generation;
 
 use test_data_generation::test_data_generator::{data_sample_parser};
@@ -19,7 +18,21 @@ mod tests {
     #[test]
     //the data sample parser starts up without issues
     fn initialization() {
-    	let mut dsp = DataSampleParser::new();
+    	let dsp = DataSampleParser::new();
         assert!(!dsp.runing_with_issues());
+    }
+    
+    #[test]
+    //the data sample parser configuration parameters are ready
+    fn configuration() {
+    	let dsp = DataSampleParser::new();
+        assert!(!dsp.get_config_file().is_empty());
+    }
+    
+    #[test]
+    //the data sample parser looging parameters are ready
+    fn logging() {
+    	let dsp = DataSampleParser::new();
+        assert!(!dsp.get_log_file().is_empty());
     }
 }
