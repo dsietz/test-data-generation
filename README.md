@@ -26,7 +26,7 @@ or production environment (option #1 above)
 ---
 
 ## Continuous Integration
-See [travis](./travis.yml) for detailed script
+See [travis](./.travis.yml) for detailed script
 
 ## Contributing
 
