@@ -1,5 +1,6 @@
 use clap::{Arg, App, ArgMatches};
 
+//set the default configuration values
 matches = App::new("Test Data Generation")	
                           .version("1.0")
                           .author("dsietz")
