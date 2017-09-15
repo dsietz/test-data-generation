@@ -20,14 +20,14 @@ impl<'a> DataSampleParser<'a> {
                                .short("c")
                                .long("config")
                                .value_name("FILE")
-                               .help("Sets a custom config file")
+                               .help("Specifies the location of the Test Data Generation configuration file (default ./config/tdg.yaml)")
                                .takes_value(true)
                                .default_value("./config/tdg.yaml"))
                           .arg(Arg::with_name("log")
                                .short("l")
                                .long("log")
                                .value_name("FILE")
-                               .help("set a custom logging configuration file - format YAML")
+                               .help("Specifies the location of the log4rs logging configuration file (default ./config/log4rs.yaml)")
                                .takes_value(true)
                                .default_value("./config/log4rs.yaml"))     
                           .arg(Arg::with_name("verbose")
@@ -38,6 +38,7 @@ impl<'a> DataSampleParser<'a> {
 		}
 	}
 	
+	// get() functions
 	pub fn get_config_file(&self) -> &str{
 		&self.opts.value_of("config").unwrap_or("config/default.yaml")
 	}
@@ -46,6 +47,12 @@ impl<'a> DataSampleParser<'a> {
 		&self.opts.value_of("log").unwrap_or("config/log4rs.yaml")
 	}	
 	
+	pub fn get_verbos(&self) -> &str{
+		&self.opts.value_of("verbose").unwrap_or("false")
+	}	
+	
+	
+	// unique() funcitons
 	pub fn runing_with_issues(&self) -> &bool{
 		&self.issues
 	}
