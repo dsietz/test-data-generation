@@ -33,7 +33,9 @@ impl<'a> DataSampleParser<'a> {
                           .arg(Arg::with_name("verbose")
                                .short("v")
                                .long("verbose")
-                               .help("explain what is being done"))
+                               .possible_values(&["off","info","debug"])
+                               .default_value("off")
+                               .help("explain what is being done (options: off, info, debug)"))
                           .get_matches(),
 		}
 	}
@@ -52,7 +54,7 @@ impl<'a> DataSampleParser<'a> {
 	}	
 	
 	
-	// unique() funcitons
+	// unique() functions
 	pub fn runing_with_issues(&self) -> &bool{
 		&self.issues
 	}
