@@ -23,6 +23,11 @@ or production environment (option #1 above)
 ### Creating an Algorithm from Sample Data
 
 
+---
+
+## Continuous Integration
+See [travis](./travis.yml) for detailed script
+
 ## Contributing
 
 See [CONTRIBUTING](./CONTRIBUTING.md) for more information on technical details.
