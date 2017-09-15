@@ -1,7 +1,6 @@
 extern crate test_data_generation;
 
 use test_data_generation::test_data_generator::{data_sample_parser};
-//use data_sample_parser::DataSampleParser;
 
 // Conditionally compile `main` only when the test-suite is *not* being run.
 #[cfg(not(test))]
@@ -30,7 +29,7 @@ mod tests {
     }
     
     #[test]
-    //the data sample parser looging parameters are ready
+    //the data sample parser logging parameters are ready
     fn logging() {
     	let dsp = DataSampleParser::new();
         assert!(!dsp.get_log_file().is_empty());

@@ -21,7 +21,15 @@ or production environment (option #1 above)
 
 
 ### Creating an Algorithm from Sample Data
+The following utilities are part of the Test Data Generation project:
+1. Data Algorithm Creator
+2. Data Generator
 
+#### Configuration
+|  file name  | default location | description |
+| ----------- | :--------------- | :---------- |
+| log4rs.yaml | ./config         | setting for logging |
+| tdg.yaml    | ./config         | general setting for Test Data generation |
 
 ---
 
