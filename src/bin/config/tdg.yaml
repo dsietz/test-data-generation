@@ -1,0 +1,6 @@
+---
+data-algorithm-creator:
+  data-source:
+    file:
+      ext: csv
+      path: "./sample"
