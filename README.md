@@ -1,4 +1,5 @@
 ## Test Data Generation
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ### Description
 **PROBLEM**
@@ -15,11 +16,6 @@ or production environment (option #1 above)
 
 ---
 
-### Archtecture 
-![Architectural Diagram](./docs/img/test-data-generation-architecture.png "Architectural Diagram")
-
-
-
 ### Creating an Algorithm from Sample Data
 The following utilities are part of the Test Data Generation project:
 1. Data Algorithm Creator
@@ -33,6 +29,10 @@ The following utilities are part of the Test Data Generation project:
 
 ---
 
+### Support
+Visit our [wiki](https://github.com/dsietz/test-data-generation/wiki) to help you get started with the project and its utilities
+
+---
 ## Continuous Integration
 See [travis](./.travis.yml) for detailed script
 
