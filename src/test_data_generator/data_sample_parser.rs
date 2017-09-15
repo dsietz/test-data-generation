@@ -54,7 +54,7 @@ impl<'a> DataSampleParser<'a> {
 	}	
 	
 	
-	// unique() funcitons
+	// unique() functions
 	pub fn runing_with_issues(&self) -> &bool{
 		&self.issues
 	}
