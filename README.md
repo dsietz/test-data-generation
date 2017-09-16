@@ -1,6 +1,8 @@
 ## Test Data Generation
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)]
+
 ### Description
 **PROBLEM**
 </br>
