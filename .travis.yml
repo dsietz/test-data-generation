@@ -1,6 +1,7 @@
 sudo: false
 os: linux
 language: rust
+cache: cargo
 rust:
   - stable
   - nightly
@@ -8,8 +9,8 @@ matrix:
   allow_failures:
     - rust: nightly
 script:
-  - cargo build --verbose --all
-  - cargo test --verbose --all
+  - cargo build --all
+  - cargo test --all
 after_success: |
   [ $TRAVIS_BRANCH = master ] &&
   [ $TRAVIS_PULL_REQUEST = false ] &&
