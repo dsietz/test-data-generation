@@ -13,7 +13,7 @@ or production environment (option #1 above)
 
 **SOLUTION**
 </br>
- By analyzing a sample data set (e.g.: 2016 Census of top 200 male first names), we are able to create an algorithm (profile) based on that data sample. 
+ By analyzing a sample data set (e.g.: 2016 Census of top 200 male first names), we are able to create an algorithm based on that data sample. 
  This algorithm can be easily stored (as a data file) and used to generate "realistic" test data as desired. 
 
 ---
