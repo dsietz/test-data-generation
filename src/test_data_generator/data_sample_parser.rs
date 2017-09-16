@@ -49,11 +49,10 @@ impl<'a> DataSampleParser<'a> {
 		&self.opts.value_of("log").unwrap_or("config/log4rs.yaml")
 	}	
 	
-	pub fn get_verbos(&self) -> &str{
-		&self.opts.value_of("verbose").unwrap_or("false")
+	pub fn get_verbose(&self) -> &str{
+		&self.opts.value_of("verbose").unwrap_or("off")
 	}	
-	
-	
+		
 	// unique() functions
 	pub fn runing_with_issues(&self) -> &bool{
 		&self.issues
