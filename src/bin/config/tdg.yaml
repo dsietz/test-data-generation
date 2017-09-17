@@ -1,6 +1,6 @@
 ---
 data-algorithm-creator:
   data-source:
-    file:
-      ext: csv
-      path: "./sample"
+    delimited-string:
+      delimiter: ","
+      value: "Hello,World,from,Test,Data,Generation"
