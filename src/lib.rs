@@ -2,6 +2,8 @@
 #![crate_name = "test_data_generation"]
 
 //External
+extern crate serde_yaml;
+extern crate yaml_rust;
 extern crate clap;
 
 //Internal

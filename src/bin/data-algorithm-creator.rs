@@ -11,7 +11,7 @@ use test_data_generation::test_data_generator::{data_sample_parser};
 fn main() {
 	use data_sample_parser::DataSampleParser;
 
-	let dsp = DataSampleParser::new();
+	let mut dsp = DataSampleParser::new();
     
     // Prints each argument on a separate line
 	for argument in env::args() {
@@ -19,5 +19,7 @@ fn main() {
 	}
 	
 	println!( "Configuration file: {}", dsp.get_config_file() );
+	
+	//dsp.load_config_file(dsp.get_config_file());
 
 }
