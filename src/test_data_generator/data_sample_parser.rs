@@ -1,10 +1,16 @@
+use std::fs::File;
+use std::io::prelude::*;
 use clap::App;
 use clap::Arg;
 use clap::ArgMatches;
+//use serde_yaml::{Value, from_str};
+use yaml_rust::YamlLoader;
+
 
 pub struct DataSampleParser<'a>{
 	pub issues: bool,
 	opts: ArgMatches<'a>,
+	cfg: String,
 }
 
 impl<'a> DataSampleParser<'a> {
@@ -37,6 +43,7 @@ impl<'a> DataSampleParser<'a> {
                                .default_value("off")
                                .help("explain what is being done (options: off, info, debug)"))
                           .get_matches(),
+           cfg: String::from(""),
 		}
 	}
 	
@@ -54,7 +61,19 @@ impl<'a> DataSampleParser<'a> {
 	}	
 		
 	// unique() functions
+	pub fn load_config_file(&mut self, file: &str){
+		let mut f = File::open(file).expect(concat!("Error: Configuration file not found"));
+		let mut contents = String::new();
+		f.read_to_string(&mut self.cfg).expect("Something went wrong reading file");
+		//println!("With text:\n{}", contents);
+		//&*contents.clone_into(&mut self.cfg);
+		//self.cfg = Some(&*contents);
+		let cfg = &YamlLoader::load_from_str(&*self.cfg).expect("failed to load YAML file")[0];
+		println!("{:?}", cfg);
+	}
+	
 	pub fn runing_with_issues(&self) -> &bool{
 		&self.issues
 	}
+	
 }
