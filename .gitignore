@@ -1,5 +1,6 @@
-# Eclipse files
+# Eclipse files and directories
 .project
+.settings/
 
 # Compiled files
 *.o
