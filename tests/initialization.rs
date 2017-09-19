@@ -25,15 +25,7 @@ mod tests {
     //the data sample parser configuration parameters are ready
     fn load_configuration() {
     	let mut dsp = DataSampleParser::new();
-    	dsp.load_config_file("./src/bin/config/tdg.yaml");
-        assert!(!dsp.get_config_file().is_empty());
-    }
-    
-    
-    #[test]
-    //the data sample parser configuration parameters are ready
-    fn configuration() {
-    	let dsp = DataSampleParser::new();
+    	dsp.load_config_file();
         assert!(!dsp.get_config_file().is_empty());
     }
     
@@ -41,6 +33,7 @@ mod tests {
     //the data sample parser logging parameters are ready
     fn logging() {
     	let dsp = DataSampleParser::new();
+    	dsp.warn("testing the utility...");
         assert!(!dsp.get_log_file().is_empty());
     }
 }
