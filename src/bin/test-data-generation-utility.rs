@@ -1,24 +1,25 @@
 /*
 ** Data Algorithm Creator 
 */
-
+#[macro_use]
+extern crate log;
 extern crate test_data_generation;
+extern crate log4rs;
 
-use test_data_generation::test_data_generator::{data_sample_parser};
+use test_data_generation::test_data_generator::{data_sample_parser,configs, params};
+use data_sample_parser::DataSampleParser;
+use params::Params;
+use configs::Configs;
 
 // This is the main function
 fn main() {
-	use data_sample_parser::DataSampleParser;
-
-	let mut dsp = DataSampleParser::new();
-    
-    // Prints each argument on a separate line
-	//for argument in env::args() {
-    //	println!("{}", argument);
-	//}
+	// Params object holds the arguments passed 
+	let params =  Params::new();
 	
-	println!( "Configuration file: {}", dsp.get_config_file() );
+	// setup logging
+	log4rs::init_file(params.get_log_file(), Default::default()).unwrap();
+	info!("Logging enabled...");
 	
-	dsp.load_config_file();
-
+	// start up a Data Sample Parser
+	//let mut dsp = DataSampleParser::new(params.get_config_file());
 }
