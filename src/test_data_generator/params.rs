@@ -23,16 +23,16 @@ impl<'a> Params<'a> {
                                .short("c")
                                .long("config")
                                .value_name("FILE")
-                               .help("Specifies the location of the Test Data Generation configuration file (default ./config/tdg.yaml)")
+                               .help("Specifies the location of the Test Data Generation configuration file (default tdg.yaml)")
                                .takes_value(true)
-                               .default_value("./config/tdg.yaml"))
+                               .default_value("tdg.yaml"))
                           .arg(Arg::with_name("log")
                                .short("l")
                                .long("log")
                                .value_name("FILE")
-                               .help("Specifies the location of the log4rs logging configuration file (default ./config/log4rs.yaml)")
+                               .help("Specifies the location of the log4rs logging configuration file (default log4rs.yaml)")
                                .takes_value(true)
-                               .default_value("./config/log4rs.yaml"))     
+                               .default_value("log4rs.yaml"))     
                           .arg(Arg::with_name("verbose")
                                .short("v")
                                .long("verbose")
@@ -45,15 +45,19 @@ impl<'a> Params<'a> {
 	
 	// get() functions
 	pub fn get_config_file(&self) -> &str{
-		&self.opts.value_of("config").unwrap_or("config/default.yaml")
+		&self.opts.value_of("config").unwrap()
 	}
 	
 	pub fn get_log_file(&self) -> &str{
-		&self.opts.value_of("log").unwrap_or("config/log4rs.yaml")
+		&self.opts.value_of("log").unwrap()
+	}
+	
+	pub fn get_tool(&self) -> &str{
+		&self.opts.value_of("tool").unwrap()
 	}
 	
 	pub fn get_verbose(&self) -> &str{
-		&self.opts.value_of("verbose").unwrap_or("off")
+		&self.opts.value_of("verbose").unwrap()
 	}
 	
 	//set() functions
