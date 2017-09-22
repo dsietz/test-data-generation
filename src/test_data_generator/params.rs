@@ -1,5 +1,9 @@
 use clap::{Arg, App, ArgMatches};
 
+/// A parameters manager object
+/// 
+
+
 pub struct Params<'a>{
 	opts: ArgMatches<'a>,
 }
