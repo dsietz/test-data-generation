@@ -14,7 +14,9 @@ mod tests {
 	use data_sample_parser::DataSampleParser;
 	//use test_data_generation::test_data_generator::{data_sample_parser,configs, params};
 	use test_data_generation::test_data_generator::params::Params;
-	use test_data_generation::test_data_generator::profile::pattern::Pattern;
+	use test_data_generation::test_data_generator::profile::{profile,pattern};
+	use profile::pattern::Pattern;
+	use profile::profile::Profile;
     
     #[test]
     // ensure the the default parameters are set
@@ -29,10 +31,22 @@ mod tests {
     
     #[test]
     // special characters for profiling
-    fn profile_analyze(){
+    fn pattern_analyze(){
     	let mut pattrn =  Pattern::new();
     	let word = pattrn.analyze("H3Ll0?");    		
-    	assert_eq!(word, "[A-Z][0-9][A-Z][a-z][0-9][\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\]\\{\\}]");
+    	assert_eq!(word, "A#Aa#~");
+    }
+    
+    #[test]
+    // special characters for profiling
+    fn profile_analyze(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("Smith, John");
+    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("Dale, Danny"); 
+    	profil.analyze("Rickets, Ronney"); 
+    	    		
+    	assert_eq!(profil.patterns.len(), 4);
     }
     
     #[test]

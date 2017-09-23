@@ -3,6 +3,7 @@ use regex::Regex;
 pub struct Pattern{
 	pub special_char: [char; 14],
 	reg_exp: String,
+	regex_symbols: [char; 4],
 	regex_alpha_upper: Regex,
 	regex_alpha_lower: Regex,
 	regex_numeric: Regex,
@@ -15,6 +16,7 @@ impl Pattern {
 		Pattern{
 			special_char: ['\\','^','$','.','|','?','*','+','(',')','[',']','{','}'],
 			reg_exp: String::from(""),
+			regex_symbols: ['A','a','#','~'],
 			regex_alpha_upper: Regex::new(r"[A-Z]").unwrap(),
 			regex_alpha_lower: Regex::new(r"[a-z]").unwrap(),
 			regex_numeric: Regex::new(r"[0-9]").unwrap(),
@@ -25,19 +27,19 @@ impl Pattern {
 	pub fn analyze(&mut self, entity: &str) -> &String{
 		for c in entity.chars(){
 			if self.regex_alpha_upper.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, "[A-Z]"].concat(); 
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[0].to_string()].concat(); 
 			}
 			
 			if self.regex_alpha_lower.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, "[a-z]"].concat(); 
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[1].to_string()].concat(); 
 			}
 			
 			if self.regex_numeric.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, "[0-9]"].concat(); 
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[2].to_string()].concat(); 
 			}
 			
 			if self.regex_special.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, "[\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\]\\{\\}]"].concat(); 
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[3].to_string()].concat(); 
 			}
 		}
 		
@@ -50,7 +52,7 @@ impl Pattern {
 //
 // scalar types: integers, floating-point numbers, booleans, and characters
 // https://doc.rust-lang.org/regex/regex/index.html#ascii-character-classes
-//
+// https://regex101.com/
 //
 //
 //
