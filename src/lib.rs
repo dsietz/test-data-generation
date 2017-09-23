@@ -7,6 +7,7 @@ extern crate serde_yaml;
 extern crate yaml_rust;
 extern crate clap;
 extern crate log;
+extern crate regex;
 
 //Internal
 pub mod test_data_generator;
