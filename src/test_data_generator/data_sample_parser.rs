@@ -15,11 +15,7 @@ impl DataSampleParser {
 		}
 	}
 	
-	// get() functions
-		
-	// set() functions
-
-	// unique() functions	
+	// methods	
 	pub fn runing_with_issues(&self) -> &bool{
 		&self.issues
 	}	
