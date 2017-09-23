@@ -1,7 +1,13 @@
 use test_data_generator::profile::pattern::{Pattern};
+use std::collections::BTreeMap;
+use crossbeam;
+
+type CountMap = BTreeMap<String, u32>;
+
+
 
 pub struct Profile{
-	pub patterns: Vec<String>,
+	pub patterns: Vec<String>
 }
 
 impl Profile {
@@ -15,11 +21,39 @@ impl Profile {
 	// methods
 	pub fn analyze(&mut self, entity: &str) {
 		let mut pattrn =  Pattern::new();
-    	self.patterns.push(pattrn.analyze(entity).to_string()); 
+		self.patterns.push(pattrn.analyze(entity).to_string()); 
 	} 
 	
+	pub fn pattern_count(&self) {
+/*	
+		let mut count_maps: Vec<CountMap> = vec![]; 
+		let mut mapped : CountMap = CountMap::new();
+		
+		crossbeam::scope(|scope|{
+			for p in &self.patterns {
+				scope.spawn(move || {
+					*mapped.entry(*p).or_insert(0) += 1
+				});
+			}
+		});
+		
+		//for pttrn in &self.patterns {
+		//	let thrd = crossbeam::scope(|scope|{
+		//		scope.spawn(move || {
+        //       	*mapped.entry(pttrn.clone()).or_insert(0) += 1
+        //    	})
+        //    });
+            
+			//count_maps.push(thrd);
+		//}
+		
+		//let counts = count_maps.into_iter().map(|x|{x.join()}).collect::<Vec<CountMap>>();
+		
+		//self.patterns.push(*mapped.entry(pattrn.analyze(entity).to_string().to_owned()).or_insert(0) += 1);	
+*/
+	}
 	
-	pub fn map_reduce(&self) {
+//	pub fn map_reduce(&self) {
 		/*************************************************************************
      	* "Map" phase
      	*
@@ -31,8 +65,8 @@ impl Profile {
     	// the resulting tuple "(index, element)" is then immediately
     	// "destructured" into two variables, "i" and "data_segment" with a
     	// "destructuring assignment"
-		for (i,data_segment) in self.patterns.iter().enumerate() {
-			println!("{},{}",i,data_segment);
+//		for (i,data_segment) in self.patterns.iter().enumerate() {
+//			println!("{},{}",i,data_segment);
 			
 			// Process each data segment in a separate thread
         	//
@@ -49,7 +83,7 @@ impl Profile {
         	//
         	// TODO: try removing the 'move' and see what happens
         	
-		}
-	}
+//		}
+//	}
 	
 }

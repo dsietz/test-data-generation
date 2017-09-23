@@ -30,7 +30,7 @@ mod tests {
     }
     
     #[test]
-    // special characters for profiling
+    // ensure Pattern is analyzing data into patterns
     fn pattern_analyze(){
     	let mut pattrn =  Pattern::new();
     	let word = pattrn.analyze("H3Ll0?");    		
@@ -38,7 +38,23 @@ mod tests {
     }
     
     #[test]
-    // special characters for profiling
+    // ensure Pattern is performing distinct count on patterns
+    fn pattern_count(){
+    	let mut profil =  Profile::new();
+    	
+    	profil.analyze("Smith, John");
+    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("Dale, Danny"); 
+    	profil.analyze("Rickets, Ronney"); 
+    	   		
+    	profil.pattern_count();
+    	   		
+    	assert!(true);
+    }
+    
+    
+    #[test]
+    // ensure Pattern is appending data
     fn profile_analyze(){
     	let mut profil =  Profile::new();
     	profil.analyze("Smith, John");
