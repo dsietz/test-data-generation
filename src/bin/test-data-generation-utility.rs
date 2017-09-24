@@ -7,9 +7,9 @@ extern crate test_data_generation;
 extern crate log4rs;
 
 use test_data_generation::test_data_generator::{data_sample_parser,configs, params};
-use data_sample_parser::DataSampleParser;
+//use data_sample_parser::DataSampleParser;
 use params::Params;
-use configs::Configs;
+//use configs::Configs;
 
 // This is the main function
 fn main() {

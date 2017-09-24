@@ -1,26 +1,42 @@
+///
+///
+///
+/// Regex Symbols placeholder
+/// A = upper case alpha
+/// a = lower case alpha
+/// # = numberic
+/// ~ = special regex character
+/// S = white space
+/// p = punctuation
+///
+///
+
 use regex::Regex;
 
 pub struct Pattern{
-	pub special_char: [char; 14],
 	reg_exp: String,
-	regex_symbols: [char; 4],
+	regex_symbols: [char; 6],
 	regex_alpha_upper: Regex,
 	regex_alpha_lower: Regex,
 	regex_numeric: Regex,
+	regex_punctuation: Regex,
 	regex_special: Regex,
+	regex_space: Regex,
 }
 
 impl Pattern {
 	//constructor
 	pub fn new() -> Pattern {
 		Pattern{
-			special_char: ['\\','^','$','.','|','?','*','+','(',')','[',']','{','}'],
 			reg_exp: String::from(""),
-			regex_symbols: ['A','a','#','~'],
+			regex_symbols: ['A','a','#','~','S','p'],
 			regex_alpha_upper: Regex::new(r"[A-Z]").unwrap(),
 			regex_alpha_lower: Regex::new(r"[a-z]").unwrap(),
 			regex_numeric: Regex::new(r"[0-9]").unwrap(),
+			//regex_punctuation: Regex::new(r"[.,\/#!$%\^&\*;:{}=\-_`~()]").unwrap(),
+			regex_punctuation: Regex::new(r"[.,\\/#!$%\\^&\\*;:{}=\\-_`~()]").unwrap(),
 			regex_special: Regex::new(r"[\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\]\\{\\}]").unwrap(),
+			regex_space: Regex::new(r"[\s]").unwrap(),
 		}
 	}
 	
@@ -40,6 +56,14 @@ impl Pattern {
 			
 			if self.regex_special.is_match(&c.to_string()) {
 				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[3].to_string()].concat(); 
+			}
+			
+			if self.regex_space.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[4].to_string()].concat(); 
+			}
+			
+			if self.regex_punctuation.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[5].to_string()].concat(); 
 			}
 		}
 		
