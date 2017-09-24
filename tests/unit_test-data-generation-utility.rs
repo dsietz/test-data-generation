@@ -41,7 +41,7 @@ mod tests {
     
     #[test]
     // ensure Profile is ranking patterns correctly
-    fn profile_rank(){
+    fn profile_rank_patterns(){
     	let mut profil =  Profile::new();
     	
     	profil.analyze("Smith, Johny");
@@ -51,14 +51,32 @@ mod tests {
     	profil.analyze("Rickets, Ronney"); 
     	profil.analyze("Mr. Wilberson"); 
     	   		
-    	let rnk = profil.rank();
+    	let rnk = profil.rank_patterns();
 
     	assert_eq!(*rnk.get("AaaaapSAaaaa").unwrap(), 33.33333333333333 as f64);
     }
     
+    #[test]
+    // ensure Profile is ranking sizes correctly
+    fn profile_rank_sizes(){
+    	let mut profil =  Profile::new();
+    	
+    	profil.analyze("Smith, Johny");
+    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("Dale, Danny"); 
+    	profil.analyze("O'Henry, Al"); 
+    	profil.analyze("Rickets, Ron"); 
+    	profil.analyze("Mr. Wilberson");
+    	profil.analyze("Po, Al"); 
+    	   		
+    	let rnk = profil.rank_sizes();
+    	let i   = 6 as u32;
+
+    	assert_eq!(*rnk.get(&i).unwrap(), 14.285714285714285 as f64);
+    }        
     
     #[test]
-    // ensure Pattern is appending data
+    // ensure Profile is analyzing all the sample data points
     fn profile_analyze(){
     	let mut profil =  Profile::new();
     	profil.analyze("Smith, John");
