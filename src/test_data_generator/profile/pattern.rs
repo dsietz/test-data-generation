@@ -11,17 +11,20 @@
 ///
 ///
 
+use regex;
 use regex::Regex;
+use test_data_generator::profile::pattern_placeholder::PatternPlaceholder;
 
 pub struct Pattern{
 	pub size: u32,
 		reg_exp: String,
-		regex_symbols: [char; 6],
-		regex_alpha_upper: Regex,
-		regex_alpha_lower: Regex,
+		regex_symbols: PatternPlaceholder,
+		regex_consonant_upper: Regex,
+		regex_consonant_lower: Regex,
+		regex_vowel_upper: Regex,
+		regex_vowel_lower: Regex,
 		regex_numeric: Regex,
 		regex_punctuation: Regex,
-		regex_special: Regex,
 		regex_space: Regex,
 }
 
@@ -31,13 +34,13 @@ impl Pattern {
 		Pattern{
 			size: 0,
 			reg_exp: String::from(""),
-			regex_symbols: ['A','a','#','~','S','p'],
-			regex_alpha_upper: Regex::new(r"[A-Z]").unwrap(),
-			regex_alpha_lower: Regex::new(r"[a-z]").unwrap(),
+			regex_symbols: PatternPlaceholder::new(),
+			regex_consonant_upper: Regex::new(r"[B-DF-HJ-NP-TV-Z]").unwrap(),
+			regex_consonant_lower: Regex::new(r"[b-df-hj-np-tv-z]").unwrap(),
+			regex_vowel_upper: Regex::new(r"[A|E|I|O|U]").unwrap(),
+			regex_vowel_lower: Regex::new(r"[a|e|i|o|u]").unwrap(),
 			regex_numeric: Regex::new(r"[0-9]").unwrap(),
-			//regex_punctuation: Regex::new(r"[.,\/#!$%\^&\*;:{}=\-_`~()]").unwrap(),
-			regex_punctuation: Regex::new(r"[.,\\/#!$%\\^&\\*;:{}=\\-_`~()]").unwrap(),
-			regex_special: Regex::new(r"[\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\]\\{\\}]").unwrap(),
+			regex_punctuation: Regex::new(r"[.,\\/#!$%\\^&\\*;:{}=\\-_`~()\\?]").unwrap(),
 			regex_space: Regex::new(r"[\s]").unwrap(),
 		}
 	}
@@ -48,28 +51,47 @@ impl Pattern {
 		
 		// record the pattern of the passed value
 		for c in entity.chars(){
-			if self.regex_alpha_upper.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[0].to_string()].concat(); 
+			// if you have to escape regex special characters: &*regex::escape(&*&c.to_string())
+			let mut found = false;
+			
+			if !found && self.regex_consonant_upper.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("ConsonantUpper").to_string()].concat(); 
+				found = true;
 			}
 			
-			if self.regex_alpha_lower.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[1].to_string()].concat(); 
+			if !found && self.regex_consonant_lower.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("ConsonantLower").to_string()].concat(); 
+				found = true;
 			}
 			
-			if self.regex_numeric.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[2].to_string()].concat(); 
+			if !found && self.regex_vowel_upper.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("VowelUpper").to_string()].concat();  
+				found = true;
 			}
 			
-			if self.regex_special.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[3].to_string()].concat(); 
+			if !found && self.regex_vowel_lower.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("VowelLower").to_string()].concat();  
+				found = true;
 			}
 			
-			if self.regex_space.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[4].to_string()].concat(); 
+			if !found && self.regex_numeric.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("Numeric").to_string()].concat();  
+				found = true;
 			}
 			
-			if self.regex_punctuation.is_match(&c.to_string()) {
-				self.reg_exp = [&self.reg_exp, &*self.regex_symbols[5].to_string()].concat(); 
+			if !found && self.regex_space.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("WhiteSpace").to_string()].concat(); 
+				found = true; 
+			}
+			
+			if !found && self.regex_punctuation.is_match(&c.to_string()) {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("Punctuation").to_string()].concat();  
+				found = true;
+			}
+			
+			// if not matched, then use "Unknown" placeholder symbol
+			if !found {
+				self.reg_exp = [&self.reg_exp, &*self.regex_symbols.get("Unknown").to_string()].concat();
 			}
 		}
 		

@@ -13,12 +13,13 @@ fn main() {
 #[cfg(test)]
 mod tests {
 	use std::collections::BTreeMap;
+	use test_data_generation::test_data_generator::{data_sample_parser, configs, params};
 	use data_sample_parser::DataSampleParser;
-	//use test_data_generation::test_data_generator::{data_sample_parser,configs, params};
 	use test_data_generation::test_data_generator::params::Params;
-	use test_data_generation::test_data_generator::profile::{profile,pattern};
+	use test_data_generation::test_data_generator::profile::{profile, pattern, pattern_placeholder};
 	use profile::pattern::Pattern;
 	use profile::profile::Profile;
+	use profile::pattern_placeholder::PatternPlaceholder;
     
     #[test]
     // ensure the the default parameters are set
@@ -35,8 +36,16 @@ mod tests {
     // ensure Pattern is analyzing data into patterns
     fn pattern_analyze(){
     	let mut pattrn =  Pattern::new();
-    	let word = pattrn.analyze("H3Ll0?");    		
-    	assert_eq!(word, "A#Aa#~");
+    	let word = pattrn.analyze("HELlo0?^@");    		
+    	assert_eq!(word, "CVCcv#pp~");
+    }
+    
+    #[test]
+    // ensure PatternPlaceholder has the correct symbols
+    fn pattern_placeholder(){
+    	let mut placeholder =  PatternPlaceholder::new();
+    	let symbols:[char; 9] = ['~','C','c','V','v','#','~','S','p'];	
+    	assert_eq!(placeholder.get(&"VowelUpper".to_string()), symbols[3]);
     }
     
     #[test]
@@ -46,14 +55,12 @@ mod tests {
     	
     	profil.analyze("Smith, Johny");
     	profil.analyze("O'Brian, Henny"); 
-    	profil.analyze("Dale, Danny"); 
-    	profil.analyze("Shale, Honey"); 
-    	profil.analyze("Rickets, Ronney"); 
-    	profil.analyze("Mr. Wilberson"); 
+    	profil.analyze("Dhalg, Danny");
     	   		
     	let rnk = profil.rank_patterns();
 
-    	assert_eq!(*rnk.get("AaaaapSAaaaa").unwrap(), 33.33333333333333 as f64);
+    	assert_eq!(*rnk.get("CcvccpSCvccc").unwrap(),   66.66666666666666 as f64);
+    	//assert_eq!(*rnk.get("V~CcvvcpSCvccc").unwrap(), 33.33333333333333 as f64);
     }
     
     #[test]
