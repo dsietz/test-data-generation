@@ -8,7 +8,6 @@ extern crate yaml_rust;
 extern crate clap;
 extern crate log;
 extern crate regex;
-extern crate crossbeam;
 
 //Internal
 pub mod test_data_generator;
