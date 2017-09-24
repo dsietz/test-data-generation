@@ -2,6 +2,7 @@ extern crate test_data_generation;
 
 use test_data_generation::test_data_generator::{data_sample_parser,profile};
 
+
 // Conditionally compile `main` only when the test-suite is *not* being run.
 #[cfg(not(test))]
 fn main() {
@@ -11,6 +12,7 @@ fn main() {
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
+	use std::collections::BTreeMap;
 	use data_sample_parser::DataSampleParser;
 	//use test_data_generation::test_data_generator::{data_sample_parser,configs, params};
 	use test_data_generation::test_data_generator::params::Params;
@@ -38,18 +40,20 @@ mod tests {
     }
     
     #[test]
-    // ensure Pattern is performing distinct count on patterns
-    fn pattern_count(){
+    // ensure Profile is ranking patterns correctly
+    fn profile_rank(){
     	let mut profil =  Profile::new();
     	
-    	profil.analyze("Smith, John");
+    	profil.analyze("Smith, Johny");
     	profil.analyze("O'Brian, Henny"); 
     	profil.analyze("Dale, Danny"); 
+    	profil.analyze("Shale, Honey"); 
     	profil.analyze("Rickets, Ronney"); 
+    	profil.analyze("Mr. Wilberson"); 
     	   		
-    	profil.pattern_count();
-    	   		
-    	assert!(true);
+    	let rnk = profil.rank();
+
+    	assert_eq!(*rnk.get("AaaaapSAaaaa").unwrap(), 33.33333333333333 as f64);
     }
     
     
@@ -63,12 +67,5 @@ mod tests {
     	profil.analyze("Rickets, Ronney"); 
     	    		
     	assert_eq!(profil.patterns.len(), 4);
-    }
-    
-    #[test]
-    // special characters for profiling
-    fn profile_special_characters(){
-    	let pattrn =  Pattern::new();    		
-    	assert_eq!(pattrn.special_char.len(), 14);
     }
 }
