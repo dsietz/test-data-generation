@@ -9,8 +9,8 @@
 /// 
 pub struct Fact{
 	pub key: char,
-	pub	prior_key: char,
-	pub	next_key: char,
+	pub	prior_key: Option<char>,
+	pub	next_key: Option<char>,
 	pub	pattern_placeholder: char,
 	pub	starts_with: u32,
 	pub	ends_with: u32,
@@ -19,15 +19,23 @@ pub struct Fact{
 
 impl Fact {
 	//constructor
-	pub fn new(k: char, pk: char, nk: char, pp: char, sw: u32, ew: u32, idx_off: u32 ) -> Fact {
+	pub fn new(k: char, pp: char, sw: u32, ew: u32, idx_off: u32 ) -> Fact {
 		Fact{
 			key: k,
-			prior_key: pk,
-			next_key: nk,
+			prior_key: None,
+			next_key: None,
 			pattern_placeholder: pp,
 			starts_with: sw,
 			ends_with: ew,
 			index_offset: idx_off,
 		}
+	}
+	
+	pub fn set_next_key(&mut self, nk: char) {
+		self.next_key = Some(nk);
+	}
+	
+	pub fn set_prior_key(&mut self, pk: char) {
+		self.prior_key = Some(pk);
 	}
 }

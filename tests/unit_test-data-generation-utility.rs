@@ -1,6 +1,6 @@
 extern crate test_data_generation;
 
-use test_data_generation::test_data_generator::{data_sample_parser,profile};
+use test_data_generation::test_data_generator::{profile};
 
 
 // Conditionally compile `main` only when the test-suite is *not* being run.
@@ -12,38 +12,23 @@ fn main() {
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
-	use std::collections::BTreeMap;
-	use test_data_generation::test_data_generator::{data_sample_parser, configs, params};
-	use data_sample_parser::DataSampleParser;
-	use test_data_generation::test_data_generator::params::Params;
-	use test_data_generation::test_data_generator::profile::{profile, pattern, pattern_placeholder};
+	use test_data_generation::test_data_generator::profile::{pattern_placeholder};
 	use profile::pattern::Pattern;
 	use profile::profile::Profile;
 	use profile::pattern_placeholder::PatternPlaceholder;
-    
-    #[test]
-    // ensure the the default parameters are set
-    fn parameters_defaults(){
-    	let params =  Params::new();    	
-    	assert!(true);
-    	//assert!(params.get_config_file().is_empty());
-    	//assert!(params.get_log_file().is_empty());
-    	//assert!(params.get_tool().is_empty());
-    	//assert!(params.get_verbose().is_empty());
-    }
     
     #[test]
     // ensure Pattern is analyzing data into patterns
     fn pattern_analyze(){
     	let mut pattrn =  Pattern::new();
     	let word = pattrn.analyze("HELlo0?^@");    		
-    	assert_eq!(word, "CVCcv#pp~");
+    	assert_eq!(word.0, "CVCcv#pp~");
     }
     
     #[test]
     // ensure PatternPlaceholder has the correct symbols
     fn pattern_placeholder(){
-    	let mut placeholder =  PatternPlaceholder::new();
+    	let placeholder =  PatternPlaceholder::new();
     	let symbols:[char; 9] = ['~','C','c','V','v','#','~','S','p'];	
     	assert_eq!(placeholder.get(&"VowelUpper".to_string()), symbols[3]);
     }
