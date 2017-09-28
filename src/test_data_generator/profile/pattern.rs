@@ -14,7 +14,6 @@ use test_data_generator::profile::fact::Fact;
 
 pub struct Pattern{
 	pub size: u32,
-		reg_exp: String,
 		regex_symbols: PatternPlaceholder,
 		regex_consonant_upper: Regex,
 		regex_consonant_lower: Regex,
@@ -30,7 +29,6 @@ impl Pattern {
 	pub fn new() -> Pattern {
 		Pattern{
 			size: 0,
-			reg_exp: String::from(""),
 			regex_symbols: PatternPlaceholder::new(),
 			regex_consonant_upper: Regex::new(r"[B-DF-HJ-NP-TV-Z]").unwrap(),
 			regex_consonant_lower: Regex::new(r"[b-df-hj-np-tv-z]").unwrap(),
@@ -90,9 +88,12 @@ impl Pattern {
 		x
 	}
 	
-	pub fn analyze(&mut self, entity: &str) -> (&String, Vec<Fact>) {
+	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
 		// record the length of the passed value
 		self.size = entity.len() as u32;
+		
+		// String to hold the pattern
+		let mut pttrn = String::new();
 		
 		// Vec to hold all the Facts to be returned
 		let mut facts = Vec::new();
@@ -143,11 +144,11 @@ impl Pattern {
 			
 			println!("pk:{:?}, k:{:?}, nk:{:?}, pp::{:?}, sw::{:?}, ew::{:?}, idx_off::{:?}",f.prior_key, f.key, f.next_key, f.pattern_placeholder, f.starts_with, f.ends_with, f.index_offset);
 			
-			self.reg_exp = [&self.reg_exp, &*pp.to_string()].concat();		
+			pttrn = [&pttrn, &*pp.to_string()].concat();		
 			
 			facts.push(f);
 		}
 		
-		(&self.reg_exp, facts)
+		(pttrn, facts)
 	}
 }

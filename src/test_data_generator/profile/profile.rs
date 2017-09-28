@@ -35,8 +35,8 @@ impl Profile {
 		let mut pattrn =  Pattern::new();
 		
 		// analyze patterns
-		//let mut rslt = &pattrn.analyze(entity);
-		AddAssign::add_assign(self.patterns.entry(pattrn.analyze(entity).0.to_string()).or_insert(0), 1);
+		let rslt = pattrn.analyze(entity);
+		AddAssign::add_assign(self.patterns.entry(rslt.0.to_string()).or_insert(0), 1);
 		self.pattern_total = self.patterns.values().sum::<u32>();
 		//println!("{:?}",&self.patterns);
 		//println!("{:?}",self.pattern_total);
