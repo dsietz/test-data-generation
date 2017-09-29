@@ -1,6 +1,4 @@
 ///
-///
-///
 /// Regex Symbols placeholder
 /// A = upper case alpha
 /// a = lower case alpha
@@ -9,16 +7,13 @@
 /// S = white space
 /// p = punctuation
 ///
-///
 
-use regex;
 use regex::Regex;
 use test_data_generator::profile::pattern_placeholder::PatternPlaceholder;
 use test_data_generator::profile::fact::Fact;
 
 pub struct Pattern{
 	pub size: u32,
-		reg_exp: String,
 		regex_symbols: PatternPlaceholder,
 		regex_consonant_upper: Regex,
 		regex_consonant_lower: Regex,
@@ -34,7 +29,6 @@ impl Pattern {
 	pub fn new() -> Pattern {
 		Pattern{
 			size: 0,
-			reg_exp: String::from(""),
 			regex_symbols: PatternPlaceholder::new(),
 			regex_consonant_upper: Regex::new(r"[B-DF-HJ-NP-TV-Z]").unwrap(),
 			regex_consonant_lower: Regex::new(r"[b-df-hj-np-tv-z]").unwrap(),
@@ -94,19 +88,64 @@ impl Pattern {
 		x
 	}
 	
-	pub fn analyze(&mut self, entity: &str) -> &String{
+	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
 		// record the length of the passed value
 		self.size = entity.len() as u32;
 		
+		// String to hold the pattern
+		let mut pttrn = String::new();
+		
+		// Vec to hold all the Facts to be returned
+		let mut facts = Vec::new();
+		
 		// record the pattern of the passed value
-		for c in entity.chars(){
-			let pp = self.parse_entity(&c);
+		for (i, c) in entity.chars().enumerate() {
+			let mut pk      = None;
+			let mut nk      = None;
+			let     pp      = self.parse_entity(&c);
+			let mut sw      = 0;
+			let mut ew      = 0;
+			let     idx_off = i;	
+		
+			// first char in entity
+			if i == 0 {
+				sw = 1;			
+			}
+			
+			// last char in entity
+			if i == (self.size as usize)-1 {
+				ew = 1;				
+			}
+			
+			// not the first
+			if i > 0 {
+				pk = entity.chars().nth(i-1);
+			}
+			
+			// not the last
+			if i < (self.size as usize)-1 {
+				nk = entity.chars().nth(i+1);
+			}
+			
 			// store the Facts in a HashMap of HashMaps that will be evenly distributed 
 			// so the MapReduce can be performed for multiple threads calculating when aggregating 
 			// on the Facts
-			let f = Fact::new(c,self.regex_symbols.get("Unknown"),self.regex_symbols.get("Unknown"),pp,0,0,0);
-			self.reg_exp = [&self.reg_exp, &*pp.to_string()].concat();		
-		}		
-		&self.reg_exp
+			let mut f = Fact::new(c,pp,sw,ew,(idx_off as u32));
+			
+			// only if there is a next key
+			if nk.is_some() {
+				&f.set_next_key(nk.unwrap());
+			}
+			
+			// only if there is a prior key
+			if pk.is_some() {
+				&f.set_prior_key(pk.unwrap());
+			}
+			
+			pttrn = [&pttrn, &*pp.to_string()].concat();		
+			facts.push(f);
+		}
+		
+		(pttrn, facts)
 	}
 }

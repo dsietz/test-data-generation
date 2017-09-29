@@ -1,7 +1,7 @@
 use test_data_generator::profile::pattern::{Pattern};
+use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
-//use std::iter::Sum;
 
 type PatternMap = BTreeMap<String, u32>;
 type PatternRankMap  = BTreeMap<String, f64>;
@@ -15,6 +15,8 @@ pub struct Profile{
 	pub sizes: SizeMap,
 	pub size_total: u32,
 	pub size_ranks: SizeRankMap,
+	pub processors: u8,
+	pub facts: Vec<Vec<Fact>>,
 }
 
 impl Profile {
@@ -27,24 +29,64 @@ impl Profile {
 			sizes: SizeMap::new(),
 			size_total: 0,
 			size_ranks: SizeRankMap::new(), 
+			processors: 4,
+			facts: Profile::new_facts(4),
 		}
 	}
 	
+	pub fn new_with(p: u8) -> Profile {
+		Profile{
+			patterns: PatternMap::new(),
+			pattern_total: 0,
+			pattern_ranks: PatternRankMap::new(),
+			sizes: SizeMap::new(),
+			size_total: 0,
+			size_ranks: SizeRankMap::new(), 
+			processors: p,
+			facts: Profile::new_facts(p),
+		}
+	}
+
 	// methods
 	pub fn analyze(&mut self, entity: &str) {
 		let mut pattrn =  Pattern::new();
 		
-		// analyze aptterns
-		AddAssign::add_assign(self.patterns.entry(pattrn.analyze(entity).to_string()).or_insert(0), 1);
+		// analyze patterns
+		let rslt = pattrn.analyze(entity);
+		
+		// store the facts
+		let mut i = 0;
+		for f in rslt.1.into_iter() {			
+			if i == self.processors {
+				i = 0;
+			}
+
+			self.facts[i as usize].push(f);
+			i = i + 1;
+			
+		}
+		
+		// store the pattern
+		AddAssign::add_assign(self.patterns.entry(rslt.0.to_string()).or_insert(0), 1);
+		
+		// store the total number of patterns generated so far
 		self.pattern_total = self.patterns.values().sum::<u32>();
-		//println!("{:?}",&self.patterns);
-		//println!("{:?}",self.pattern_total);
 		
 		// analyze sizes
 		AddAssign::add_assign(self.sizes.entry(pattrn.size).or_insert(0), 1);
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
 	
+	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
+		let mut vec_main = Vec::new();
+		
+		for _ in 0..p {  
+			vec_main.push(Vec::new());
+		}
+
+		vec_main
+	}
+
 	pub fn rank_patterns(&mut self) -> PatternRankMap{
 		self.pattern_ranks = PatternRankMap::new();
 		
@@ -52,7 +94,6 @@ impl Profile {
 			self.pattern_ranks.insert(key.to_string(), (*self.patterns.get(key).unwrap() as f64 / self.pattern_total as f64)*100.0);
 		}
 		
-		println!("{:?}",&self.pattern_ranks);
 		self.pattern_ranks.clone()
 	}
 	
@@ -67,7 +108,7 @@ impl Profile {
 			self.size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
 		}
 		
-		println!("{:?}",&self.size_ranks);
+		//println!("{:?}",&self.size_ranks);
 		self.size_ranks.clone()
 	} 
 }
