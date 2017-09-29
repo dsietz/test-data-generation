@@ -2,8 +2,6 @@ use test_data_generator::profile::pattern::{Pattern};
 use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
-//use std::iter::Sum;
-use std::mem;
 
 type PatternMap = BTreeMap<String, u32>;
 type PatternRankMap  = BTreeMap<String, f64>;
@@ -17,6 +15,7 @@ pub struct Profile{
 	pub sizes: SizeMap,
 	pub size_total: u32,
 	pub size_ranks: SizeRankMap,
+	pub processors: u8,
 	pub facts: Vec<Vec<Fact>>,
 }
 
@@ -30,6 +29,7 @@ impl Profile {
 			sizes: SizeMap::new(),
 			size_total: 0,
 			size_ranks: SizeRankMap::new(), 
+			processors: 10,
 			facts: Profile::new_facts(10),
 		}
 	}
@@ -42,6 +42,7 @@ impl Profile {
 			sizes: SizeMap::new(),
 			size_total: 0,
 			size_ranks: SizeRankMap::new(), 
+			processors: p,
 			facts: Profile::new_facts(p),
 		}
 	}
@@ -74,7 +75,7 @@ impl Profile {
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
 		let mut vec_main = Vec::new();
 		
-		for i in 0..p { 
+		for _ in 1..p {  
 			vec_main.push(Vec::new());
 		}
 		
