@@ -78,4 +78,19 @@ mod tests {
     	    		
     	assert_eq!(profil.patterns.len(), 4);
     }
+    
+        #[test]
+    // ensure Profile is generating correct test data
+    fn profile_generate(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("Smith, John");
+    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("Dale, Danny"); 
+    	profil.analyze("Rickets, Ronney"); 
+    	profil.analyze("Richard, Richie");
+    	profil.analyze("Roberts, Binkie");
+    	profil.analyze("Conways, Steven");
+    	    		
+    	assert!(profil.generate());
+    }
 }

@@ -1,6 +1,7 @@
 use test_data_generator::profile::pattern::{Pattern};
 use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
+use std::iter::FromIterator;
 use std::ops::AddAssign;
 
 type PatternMap = BTreeMap<String, u32>;
@@ -54,7 +55,7 @@ impl Profile {
 		// analyze patterns
 		let rslt = pattrn.analyze(entity);
 		
-		// store the facts
+		// balance the storing of facts across all the vectors that can be processed in parallel
 		let mut i = 0;
 		for f in rslt.1.into_iter() {			
 			if i == self.processors {
@@ -76,6 +77,35 @@ impl Profile {
 		AddAssign::add_assign(self.sizes.entry(pattrn.size).or_insert(0), 1);
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
+	
+	fn cum_sizemap(tree: SizeMap) -> Vec<(u32,u32)> {
+		let mut v = Vec::from_iter(tree);
+
+		// 1 - sort the SizeMap
+		v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));		
+
+		// 2 - calculate the cumulative sum (running total)
+/*		
+		v = v.iter().scan(1, |state, &x: &(&u32, &u32)| {
+			*state = *state + x[1];
+			Some(*state)
+		});
+*/		
+		v
+	}
+	
+	pub fn generate(&self) -> bool{
+		// first, determine the length of the entity
+		let sizes = Profile::cum_sizemap(self.sizes.clone());	
+		println!("sorted sizes:{:?}",sizes);	 
+
+		// second, determine the pattern to use
+		
+		// build the entity using facts that adhere to the pattern 
+		
+		
+		true
+	}
 	
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
 		let mut vec_main = Vec::new();
