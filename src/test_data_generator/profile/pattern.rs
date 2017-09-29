@@ -142,10 +142,7 @@ impl Pattern {
 				&f.set_prior_key(pk.unwrap());
 			}
 			
-			println!("pk:{:?}, k:{:?}, nk:{:?}, pp::{:?}, sw::{:?}, ew::{:?}, idx_off::{:?}",f.prior_key, f.key, f.next_key, f.pattern_placeholder, f.starts_with, f.ends_with, f.index_offset);
-			
 			pttrn = [&pttrn, &*pp.to_string()].concat();		
-			
 			facts.push(f);
 		}
 		

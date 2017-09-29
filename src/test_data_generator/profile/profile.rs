@@ -29,8 +29,8 @@ impl Profile {
 			sizes: SizeMap::new(),
 			size_total: 0,
 			size_ranks: SizeRankMap::new(), 
-			processors: 10,
-			facts: Profile::new_facts(10),
+			processors: 4,
+			facts: Profile::new_facts(4),
 		}
 	}
 	
@@ -55,8 +55,15 @@ impl Profile {
 		let rslt = pattrn.analyze(entity);
 		
 		// store the facts
-		for f in rslt.1.into_iter() {
-			self.facts[0].push(f);
+		let mut i = 0;
+		for f in rslt.1.into_iter() {			
+			if i == self.processors {
+				i = 0;
+			}
+
+			self.facts[i as usize].push(f);
+			i = i + 1;
+			
 		}
 		
 		// store the pattern
@@ -64,8 +71,6 @@ impl Profile {
 		
 		// store the total number of patterns generated so far
 		self.pattern_total = self.patterns.values().sum::<u32>();
-		//println!("{:?}",&self.patterns);
-		//println!("{:?}",self.pattern_total);
 		
 		// analyze sizes
 		AddAssign::add_assign(self.sizes.entry(pattrn.size).or_insert(0), 1);
@@ -75,10 +80,10 @@ impl Profile {
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
 		let mut vec_main = Vec::new();
 		
-		for _ in 1..p {  
+		for _ in 0..p {  
 			vec_main.push(Vec::new());
 		}
-		
+
 		vec_main
 	}
 
@@ -89,7 +94,6 @@ impl Profile {
 			self.pattern_ranks.insert(key.to_string(), (*self.patterns.get(key).unwrap() as f64 / self.pattern_total as f64)*100.0);
 		}
 		
-		//println!("{:?}",&self.pattern_ranks);
 		self.pattern_ranks.clone()
 	}
 	
