@@ -1,7 +1,6 @@
 use test_data_generator::profile::pattern::{Pattern};
 use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
-use std::iter::FromIterator;
 use std::ops::AddAssign;
 
 type PatternMap = BTreeMap<String, u32>;
@@ -78,27 +77,21 @@ impl Profile {
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
 	
-	fn cum_sizemap(tree: SizeMap) -> Vec<(u32,u32)> {
-		let mut v = Vec::from_iter(tree);
-
-		// 1 - sort the SizeMap
-		v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));		
-
-		// 2 - calculate the cumulative sum (running total)
-/*		
-		v = v.iter().scan(1, |state, &x: &(&u32, &u32)| {
-			*state = *state + x[1];
-			Some(*state)
-		});
-*/		
-		v
+	pub fn cum_sizemap(&mut self) {
+		for key in self.sizes.keys(){
+			self.size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
+		}
 	}
 	
-	pub fn generate(&self) -> bool{
+	pub fn pre_generate(&mut self){
+		self.cum_sizemap();
+	}
+	
+	pub fn generate(&mut self) -> bool{
 		// first, determine the length of the entity
-		let sizes = Profile::cum_sizemap(self.sizes.clone());	
-		println!("sorted sizes:{:?}",sizes);	 
-
+	 	let mut size = self.size_ranks.iter().collect::<Vec<_>>();
+	 	size.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+		
 		// second, determine the pattern to use
 		
 		// build the entity using facts that adhere to the pattern 
@@ -142,3 +135,9 @@ impl Profile {
 		self.size_ranks.clone()
 	} 
 }
+
+
+
+
+// How to sort a Vec
+// v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));

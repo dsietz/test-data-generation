@@ -90,6 +90,8 @@ mod tests {
     	profil.analyze("Richard, Richie");
     	profil.analyze("Roberts, Binkie");
     	profil.analyze("Conways, Steven");
+    	
+    	profil.pre_generate();	
     	    		
     	assert!(profil.generate());
     }
