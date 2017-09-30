@@ -2,8 +2,6 @@ use test_data_generator::profile::pattern::{Pattern};
 use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
-use rand::{Rng, SeedableRng, StdRng};
-//use std::rand::Rng;
 
 type PatternMap = BTreeMap<String, u32>;
 type PatternRankMap  = BTreeMap<String, f64>;
@@ -93,18 +91,14 @@ impl Profile {
 		// first, determine the length of the entity
 	 	let mut sizes = self.size_ranks.iter().collect::<Vec<_>>();
 	 	sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
-	 	//let size_idx = Profile::random_percentage();
-		
-		/*
-		let s = rand::random::<f64>();
-		let s: f64 = task_rng().gen_range(0, 100);
-		 range between 0 and 100
-		let mut rng: usize = SeedableRng::from_seed(&[0..100]);
-		let s: u8 = rng.gen::<u8>();
-		let mut lst = sizes.inter().filter(|x|x<=s);
-		println!("{:?}", s);
-		*/
-		
+	 	let mut s: f64 = 0 as f64;
+	 	random_percentage!(s);
+
+println!("rand: {}", s);
+println!("sizes: {:?}", sizes);
+
+		 	
+	 	
 		
 		// second, determine the pattern to use
 		
@@ -123,21 +117,7 @@ impl Profile {
 
 		vec_main
 	}
-/*	
-	fn random_percentage() -> f64{
-		// range between 0 and 100
-		let mut seed: &[usize];
-		
-		for i in 0..100{
-			seed[*i] = *i;
-		}
-		
-		let mut rng: StdRng = SeedableRng::from_seed(seed);
-		let x = rng.gen::<f64>();
-		
-		0.00 as f64
-	}
-*/
+
 	pub fn rank_patterns(&mut self) -> PatternRankMap{
 		self.pattern_ranks = PatternRankMap::new();
 		
