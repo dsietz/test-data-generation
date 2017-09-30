@@ -91,13 +91,18 @@ impl Profile {
 		// first, determine the length of the entity
 	 	let mut sizes = self.size_ranks.iter().collect::<Vec<_>>();
 	 	sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+	 	/// try this ...
+	 	/// cum_vec_f64!(sizes);
+	 	/// or this ...
+	 	/// let mut iter = sizes.into_iter().map(|x| x.1 * 2 as f64);
+	 	///
+		/// println!("sizes: {:?}", iter);
+		
+			 	
 	 	let mut s: f64 = 0 as f64;
 	 	random_percentage!(s);
 
 println!("rand: {}", s);
-println!("sizes: {:?}", sizes);
-
-		 	
 	 	
 		
 		// second, determine the pattern to use
