@@ -1,16 +1,29 @@
 use rand::{thread_rng, Rng};
 
 #[macro_export]
-macro_rules! cum_vec_f64 {
-	($a:ident) => {
-		let mut cum = 0.00 as f64; 
-		for v in $a.iter_mut() {
-		 	cum = &cum + v.1;
-		 	v.1 = &cum;
-		 	println!("{}", cum);
-		}
+/*
+macro_rules! cum_sizerankmap {
+	($a:ident) => {	
+		let x = u32::min_value();
+		let mut iter = $a.iter().scan((&x, 0.00 as &f64), |state, &(k, v)| { 
+			*state = (k, state.1 + v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();
+		$a = iter;
 	};
 }
+*/
+/**
+macro_rules! cum_sizerankmap {
+	($a:ident) => {
+		let mut iter = $a.iter().scan((0 as u32, 0.00 as f64), |state, &(k, v)| {
+			*state = (*k, state.1 + v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();
+		//$a = iter;
+	};
+}
+**/
 
 #[macro_export]
 macro_rules! random_percentage {
