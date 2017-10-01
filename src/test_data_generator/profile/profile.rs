@@ -77,19 +77,26 @@ impl Profile {
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
 	
+	/// calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
 	pub fn cum_sizemap(&mut self) {
+		// calculate the percentage by sizes
+		// -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
 		let mut size_ranks = SizeRankMap::new();
 		for key in self.sizes.keys(){
 			size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
 		}
-		
+	
+		// sort the ranks by percentages in decreasing order
+		// -> [(15, 57.14285714285714), (11, 28.57142857142857), (14, 14.285714285714285)]
 		let mut sizes = size_ranks.iter().collect::<Vec<_>>();
 		sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
 		
+		// calculate the cumulative sum of the size rankings
+		// -> [(15, 57.14285714285714), (11, 85.71428571428571), (14, 100)]
 		self.size_ranks = sizes.iter().scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
 			*state = (k, state.1 + &v);
 			Some(*state)
-		}).collect::<Vec<(_,_)>>();
+		}).collect::<Vec<(_,_)>>();	
 	}
 
 	pub fn pre_generate(&mut self){
@@ -98,8 +105,10 @@ impl Profile {
 	
 	pub fn generate(&mut self) -> bool{
 		// first, determine the length of the entity
+		// 1. get a random number
 	 	let mut s: f64 = 0 as f64;
 	 	random_percentage!(s);
+	 	// 2. find the first size that falls within the percentage chance of occurring
 		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
 		
 		// second, determine the pattern to use
