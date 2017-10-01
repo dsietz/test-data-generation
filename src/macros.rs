@@ -1,7 +1,5 @@
-use rand::{thread_rng, Rng};
+/**
 
-#[macro_export]
-/*
 macro_rules! cum_sizerankmap {
 	($a:ident) => {	
 		let x = u32::min_value();
@@ -12,8 +10,8 @@ macro_rules! cum_sizerankmap {
 		$a = iter;
 	};
 }
-*/
-/**
+
+
 macro_rules! cum_sizerankmap {
 	($a:ident) => {
 		let mut iter = $a.iter().scan((0 as u32, 0.00 as f64), |state, &(k, v)| {

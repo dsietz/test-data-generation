@@ -14,7 +14,7 @@ pub struct Profile{
 	pub pattern_ranks: PatternRankMap,
 	pub sizes: SizeMap,
 	pub size_total: u32,
-	pub size_ranks: SizeRankMap,
+	pub size_ranks: Vec<(u32, f64)>,
 	pub processors: u8,
 	pub facts: Vec<Vec<Fact>>,
 }
@@ -28,7 +28,7 @@ impl Profile {
 			pattern_ranks: PatternRankMap::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
-			size_ranks: SizeRankMap::new(), 
+			size_ranks: Vec::new(), 
 			processors: 4,
 			facts: Profile::new_facts(4),
 		}
@@ -41,7 +41,7 @@ impl Profile {
 			pattern_ranks: PatternRankMap::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
-			size_ranks: SizeRankMap::new(), 
+			size_ranks: Vec::new(), 
 			processors: p,
 			facts: Profile::new_facts(p),
 		}
@@ -78,45 +78,36 @@ impl Profile {
 	} 
 	
 	pub fn cum_sizemap(&mut self) {
+		let mut size_ranks = SizeRankMap::new();
 		for key in self.sizes.keys(){
-			self.size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
+			size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
 		}
+		
+		let mut sizes = size_ranks.iter().collect::<Vec<_>>();
+		sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+		
+		self.size_ranks = sizes.iter().scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
+			*state = (k, state.1 + &v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();
 	}
-	
+
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
 	}
 	
 	pub fn generate(&mut self) -> bool{
 		// first, determine the length of the entity
-	 	let mut sizes = self.size_ranks.iter().collect::<Vec<_>>();
-	 	sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
-	 	
-println!("ranked: {:?}", sizes);		
-
-
-		let mut iter = sizes.iter().scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
-			*state = (k, state.1 + &v);
-			Some(*state)
-		}).collect::<Vec<(_,_)>>();
-println!("{:?}", iter);
-		
-/*
-cum_sizerankmap!(sizes);
-println!("cumulative: {:?}", sizes);	
-*/			 	
 	 	let mut s: f64 = 0 as f64;
 	 	random_percentage!(s);
-
-println!("rand: {}", s);
-	 	
+		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
 		
 		// second, determine the pattern to use
 		
 		// build the entity using facts that adhere to the pattern 
 		
 		
-		true
+		if size > 0 { true }else{ false}
 	}
 	
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
@@ -142,17 +133,6 @@ println!("rand: {}", s);
 	pub fn reset_analyze(&mut self) {
 		self.patterns = PatternMap::new();
 	}
-	
-	pub fn rank_sizes(&mut self) -> SizeRankMap{
-		self.size_ranks = SizeRankMap::new();
-
-		for key in self.sizes.keys(){
-			self.size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
-		}
-		
-		//println!("{:?}",&self.size_ranks);
-		self.size_ranks.clone()
-	} 
 }
 
 
