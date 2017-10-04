@@ -33,6 +33,7 @@ mod tests {
     	assert_eq!(placeholder.get(&"VowelUpper".to_string()), symbols[3]);
     }
     
+/*    
     #[test]
     // ensure Profile is ranking patterns correctly
     fn profile_rank_patterns(){
@@ -47,6 +48,7 @@ mod tests {
     	assert_eq!(*rnk.get("CcvccpSCvccc").unwrap(),   66.66666666666666 as f64);
     	//assert_eq!(*rnk.get("V~CcvvcpSCvccc").unwrap(), 33.33333333333333 as f64);
     }
+*/
     
     #[test]
     // ensure Profile is ranking sizes correctly

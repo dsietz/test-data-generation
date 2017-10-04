@@ -8,10 +8,10 @@ type PatternRankMap  = BTreeMap<String, f64>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
-pub struct Profile{
+pub struct Profile<'a> {
 	pub patterns: PatternMap,
 	pub pattern_total: u32,
-	pub pattern_ranks: PatternRankMap,
+	pub pattern_ranks: Vec<(&'a str, f64)>,
 	pub sizes: SizeMap,
 	pub size_total: u32,
 	pub size_ranks: Vec<(u32, f64)>,
@@ -19,13 +19,13 @@ pub struct Profile{
 	pub facts: Vec<Vec<Fact>>,
 }
 
-impl Profile {
+impl<'a> Profile<'a> {
 	//constructor
-	pub fn new() -> Profile {
-		Profile{
+	pub fn new() -> Profile<'a> {
+		Profile {
 			patterns: PatternMap::new(),
 			pattern_total: 0,
-			pattern_ranks: PatternRankMap::new(),
+			pattern_ranks: Vec::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
 			size_ranks: Vec::new(), 
@@ -34,11 +34,11 @@ impl Profile {
 		}
 	}
 	
-	pub fn new_with(p: u8) -> Profile {
-		Profile{
+	pub fn new_with(p: u8) -> Profile<'a> {
+		Profile {
 			patterns: PatternMap::new(),
 			pattern_total: 0,
-			pattern_ranks: PatternRankMap::new(),
+			pattern_ranks: Vec::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
 			size_ranks: Vec::new(), 
@@ -77,11 +77,35 @@ impl Profile {
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
 	
+	pub fn cum_patternmap(&mut self) {
+		// calculate the percentage by patterns
+		// -> 	
+		let mut pattern_ranks = PatternRankMap::new();
+		
+		for key in self.patterns.keys(){
+			pattern_ranks.insert(key.to_string(), (*self.patterns.get(key).unwrap() as f64 / self.pattern_total as f64)*100.0);
+		}
+		
+		// sort the ranks by percentages in decreasing order
+		// -> 
+		let mut patterns = pattern_ranks.iter().collect::<Vec<_>>();
+		patterns.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+
+		// calculate the cumulative sum of the pattern rankings
+		// ->
+		//self.pattern_ranks 
+		let y = patterns.into_iter().scan(("", 0.00 as f64), |state, (ref k, &v)| {
+			*state = (&*k, state.1 + &v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();
+	}
+	
 	/// calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
 	pub fn cum_sizemap(&mut self) {
 		// calculate the percentage by sizes
 		// -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
 		let mut size_ranks = SizeRankMap::new();
+		
 		for key in self.sizes.keys(){
 			size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
 		}
@@ -101,17 +125,19 @@ impl Profile {
 
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
+		self.cum_patternmap();
 	}
 	
 	pub fn generate(&mut self) -> bool{
 		// first, determine the length of the entity
-		// 1. get a random number
+		 // 1. get a random number
 	 	let mut s: f64 = 0 as f64;
 	 	random_percentage!(s);
-	 	// 2. find the first size that falls within the percentage chance of occurring
+	 	 // 2. find the first size that falls within the percentage chance of occurring
 		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
 		
 		// second, determine the pattern to use
+		
 		
 		// build the entity using facts that adhere to the pattern 
 		
@@ -128,7 +154,7 @@ impl Profile {
 
 		vec_main
 	}
-
+/*
 	pub fn rank_patterns(&mut self) -> PatternRankMap{
 		self.pattern_ranks = PatternRankMap::new();
 		
@@ -138,7 +164,7 @@ impl Profile {
 		
 		self.pattern_ranks.clone()
 	}
-	
+*/	
 	pub fn reset_analyze(&mut self) {
 		self.patterns = PatternMap::new();
 	}
