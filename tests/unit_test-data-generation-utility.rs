@@ -91,10 +91,10 @@ mod tests {
     	profil.analyze("Smith, John");
     	profil.analyze("O'Brian, Henny"); 
     	profil.analyze("Dale, Danny"); 
-    	profil.analyze("Rickets, Ronney"); 
+    	profil.analyze("Rickets, Ronnae"); 
     	profil.analyze("Richard, Richie");
-    	profil.analyze("Roberts, Binkie");
-    	profil.analyze("Conways, Steven");
+    	profil.analyze("Roberts, Blake");
+    	profil.analyze("Conways, Sephen");
     	
     	profil.pre_generate();	
     	    		
