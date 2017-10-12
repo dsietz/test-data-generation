@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use std::ops::AddAssign;
 
 type PatternMap = BTreeMap<String, u32>;
-type PatternRankMap  = BTreeMap<String, f64>;
+//type PatternRankMap  = BTreeMap<&str, f64>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
@@ -77,27 +77,24 @@ impl<'a> Profile<'a> {
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
 	
-	pub fn cum_patternmap(&mut self) {
+	pub fn cum_patternmap(&mut self) ->  Vec<(&'a str, f64)> {
 		// calculate the percentage by patterns
 		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}	
-		let mut pattern_ranks = PatternRankMap::new();
-		
-		for key in self.patterns.keys(){
-			pattern_ranks.insert(key.to_string(), (*self.patterns.get(key).unwrap() as f64 / self.pattern_total as f64)*100.0);
-		}
+		let mut patterns = self.patterns.iter().map(|t| (t.0, (*t.1 as f64 / self.pattern_total as f64) * 100.0)).collect::<Vec<_>>();
 
 		// sort the ranks by percentages in decreasing order
 		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 14.285714285714285), ("CvccvccpSCvccvc", 14.285714285714285), ("CvcvcccpSCcvcv", 14.285714285714285), ("CvcvpSCvccc", 14.285714285714285), ("V~CcvvcpSCvccc", 14.285714285714285)]
-		let mut patterns = pattern_ranks.iter().collect::<Vec<_>>();
+		//let mut patterns = pattern_ranks.iter().collect::<Vec<_>>();
 		patterns.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
 	
 		// calculate the cumulative sum of the pattern rankings
-		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)]
-		//self.pattern_ranks 
-		let y = patterns.into_iter().scan(("", 0.00 as f64), |state, (ref k, &v)| {
+		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)] 
+		let p = patterns.into_iter().scan(("", 0.00 as f64), |state, (ref k, v)| {
 			*state = (&*k, state.1 + &v);
 			Some(*state)
-		}).collect::<Vec<(_,_)>>().to_owned();			
+		}).collect::<Vec<(_,_)>>();
+		
+		Vec::new()
 	}
 	
 	/// calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
@@ -125,7 +122,7 @@ impl<'a> Profile<'a> {
 
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
-		self.cum_patternmap();
+		self.pattern_ranks = self.cum_patternmap();
 	}
 	
 	pub fn generate(&mut self) -> bool{
@@ -159,9 +156,3 @@ impl<'a> Profile<'a> {
 		self.patterns = PatternMap::new();
 	}
 }
-
-
-
-
-// How to sort a Vec
-// v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));
