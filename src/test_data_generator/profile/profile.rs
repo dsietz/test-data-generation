@@ -4,44 +4,44 @@ use std::collections::BTreeMap;
 use std::ops::AddAssign;
 
 type PatternMap = BTreeMap<String, u32>;
-type PatternRankMap  = BTreeMap<String, f64>;
+//type PatternRankMap  = BTreeMap<&str, f64>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
-pub struct Profile{
+pub struct Profile<'a> {
 	pub patterns: PatternMap,
 	pub pattern_total: u32,
-	pub pattern_ranks: PatternRankMap,
+	pub pattern_ranks: Vec<(&'a str, f64)>,
 	pub sizes: SizeMap,
 	pub size_total: u32,
-	pub size_ranks: SizeRankMap,
+	pub size_ranks: Vec<(u32, f64)>,
 	pub processors: u8,
 	pub facts: Vec<Vec<Fact>>,
 }
 
-impl Profile {
+impl<'a> Profile<'a> {
 	//constructor
-	pub fn new() -> Profile {
-		Profile{
+	pub fn new() -> Profile<'a> {
+		Profile {
 			patterns: PatternMap::new(),
 			pattern_total: 0,
-			pattern_ranks: PatternRankMap::new(),
+			pattern_ranks: Vec::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
-			size_ranks: SizeRankMap::new(), 
+			size_ranks: Vec::new(), 
 			processors: 4,
 			facts: Profile::new_facts(4),
 		}
 	}
 	
-	pub fn new_with(p: u8) -> Profile {
-		Profile{
+	pub fn new_with(p: u8) -> Profile<'a> {
+		Profile {
 			patterns: PatternMap::new(),
 			pattern_total: 0,
-			pattern_ranks: PatternRankMap::new(),
+			pattern_ranks: Vec::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
-			size_ranks: SizeRankMap::new(), 
+			size_ranks: Vec::new(), 
 			processors: p,
 			facts: Profile::new_facts(p),
 		}
@@ -54,7 +54,7 @@ impl Profile {
 		// analyze patterns
 		let rslt = pattrn.analyze(entity);
 		
-		// store the facts
+		// balance the storing of facts across all the vectors that can be processed in parallel
 		let mut i = 0;
 		for f in rslt.1.into_iter() {			
 			if i == self.processors {
@@ -77,6 +77,71 @@ impl Profile {
 		self.size_total = self.sizes.values().sum::<u32>();
 	} 
 	
+	pub fn cum_patternmap(&mut self) ->  Vec<(&'a str, f64)> {
+		// calculate the percentage by patterns
+		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}	
+		let mut patterns = self.patterns.iter().map(|t| (t.0, (*t.1 as f64 / self.pattern_total as f64) * 100.0)).collect::<Vec<_>>();
+
+		// sort the ranks by percentages in decreasing order
+		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 14.285714285714285), ("CvccvccpSCvccvc", 14.285714285714285), ("CvcvcccpSCcvcv", 14.285714285714285), ("CvcvpSCvccc", 14.285714285714285), ("V~CcvvcpSCvccc", 14.285714285714285)]
+		//let mut patterns = pattern_ranks.iter().collect::<Vec<_>>();
+		patterns.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+	
+		// calculate the cumulative sum of the pattern rankings
+		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)] 
+		let p = patterns.into_iter().scan(("", 0.00 as f64), |state, (ref k, v)| {
+			*state = (&*k, state.1 + &v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();
+		
+		Vec::new()
+	}
+	
+	/// calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
+	pub fn cum_sizemap(&mut self) {
+		// calculate the percentage by sizes
+		// -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
+		let mut size_ranks = SizeRankMap::new();
+		
+		for key in self.sizes.keys(){
+			size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
+		}
+	
+		// sort the ranks by percentages in decreasing order
+		// -> [(15, 57.14285714285714), (11, 28.57142857142857), (14, 14.285714285714285)]
+		let mut sizes = size_ranks.iter().collect::<Vec<_>>();
+		sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+		
+		// calculate the cumulative sum of the size rankings
+		// -> [(15, 57.14285714285714), (11, 85.71428571428571), (14, 100)]
+		self.size_ranks = sizes.iter().scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
+			*state = (k, state.1 + &v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();	
+	}
+
+	pub fn pre_generate(&mut self){
+		self.cum_sizemap();
+		self.pattern_ranks = self.cum_patternmap();
+	}
+	
+	pub fn generate(&mut self) -> bool{
+		// first, determine the length of the entity
+		 // 1. get a random number
+	 	let mut s: f64 = 0 as f64;
+	 	random_percentage!(s);
+	 	 // 2. find the first size that falls within the percentage chance of occurring
+		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
+		
+		// second, determine the pattern to use
+		
+		
+		// build the entity using facts that adhere to the pattern 
+		
+		
+		if size > 0 { true } else { false }
+	}
+	
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
 		let mut vec_main = Vec::new();
 		
@@ -87,28 +152,7 @@ impl Profile {
 		vec_main
 	}
 
-	pub fn rank_patterns(&mut self) -> PatternRankMap{
-		self.pattern_ranks = PatternRankMap::new();
-		
-		for key in self.patterns.keys(){
-			self.pattern_ranks.insert(key.to_string(), (*self.patterns.get(key).unwrap() as f64 / self.pattern_total as f64)*100.0);
-		}
-		
-		self.pattern_ranks.clone()
-	}
-	
 	pub fn reset_analyze(&mut self) {
 		self.patterns = PatternMap::new();
 	}
-	
-	pub fn rank_sizes(&mut self) -> SizeRankMap{
-		self.size_ranks = SizeRankMap::new();
-
-		for key in self.sizes.keys(){
-			self.size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
-		}
-		
-		//println!("{:?}",&self.size_ranks);
-		self.size_ranks.clone()
-	} 
 }
