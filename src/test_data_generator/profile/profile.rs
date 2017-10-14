@@ -151,8 +151,7 @@ impl Profile {
 		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
 		
 		// second, determine the pattern to use
-		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();	
-println!("random: {:?}, size: {:?}, pattern: {:?}",s, size, pattern.0);		
+		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();		
 		
 		// build the entity using facts that adhere to the pattern 
 		
