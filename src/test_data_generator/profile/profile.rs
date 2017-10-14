@@ -8,10 +8,13 @@ type PatternMap = BTreeMap<String, u32>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
-pub struct Profile<'a> {
+pub struct Profile {
 	pub patterns: PatternMap,
 	pub pattern_total: u32,
-	pub pattern_ranks: Vec<(&'a str, f64)>,
+	pub pattern_keys: Vec<String>,
+	pub pattern_vals: Vec<u32>,
+	pub pattern_percentages: Vec<(String, f64)>,
+	pub pattern_ranks: Vec<(String, f64)>,
 	pub sizes: SizeMap,
 	pub size_total: u32,
 	pub size_ranks: Vec<(u32, f64)>,
@@ -19,12 +22,15 @@ pub struct Profile<'a> {
 	pub facts: Vec<Vec<Fact>>,
 }
 
-impl<'a> Profile<'a> {
+impl Profile {
 	//constructor
-	pub fn new() -> Profile<'a> {
+	pub fn new() -> Profile {
 		Profile {
 			patterns: PatternMap::new(),
 			pattern_total: 0,
+			pattern_keys: Vec::new(),
+			pattern_vals: Vec::new(),
+			pattern_percentages: Vec::new(),
 			pattern_ranks: Vec::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
@@ -34,10 +40,13 @@ impl<'a> Profile<'a> {
 		}
 	}
 	
-	pub fn new_with(p: u8) -> Profile<'a> {
+	pub fn new_with(p: u8) -> Profile {
 		Profile {
 			patterns: PatternMap::new(),
 			pattern_total: 0,
+			pattern_keys: Vec::new(),
+			pattern_vals: Vec::new(),
+			pattern_percentages: Vec::new(),
 			pattern_ranks: Vec::new(),
 			sizes: SizeMap::new(),
 			size_total: 0,
@@ -75,26 +84,34 @@ impl<'a> Profile<'a> {
 		// analyze sizes
 		AddAssign::add_assign(self.sizes.entry(pattrn.size).or_insert(0), 1);
 		self.size_total = self.sizes.values().sum::<u32>();
+		
+		self.pattern_keys = self.patterns.keys().cloned().collect();
+		self.pattern_vals = self.patterns.values().cloned().collect();
 	} 
 	
-	pub fn cum_patternmap(&mut self) ->  Vec<(&'a str, f64)> {
+	// Reference: https://users.rust-lang.org/t/cannot-infer-an-appropriate-lifetime-for-autoref/13360/3
+	pub fn cum_patternmap(&mut self) {
 		// calculate the percentage by patterns
 		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}	
-		let mut patterns = self.patterns.iter().map(|t| (t.0, (*t.1 as f64 / self.pattern_total as f64) * 100.0)).collect::<Vec<_>>();
+		let n = self.patterns.len();
+		
+		for m in 0..n {
+			self.pattern_percentages.push((self.pattern_keys[m].clone(), (self.pattern_vals[m] as f64 / self.pattern_total as f64) * 100.0));
+		}
 
 		// sort the ranks by percentages in decreasing order
 		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 14.285714285714285), ("CvccvccpSCvccvc", 14.285714285714285), ("CvcvcccpSCcvcv", 14.285714285714285), ("CvcvpSCvccc", 14.285714285714285), ("V~CcvvcpSCvccc", 14.285714285714285)]
-		//let mut patterns = pattern_ranks.iter().collect::<Vec<_>>();
-		patterns.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
-	
+		self.pattern_percentages.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+
 		// calculate the cumulative sum of the pattern rankings
 		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)] 
-		let p = patterns.into_iter().scan(("", 0.00 as f64), |state, (ref k, v)| {
-			*state = (&*k, state.1 + &v);
-			Some(*state)
-		}).collect::<Vec<(_,_)>>();
+		let mut rank: f64 = 0.00;
 		
-		Vec::new()
+		for pttrn in self.pattern_percentages.iter() {
+			let tmp = pttrn.1 + rank;
+			self.pattern_ranks.push((pttrn.0.clone(),tmp));
+			rank = tmp;
+		}
 	}
 	
 	/// calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
@@ -122,7 +139,7 @@ impl<'a> Profile<'a> {
 
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
-		self.pattern_ranks = self.cum_patternmap();
+		self.cum_patternmap();
 	}
 	
 	pub fn generate(&mut self) -> bool{
