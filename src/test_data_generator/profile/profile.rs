@@ -172,10 +172,11 @@ impl Profile {
 		vec_main
 	}
 
-
+// see https://users.rust-lang.org/t/best-way-to-get-the-result-of-a-crossbeam-scoped-thread/6832/2
 	pub fn find_facts(&self, pattern: String) -> Vec<Fact> {
 		let pattern_chars = pattern.chars().collect::<Vec<char>>();
 		
+		// iterate through the chars in the pattern string
 		for (idx, ch) in pattern_chars.iter().enumerate() {
 			//println!("pattern_chars index: {:?}",idx);	
 					
@@ -183,23 +184,34 @@ impl Profile {
 				let c = ch;
 				let starts = if idx == 0 { 1 } else { 0 };
 			 	let ends = if idx == pattern_chars.len()-1 { 1 } else { 0 };
-			 	//let mut facts = vec![];
+			 	let mut fact_options = vec![];
 			 	
+			 	// iterate through the processors (vec) that hold the lists (vec) of facts
 				for v in &self.facts {
 					//println!("list number {:?}", v.len());
-					scope.spawn(move || {					
+					let selected_facts = scope.spawn(move || {	
+						let mut facts = vec![];		
+						
+						// iterate through the list of facts				
 						for value in v {
 							if value.starts_with == starts && value.ends_with == ends && value.pattern_placeholder == *c {
-								println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, value.key);
-								//facts.push(value.key);
+								//println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, value.key);
+								facts.push(value.key);
 							}
 						}
+						
+						facts
 					});
+					
+					//println!("list of selected facts for [{:?}] : {:?}",ch, selected_facts.join());
+					fact_options.extend_from_slice(&selected_facts.join());					
 				}
 				
+				//select a fact to use as the generated char
+				println!("list of selected facts for [{:?}] : {:?}",ch,fact_options);
+				
 				//println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, facts);
-			}); 
-		
+			}); 		
 		}
 		
 		Vec::new()
