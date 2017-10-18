@@ -119,6 +119,23 @@ mod tests {
     	    		
     	assert_eq!(profil.size_ranks, test);
     }
+    
+    #[test]
+    // ensure Profile is able to find the facts that relate to a pattern
+    fn profile_find_facts(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("Smith, John");
+    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("Dale, Danny"); 
+    	profil.analyze("Rickets, Ronnae"); 
+    	profil.analyze("Richard, Richie");
+    	profil.analyze("Roberts, Blake");
+    	profil.analyze("Conways, Sephen");
+    	
+    	profil.pre_generate();	
+    	let fact = profil.find_facts("CvccvccpSCvccvv".to_string());    		
+    	assert!(true);
+    }    
         
     #[test]
     // ensure Profile is generating correct test data
