@@ -2,6 +2,8 @@ use test_data_generator::profile::pattern::{Pattern};
 use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
+//use std::thread;
+use crossbeam;
 
 type PatternMap = BTreeMap<String, u32>;
 //type PatternRankMap  = BTreeMap<&str, f64>;
@@ -151,10 +153,10 @@ impl Profile {
 		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
 		
 		// second, determine the pattern to use
-		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();	
-println!("random: {:?}, size: {:?}, pattern: {:?}",s, size, pattern.0);		
+		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();		
 		
 		// build the entity using facts that adhere to the pattern 
+		//let fact = self.find_facts(pattern.0);
 		
 		
 		if size > 0 { true } else { false }
@@ -168,6 +170,39 @@ println!("random: {:?}, size: {:?}, pattern: {:?}",s, size, pattern.0);
 		}
 
 		vec_main
+	}
+
+
+	pub fn find_facts(&self, pattern: String) -> Vec<Fact> {
+		let pattern_chars = pattern.chars().collect::<Vec<char>>();
+		
+		for (idx, ch) in pattern_chars.iter().enumerate() {
+			//println!("pattern_chars index: {:?}",idx);	
+					
+			crossbeam::scope(|scope| {
+				let c = ch;
+				let starts = if idx == 0 { 1 } else { 0 };
+			 	let ends = if idx == pattern_chars.len()-1 { 1 } else { 0 };
+			 	//let mut facts = vec![];
+			 	
+				for v in &self.facts {
+					//println!("list number {:?}", v.len());
+					scope.spawn(move || {					
+						for value in v {
+							if value.starts_with == starts && value.ends_with == ends && value.pattern_placeholder == *c {
+								println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, value.key);
+								//facts.push(value.key);
+							}
+						}
+					});
+				}
+				
+				//println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, facts);
+			}); 
+		
+		}
+		
+		Vec::new()
 	}
 
 	pub fn reset_analyze(&mut self) {

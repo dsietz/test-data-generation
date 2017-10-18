@@ -5,8 +5,11 @@
 /// pattern_placeholder = the PatternPlaceholder symbol that represents the type of key  
 /// starts_with         = indicates if the key is the first char in the entity (0=no, 1=yes)
 /// ends_with           = indicates if the key is the last char in the entity (0=no, 1=yes)
-/// index_offset        = indicates the number of positions from the from index zero (where the char is located in the entity from the first position)
+/// index_offset        = indicates the number of positions from the index zero (where the char is located in the entity from the first position)
 /// 
+
+#[derive(Debug)]
+
 pub struct Fact{
 	pub key: char,
 	pub	prior_key: Option<char>,

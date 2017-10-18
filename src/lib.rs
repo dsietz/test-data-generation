@@ -8,6 +8,7 @@ extern crate clap;
 extern crate log;
 extern crate regex;
 extern crate rand;
+extern crate crossbeam;
 
 #[macro_use]
 pub mod macros;
