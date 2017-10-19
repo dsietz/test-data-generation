@@ -33,23 +33,6 @@ mod tests {
     	assert_eq!(placeholder.get(&"VowelUpper".to_string()), symbols[3]);
     }
     
-/*    
-    #[test]
-    // ensure Profile is ranking patterns correctly
-    fn profile_rank_patterns(){
-    	let mut profil =  Profile::new();
-    	
-    	profil.analyze("Smith, Johny");
-    	profil.analyze("O'Brian, Henny"); 
-    	profil.analyze("Dhalg, Danny");
-    	   		
-    	let rnk = profil.rank_patterns();
-
-    	assert_eq!(*rnk.get("CcvccpSCvccc").unwrap(),   66.66666666666666 as f64);
-    	//assert_eq!(*rnk.get("V~CcvvcpSCvccc").unwrap(), 33.33333333333333 as f64);
-    }
-*/
-    
     #[test]
     // ensure Profile is ranking sizes correctly
     fn profile_rank_sizes(){
@@ -122,20 +105,32 @@ mod tests {
     
     #[test]
     // ensure Profile is able to find the facts that relate to a pattern
-    fn profile_find_facts(){
+    fn profile_apply_facts_string(){
     	let mut profil =  Profile::new();
-    	profil.analyze("Smith, John");
-    	profil.analyze("O'Brian, Henny"); 
-    	profil.analyze("Dale, Danny"); 
-    	profil.analyze("Rickets, Ronnae"); 
-    	profil.analyze("Richard, Richie");
-    	profil.analyze("Roberts, Blake");
-    	profil.analyze("Conways, Sephen");
+    	profil.analyze("First");
+    	profil.analyze("Next");
+    	profil.analyze("Last");
     	
     	profil.pre_generate();	
-    	let fact = profil.find_facts("CvccvccpSCvccvv".to_string());    		
-    	assert!(true);
-    }    
+    	let generated = profil.apply_facts("Cvcc".to_string());
+    	   		
+    	assert_eq!(4, generated.len());
+    } 
+    
+    #[test]
+    // ensure Profile is able to find the facts that relate to a pattern
+    // NOTE: Dates need work! e.g.: 00/15/0027
+    fn profile_apply_facts_date(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("01/13/2017");
+    	profil.analyze("11/24/2017");
+    	profil.analyze("08/05/2017");
+    	
+    	profil.pre_generate();	
+    	let generated = profil.apply_facts("##p##p####".to_string());
+    	   		
+    	assert_eq!(10, generated.len());
+    }       
         
     #[test]
     // ensure Profile is generating correct test data

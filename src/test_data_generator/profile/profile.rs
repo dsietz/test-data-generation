@@ -156,10 +156,9 @@ impl Profile {
 		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();		
 		
 		// build the entity using facts that adhere to the pattern 
-		//let fact = self.find_facts(pattern.0);
+		let generated = self.apply_facts(pattern.0);
 		
-		
-		if size > 0 { true } else { false }
+		if generated.len() > 0 { true } else { false }
 	}
 	
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
@@ -172,9 +171,9 @@ impl Profile {
 		vec_main
 	}
 
-// see https://users.rust-lang.org/t/best-way-to-get-the-result-of-a-crossbeam-scoped-thread/6832/2
-	pub fn find_facts(&self, pattern: String) -> Vec<Fact> {
+	pub fn apply_facts(&self, pattern: String) -> String {
 		let pattern_chars = pattern.chars().collect::<Vec<char>>();
+		let mut generated = String::new();
 		
 		// iterate through the chars in the pattern string
 		for (idx, ch) in pattern_chars.iter().enumerate() {
@@ -194,6 +193,7 @@ impl Profile {
 						
 						// iterate through the list of facts				
 						for value in v {
+							// NOTE: Consider using previous pattern symbol or previous char in the logic
 							if value.starts_with == starts && value.ends_with == ends && value.pattern_placeholder == *c {
 								//println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, value.key);
 								facts.push(value.key);
@@ -208,13 +208,24 @@ impl Profile {
 				}
 				
 				//select a fact to use as the generated char
-				println!("list of selected facts for [{:?}] : {:?}",ch,fact_options);
+				//println!("list of selected facts for [{:?}] : {:?}",ch,fact_options);
 				
-				//println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, facts);
+				let mut x:u32 = 0;
+				let rnd_start = 0;
+				let rnd_end = fact_options.len()-1;
+				
+				if rnd_start >= rnd_end {
+					generated.push(fact_options[0 as usize]);
+				}else{
+					random_between!(x, rnd_start, rnd_end);
+					//println!("{:?}",fact_options[x as usize]);
+					generated.push(fact_options[x as usize]);
+				}
 			}); 		
 		}
 		
-		Vec::new()
+		println!("The generated value is.. {:?}", generated);
+		generated
 	}
 
 	pub fn reset_analyze(&mut self) {
