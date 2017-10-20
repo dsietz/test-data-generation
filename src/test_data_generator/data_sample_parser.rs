@@ -18,7 +18,7 @@ impl DataSampleParser {
 	// methods		
 	pub fn demo_date(&self) -> String{
 		let mut profil =  Profile::new();
-    	
+
     	profil.analyze("01/04/2017");
     	profil.analyze("02/09/2017");
     	profil.analyze("03/13/2017");

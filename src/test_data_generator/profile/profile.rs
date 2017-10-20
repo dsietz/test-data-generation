@@ -2,11 +2,9 @@ use test_data_generator::profile::pattern::{Pattern};
 use test_data_generator::profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
-//use std::thread;
 use crossbeam;
 
 type PatternMap = BTreeMap<String, u32>;
-//type PatternRankMap  = BTreeMap<&str, f64>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
@@ -174,16 +172,19 @@ impl Profile {
 	pub fn apply_facts(&self, pattern: String) -> String {
 		let pattern_chars = pattern.chars().collect::<Vec<char>>();
 		let mut generated = String::new();
+		let mut prev_char = ' ';
 		
 		// iterate through the chars in the pattern string
 		for (idx, ch) in pattern_chars.iter().enumerate() {
 			//println!("pattern_chars index: {:?}",idx);	
+			//println!("prev_char{:?}",prev_char);
 					
 			crossbeam::scope(|scope| {
 				let c = ch;
 				let starts = if idx == 0 { 1 } else { 0 };
 			 	let ends = if idx == pattern_chars.len()-1 { 1 } else { 0 };
 			 	let mut fact_options = vec![];
+			 	let mut prior_char = prev_char;
 			 	
 			 	// iterate through the processors (vec) that hold the lists (vec) of facts
 				for v in &self.facts {
@@ -194,7 +195,20 @@ impl Profile {
 						// iterate through the list of facts				
 						for value in v {
 							// NOTE: Consider using previous pattern symbol, previous char, or index_offset to improve logic
-								
+							if value.starts_with == starts && 
+							   value.ends_with == ends && 
+							   value.pattern_placeholder == *c && 
+							   value.index_offset == idx as u32 {
+									facts.push(value.key.clone());
+									
+									// if the value.key's prior char matches the prior generated char, then weight the value.key 
+									// to increase the chance of it being used when generated
+									if value.prior_key.unwrap_or(' ') == prior_char {
+										facts.push(value.key.clone());
+										facts.push(value.key.clone());
+									}
+							}
+							/*		
 							if starts == 1 {
 								// first char in the pattern cannot use the prior char in the logic
 								if value.starts_with == starts && 
@@ -205,14 +219,17 @@ impl Profile {
 								}
 							} else {
 								// chars in the pattern that are not the first char can use the prior char in the logic
-								//  	   value.prior_key.unwrap() == prev_char
+								//  	   value.prior_key.unwrap() == prior_char
 								if value.starts_with == starts && 
 							   	   value.ends_with == ends && 
 							   	   value.pattern_placeholder == *c && 
-							   	   value.index_offset == idx as u32 {
+							   	   value.index_offset == idx as u32 &&
+							   	   value.prior_key.unwrap() == prior_char{
+							   	   		println!("pior_key:{:?} == prev_char{:?}",value.prior_key.unwrap(),prior_char);
 										facts.push(value.key);
 								}								
 							}
+							*/
 						}
 						
 						facts
@@ -234,7 +251,7 @@ impl Profile {
 				}else{
 					random_between!(x, rnd_start, rnd_end);
 					//println!("{:?}",fact_options[x as usize]);
-					let prev_char = fact_options[x as usize];
+					prev_char = fact_options[x as usize];
 					generated.push(prev_char);
 				}
 			}); 		
