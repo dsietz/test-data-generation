@@ -1,14 +1,17 @@
-/*
-** Data Algorithm Creator 
-*/
+///
+/// Data Algorithm Creator 
+///
+/// test-data-generation-utility.exe --tool="data-generator" --log="./config/log4rs.yaml" --config="./config/tdg.yaml"
+///
+
 #[macro_use]
 extern crate log;
 extern crate test_data_generation;
 extern crate log4rs;
 
-use test_data_generation::test_data_generator::{params};
-//use data_sample_parser::DataSampleParser;
+use test_data_generation::test_data_generator::{params, data_sample_parser};
 use params::Params;
+use data_sample_parser::DataSampleParser;
 //use configs::Configs;
 
 // This is the main function
@@ -21,5 +24,10 @@ fn main() {
 	info!("Logging enabled...");
 	
 	// start up a Data Sample Parser
-	//let mut dsp = DataSampleParser::new(params.get_config_file());
+	//borrowed content error when passing in params.get_config_file() as parameter
+	let mut dsp = DataSampleParser::new("/config/tdg.yaml");
+	
+	println!("generate date:{:?}", dsp.demo_date());
+	println!("generate date:{:?}", dsp.demo_person_name());
+	//println!("testing...");
 }

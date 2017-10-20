@@ -144,7 +144,7 @@ impl Profile {
 		self.cum_patternmap();
 	}
 	
-	pub fn generate(&mut self) -> bool{
+	pub fn generate(&mut self) -> String{
 		// first, determine the length of the entity
 		 // 1. get a random number
 	 	let mut s: f64 = 0 as f64;
@@ -158,7 +158,7 @@ impl Profile {
 		// build the entity using facts that adhere to the pattern 
 		let generated = self.apply_facts(pattern.0);
 		
-		if generated.len() > 0 { true } else { false }
+		generated
 	}
 	
 	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
@@ -193,10 +193,25 @@ impl Profile {
 						
 						// iterate through the list of facts				
 						for value in v {
-							// NOTE: Consider using previous pattern symbol or previous char in the logic
-							if value.starts_with == starts && value.ends_with == ends && value.pattern_placeholder == *c {
-								//println!("pattern symbol={:?}, starts={:?}, ends={:?}, key {:?}", *c, starts, ends, value.key);
-								facts.push(value.key);
+							// NOTE: Consider using previous pattern symbol, previous char, or index_offset to improve logic
+								
+							if starts == 1 {
+								// first char in the pattern cannot use the prior char in the logic
+								if value.starts_with == starts && 
+							   	   value.ends_with == ends && 
+							       value.pattern_placeholder == *c && 
+							       value.index_offset == idx as u32 {
+										facts.push(value.key);
+								}
+							} else {
+								// chars in the pattern that are not the first char can use the prior char in the logic
+								//  	   value.prior_key.unwrap() == prev_char
+								if value.starts_with == starts && 
+							   	   value.ends_with == ends && 
+							   	   value.pattern_placeholder == *c && 
+							   	   value.index_offset == idx as u32 {
+										facts.push(value.key);
+								}								
 							}
 						}
 						
@@ -219,12 +234,13 @@ impl Profile {
 				}else{
 					random_between!(x, rnd_start, rnd_end);
 					//println!("{:?}",fact_options[x as usize]);
-					generated.push(fact_options[x as usize]);
+					let prev_char = fact_options[x as usize];
+					generated.push(prev_char);
 				}
 			}); 		
 		}
 		
-		println!("The generated value is.. {:?}", generated);
+		//println!("The generated value is.. {:?}", generated);
 		generated
 	}
 
