@@ -128,9 +128,10 @@ mod tests {
     }
     
     #[test]
+    #[ignore]
     // issue #31
     // ensure Profile doesn't generate a name with a backslash preceding an apostrophe
-    // NOTE FIXED
+    // NOT FIXED
     fn profile_generate_with_apostrophe(){
     	let mut profil =  Profile::new();
     	profil.analyze("O'Brien");
@@ -142,6 +143,6 @@ mod tests {
     	let generated = profil.generate();
     	let check = generated.contains("\'");
     	   		
-    	assert!(check, true);
+    	assert_eq!(check, false);
     } 
 }

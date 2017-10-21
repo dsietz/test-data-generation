@@ -1,12 +1,38 @@
-///
-/// Regex Symbols placeholder
-/// A = upper case alpha
-/// a = lower case alpha
-/// # = numberic
-/// ~ = special regex character
-/// S = white space
-/// p = punctuation
-///
+//! The `pattern` module provides functionality to convert Strings into symbolic patterns based on the individual characters.
+//!
+//! # Examples
+//!
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::profile::pattern::Pattern;
+//! 
+//! fn main() {
+//!     // return the symbolic pattern for Hello World
+//!		let mut pattern =  Pattern::new();
+//!     // Note: analyze() returns a tuple (String, Vec<Fact>)
+//!    	let symbolic_pattern = pattern.analyze("Hello World").0;  		
+//!
+//!     // confirm that the symbolic pattern is correct 
+//! 	assert_eq!( symbolic_pattern, "CvccvSCvccc");
+//! }
+//! ```
+//!
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::profile::pattern::Pattern;
+//! 
+//! fn main() {
+//!     // return the symbolic pattern for a date format
+//!		let mut pattern =  Pattern::new();
+//!     // analyze() returns a tuple (String, Vec<Fact>)
+//!    	let symbolic_pattern = pattern.analyze("12/31/2017").0;  		
+//!
+//!     // confirm that the symbolic pattern is correct 
+//! 	assert_eq!( symbolic_pattern, "##p##p####");
+//! }
+//! ```
 
 use regex::Regex;
 use profile::pattern_placeholder::PatternPlaceholder;
@@ -130,7 +156,6 @@ impl Pattern {
 			// store the Facts in a HashMap of HashMaps that will be evenly distributed 
 			// so the MapReduce can be performed for multiple threads calculating when aggregating 
 			// on the Facts
-			println!("char is {:?}",c);
 			let mut f = Fact::new(c,pp,sw,ew,(idx_off as u32));
 			
 			// only if there is a next key
