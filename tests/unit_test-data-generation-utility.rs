@@ -3,35 +3,10 @@ extern crate test_data_generation;
 use test_data_generation::test_data_generator::{profile};
 
 
-// Conditionally compile `main` only when the test-suite is *not* being run.
-#[cfg(not(test))]
-fn main() {
-    println!("If you see this, the tests were not compiled nor ran!");
-}
-
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
-	use test_data_generation::test_data_generator::profile::{pattern_placeholder};
-	use profile::pattern::Pattern;
 	use profile::profile::Profile;
-	use profile::pattern_placeholder::PatternPlaceholder;
-    
-    #[test]
-    // ensure Pattern is analyzing data into patterns
-    fn pattern_analyze(){
-    	let mut pattrn =  Pattern::new();
-    	let word = pattrn.analyze("HELlo0?^@");    		
-    	assert_eq!(word.0, "CVCcv#pp~");
-    }
-    
-    #[test]
-    // ensure PatternPlaceholder has the correct symbols
-    fn pattern_placeholder(){
-    	let placeholder =  PatternPlaceholder::new();
-    	let symbols:[char; 9] = ['~','C','c','V','v','#','~','S','p'];	
-    	assert_eq!(placeholder.get(&"VowelUpper".to_string()), symbols[3]);
-    }
     
     #[test]
     // ensure Profile is ranking sizes correctly
@@ -80,7 +55,7 @@ mod tests {
     	profil.analyze("Conways, Sephen");
     	
     	profil.pre_generate();	
-    	let test = [("CvccvccpSCvccvv".to_string(), 28.57142857142857 as f64), ("CcvccpSCvcc".to_string(), 42.857142857142854 as f64), ("CvccvccpSCvccvc".to_string(), 57.14285714285714 as f64), ("CvcvcccpSCcvcv".to_string(), 71.42857142857142 as f64), ("CvcvpSCvccc".to_string(), 85.7142857142857 as f64), ("V~CcvvcpSCvccc".to_string(), 99.99999999999997 as f64)];    		
+    	let test = [("CvccvccpSCvccvv".to_string(), 28.57142857142857 as f64), ("CcvccpSCvcc".to_string(), 42.857142857142854 as f64), ("CvccvccpSCvccvc".to_string(), 57.14285714285714 as f64), ("CvcvcccpSCcvcv".to_string(), 71.42857142857142 as f64), ("CvcvpSCvccc".to_string(), 85.7142857142857 as f64), ("V@CcvvcpSCvccc".to_string(), 99.99999999999997 as f64)];    		
     	    		
     	assert_eq!(profil.pattern_ranks, test);
     }
