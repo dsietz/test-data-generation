@@ -7,6 +7,9 @@ use test_data_generation::profile;
 #[cfg(test)]
 mod tests {
 	use profile::profile::Profile;
+	
+	//shared functions
+
     
     #[test]
     // ensure Profile is ranking sizes correctly
@@ -123,4 +126,22 @@ mod tests {
     	    		
     	assert!(profil.generate().len() > 10);
     }
+    
+    #[test]
+    // issue #31
+    // ensure Profile doesn't generate a name with a backslash preceding an apostrophe
+    // NOTE FIXED
+    fn profile_generate_with_apostrophe(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("O'Brien");
+    	profil.analyze("O'Mac");
+    	profil.analyze("O'Connell");
+    	profil.analyze("O'Donnell");
+    	
+    	profil.pre_generate();	
+    	let generated = profil.generate();
+    	let check = generated.contains("\'");
+    	   		
+    	assert!(check, true);
+    } 
 }

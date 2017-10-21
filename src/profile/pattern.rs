@@ -130,6 +130,7 @@ impl Pattern {
 			// store the Facts in a HashMap of HashMaps that will be evenly distributed 
 			// so the MapReduce can be performed for multiple threads calculating when aggregating 
 			// on the Facts
+			println!("char is {:?}",c);
 			let mut f = Fact::new(c,pp,sw,ew,(idx_off as u32));
 			
 			// only if there is a next key
