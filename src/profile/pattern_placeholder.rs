@@ -1,22 +1,22 @@
 //! The `pattern_placeholder` module provides functionality to retrieve symbols that are used in defining a pattern.
 //!
 //! Here is the list of symbols that identify a type of character:</br>
-//! @ = unknown</br>
-//! C = upper case consonant</br>
-//! c = lower case consonant</br>
-//! V = upper case vowel</br>
-//! v = lower case vowel</br>
-//! \# = numeric digit</br>
-//! ~ = special regex character</br>
-//! S = white space</br>
-//! p = punctuation</br>
+//! @ = unknown [Unknonw]</br>
+//! C = upper case consonant [ConsonantUpper]</br>
+//! c = lower case consonant [ConsonantLower]</br>
+//! V = upper case vowel [VowelUpper]</br>
+//! v = lower case vowel [VowelLower]</br>
+//! \# = numeric digit [Numeric]</br>
+//! ~ = special regex character [RegExSpcChar]</br>
+//! S = white space [WhiteSpace]</br>
+//! p = punctuation [Punctuation]</br>
 //!
-//! # Examples
+//! # Example
 //!
 //! ```
 //! extern crate test_data_generation;
 //!
-//! use test_data_generation::test_data_generator::profile::pattern_placeholder::PatternPlaceholder;
+//! use test_data_generation::profile::pattern_placeholder::PatternPlaceholder;
 //! 
 //! fn main() {
 //!     // return the symbol that represents an upper case vowel
@@ -35,11 +35,13 @@ use std::collections::BTreeMap;
 // types
 type PlaceholderMap  = BTreeMap<String, char>;
 
+/// Represents a pattern placeholder
 pub struct PatternPlaceholder{
+	/// A PatternPlaceholder must have a PlaceholderMap that contains all the symbols used to categorize characters by type (e.g.: Upper Case Vowel)
 	pub placeholder: PlaceholderMap,
 }
 
-/// initialize a default PlaceholderMap
+/// initialize a default PlaceholderMap with the pattern symbols
 fn init() -> PlaceholderMap{
 	let symbols: [char; 9] = ['@','C','c','V','v','#','~','S','p'];
 	let mut pm = PlaceholderMap::new();
@@ -58,7 +60,19 @@ fn init() -> PlaceholderMap{
 }
 
 impl PatternPlaceholder {
-	//constructor
+	/// Constructs a new PatternPlaceholder
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::pattern_placeholder::PatternPlaceholder;
+	///	
+	/// fn main() {
+	/// 	let placeholder = PatternPlaceholder::new();
+	/// }
+	/// ```
 	pub fn new() -> PatternPlaceholder {	
 		let ph = init();
 		PatternPlaceholder{
@@ -66,6 +80,21 @@ impl PatternPlaceholder {
 		}
 	}	
 	
+	/// This function returns a pattern symbol that represents the type of character 
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::pattern_placeholder::PatternPlaceholder;
+	/// 
+	/// fn main() {
+	///		let placeholder =  PatternPlaceholder::new();
+	/// 
+	/// 	println!("Upper case vowel symbol: {:?}", placeholder.get(&"VowelUpper".to_string()));
+	/// }
+	/// ```	
 	pub fn get(&self, key: &str) -> char {
 		*self.placeholder.get(key).unwrap()
 	}

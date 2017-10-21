@@ -1,6 +1,6 @@
 extern crate test_data_generation;
 
-use test_data_generation::test_data_generator::{profile};
+use test_data_generation::profile;
 
 
 // Conditionally compile the module `test` only when the test-suite is run.

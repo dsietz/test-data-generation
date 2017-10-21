@@ -9,7 +9,7 @@ extern crate log;
 extern crate test_data_generation;
 extern crate log4rs;
 
-use test_data_generation::test_data_generator::{params, data_sample_parser};
+use test_data_generation::{params, data_sample_parser};
 use params::Params;
 use data_sample_parser::DataSampleParser;
 //use configs::Configs;

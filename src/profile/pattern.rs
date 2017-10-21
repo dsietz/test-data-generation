@@ -9,8 +9,8 @@
 ///
 
 use regex::Regex;
-use test_data_generator::profile::pattern_placeholder::PatternPlaceholder;
-use test_data_generator::profile::fact::Fact;
+use profile::pattern_placeholder::PatternPlaceholder;
+use profile::fact::Fact;
 
 pub struct Pattern{
 	pub size: u32,

@@ -1,5 +1,5 @@
-use test_data_generator::configs::Configs;
-use test_data_generator::profile::profile::{Profile};
+use configs::Configs;
+use profile::profile::{Profile};
 
 pub struct DataSampleParser{
 	pub issues: bool,

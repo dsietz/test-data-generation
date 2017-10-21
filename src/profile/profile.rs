@@ -1,5 +1,5 @@
-use test_data_generator::profile::pattern::{Pattern};
-use test_data_generator::profile::fact::{Fact};
+use profile::pattern::{Pattern};
+use profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
 use crossbeam;
