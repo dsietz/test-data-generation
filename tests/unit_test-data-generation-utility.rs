@@ -146,6 +146,6 @@ mod tests {
     	
     	profil.pre_generate();	
     	    		
-    	assert!(profil.generate());
+    	assert!(profil.generate().len() > 10);
     }
 }
