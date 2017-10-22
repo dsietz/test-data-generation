@@ -1,31 +1,79 @@
-///
-/// Regex Symbols placeholder
-/// A = upper case alpha
-/// a = lower case alpha
-/// # = numberic
-/// ~ = special regex character
-/// S = white space
-/// p = punctuation
-///
+//! The `pattern` module provides functionality to convert Strings into symbolic patterns based on the individual characters.
+//!
+//! # Examples
+//!
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::profile::pattern::Pattern;
+//! 
+//! fn main() {
+//!     // return the symbolic pattern for Hello World
+//!		let mut pattern =  Pattern::new();
+//!     // Note: analyze() returns a tuple (String, Vec<Fact>)
+//!    	let symbolic_pattern = pattern.analyze("Hello World").0;  		
+//!
+//!     // confirm that the symbolic pattern is correct 
+//! 	assert_eq!( symbolic_pattern, "CvccvSCvccc");
+//! }
+//! ```
+//!
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::profile::pattern::Pattern;
+//! 
+//! fn main() {
+//!     // return the symbolic pattern for a date format
+//!		let mut pattern =  Pattern::new();
+//!     // analyze() returns a tuple (String, Vec<Fact>)
+//!    	let symbolic_pattern = pattern.analyze("12/31/2017").0;  		
+//!
+//!     // confirm that the symbolic pattern is correct 
+//! 	assert_eq!( symbolic_pattern, "##p##p####");
+//! }
+//! ```
 
 use regex::Regex;
-use test_data_generator::profile::pattern_placeholder::PatternPlaceholder;
-use test_data_generator::profile::fact::Fact;
+use profile::pattern_placeholder::PatternPlaceholder;
+use profile::fact::Fact;
 
+/// Represents a symbolic pattern of an entity (String)
 pub struct Pattern{
+	/// The size (length) of the pattern
 	pub size: u32,
-		regex_symbols: PatternPlaceholder,
-		regex_consonant_upper: Regex,
-		regex_consonant_lower: Regex,
-		regex_vowel_upper: Regex,
-		regex_vowel_lower: Regex,
-		regex_numeric: Regex,
-		regex_punctuation: Regex,
-		regex_space: Regex,
+	/// The PatternPlaceholder that has all the symbols used to represent a char found by a regex rule 
+	regex_symbols: PatternPlaceholder,
+	/// The regex rule used to find upper case consonants
+	regex_consonant_upper: Regex,
+	/// The regex rule used to find lower case consonants
+	regex_consonant_lower: Regex,
+	/// The regex rule used to find upper case vowels
+	regex_vowel_upper: Regex,
+	/// The regex rule used to find lower case vowels
+	regex_vowel_lower: Regex,
+	/// The regex rule used to find numeric digits
+	regex_numeric: Regex,
+	/// The regex rule used to find punctuation
+	regex_punctuation: Regex,
+	/// The regex rule used to find white spaces
+	regex_space: Regex,
 }
 
 impl Pattern {
-	//constructor
+	/// Constructs a new Pattern
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::pattern::Pattern;
+	///	
+	/// fn main() {
+	/// 	let mut pattern =  Pattern::new();
+	/// }
+	/// ```
 	pub fn new() -> Pattern {
 		Pattern{
 			size: 0,
@@ -40,7 +88,23 @@ impl Pattern {
 		}
 	}
 	
-	fn parse_entity(&self, c: &char) -> char{
+	/// This function converts a char into a pattern symbol 
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::pattern::Pattern;
+	/// 
+	/// fn main() {
+	///		let pattern =  Pattern::new();
+	/// 
+	/// 	println!("The pattern symbol for 'A' is {:?}", pattern.symbolize_char(&'A'));
+	///     // The pattern symbol for 'A' is V
+	/// }
+	/// ```	
+	pub fn symbolize_char(&self, c: &char) -> char{
 		// if you have to escape regex special characters: &*regex::escape(&*&c.to_string())
 		let mut x = self.regex_symbols.get("Unknown");
 		let mut found = false;
@@ -88,6 +152,23 @@ impl Pattern {
 		x
 	}
 	
+	/// This function converts an entity (&str) into a tuplet (String, Vec<Fact>)</br>
+	/// _String_ : The symbolic pattern</br>
+	/// _Vec<Fact>_ : List of Facts extracted from the entity and related to the symbolic pattern 
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::pattern::Pattern;
+	/// 
+	/// fn main() {
+	///		let mut pattern =  Pattern::new();
+	/// 
+	/// 	assert_eq!(pattern.analyze("Hello World").0, "CvccvSCvccc");
+	/// }
+	/// ```	
 	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
 		// record the length of the passed value
 		self.size = entity.len() as u32;
@@ -102,7 +183,7 @@ impl Pattern {
 		for (i, c) in entity.chars().enumerate() {
 			let mut pk      = None;
 			let mut nk      = None;
-			let     pp      = self.parse_entity(&c);
+			let     pp      = self.symbolize_char(&c);
 			let mut sw      = 0;
 			let mut ew      = 0;
 			let     idx_off = i;	

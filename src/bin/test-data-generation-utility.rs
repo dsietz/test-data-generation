@@ -9,7 +9,7 @@ extern crate log;
 extern crate test_data_generation;
 extern crate log4rs;
 
-use test_data_generation::test_data_generator::{params, data_sample_parser};
+use test_data_generation::{params, data_sample_parser};
 use params::Params;
 use data_sample_parser::DataSampleParser;
 //use configs::Configs;
@@ -25,7 +25,7 @@ fn main() {
 	
 	// start up a Data Sample Parser
 	//borrowed content error when passing in params.get_config_file() as parameter
-	let mut dsp = DataSampleParser::new("/config/tdg.yaml");
+	let dsp = DataSampleParser::new("/config/tdg.yaml");
 	
 	println!("generate date:{:?}", dsp.demo_date());
 	println!("generate date:{:?}", dsp.demo_person_name());

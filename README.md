@@ -31,6 +31,12 @@ The following utilities are part of the Test Data Generation project:
 
 ---
 
+### Documentation
+Documentation for this crate is built without dependencies. 
+```
+cargo doc --no-deps
+```
+
 ### Support
 Visit our [wiki](https://github.com/dsietz/test-data-generation/wiki) to help you get started with the project and its utilities
 
