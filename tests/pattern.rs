@@ -10,9 +10,18 @@ mod tests {
     
     #[test]
     // ensure Pattern is analyzing data into patterns
+    fn symbolize_char(){
+    	let pattern =  Pattern::new();
+    	 		
+    	assert_eq!(pattern.symbolize_char(&'A'), 'V');
+    }
+        
+    #[test]
+    // ensure Pattern is analyzing data into patterns
     fn pattern_analyze(){
-    	let mut pattrn =  Pattern::new();
-    	let word = pattrn.analyze("HELlo0?^@");    		
+    	let mut pattern =  Pattern::new();
+    	let word = pattern.analyze("HELlo0?^@");    
+    			
     	assert_eq!(word.0, "CVCcv#pp@");
     }
 }

@@ -35,7 +35,7 @@ use std::collections::BTreeMap;
 // types
 type PlaceholderMap  = BTreeMap<String, char>;
 
-/// Represents a pattern placeholder
+/// Represents a placeholder for all the symbols used in pattern definitions
 pub struct PatternPlaceholder{
 	/// A PatternPlaceholder must have a PlaceholderMap that contains all the symbols used to categorize characters by type (e.g.: Upper Case Vowel)
 	pub placeholder: PlaceholderMap,

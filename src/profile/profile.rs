@@ -97,17 +97,31 @@ type PatternMap = BTreeMap<String, u32>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
+/// Represents a Profile for sample data that has been analyzed and can be used to generate realistic data
 pub struct Profile {
+	/// A list of symbolic patterns with a distinct count of occurrences
 	pub patterns: PatternMap,
+	/// The total number of patterns in the profile
 	pub pattern_total: u32,
+	/// A list of symbolic patterns in the profile 
+	/// (used for temporary storage due to lifetime issues)
 	pub pattern_keys: Vec<String>,
+	/// A list of distinct counts for patterns in the profile 
+	/// (used for temporary storage due to lifetime issues)
 	pub pattern_vals: Vec<u32>,
+	/// A list of symbolic patterns with their percent chance of occurrence
 	pub pattern_percentages: Vec<(String, f64)>,
+	/// A list of symbolic patterns with a running total of percent chance of occurrence, in increasing order
 	pub pattern_ranks: Vec<(String, f64)>,
+	/// A list of pattern lengths with a distinct count of occurrence
 	pub sizes: SizeMap,
+	/// the total number of pattern sizes (lengths) in the profile
 	pub size_total: u32,
+	/// A list of pattern sizes (lengths) with a running total of their percent chance of occurrence, in increasing order
 	pub size_ranks: Vec<(u32, f64)>,
+	/// The number of processors used to distribute the work load (multi-thread) while finding Facts to generate data
 	pub processors: u8,
+	/// A list of processors (which are lists of Facts) that store all the Facts in the profile
 	pub facts: Vec<Vec<Fact>>,
 }
 
@@ -146,10 +160,10 @@ impl Profile {
 	/// 
 	/// # Arguments
 	///
-	/// * `p` - A u8 number that sets the number of processors to start up to manage the Facts.
-	///         > Increasing the number of processors will speed up the generator be ditributing the workload.
-	///         > The recommended number of processors is 1 per 10K data points (e.g.: profiling 20K names should be handled by 2 processors)
-	///         > NOTE: The default number of processors is 4.
+	/// * `p: u8` - A number that sets the number of processors to start up to manage the Facts.</br>
+	///         Increasing the number of processors will speed up the generator be ditributing the workload.
+	///         The recommended number of processors is 1 per 10K data points (e.g.: profiling 20K names should be handled by 2 processors)</br>
+	///         NOTE: The default number of processors is 4.
 	/// 
 	/// #Example
 	/// 
@@ -179,7 +193,25 @@ impl Profile {
 		}
 	}
 
-	// methods
+	/// This function converts an data point (&str) and adds it to the profile
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///		profile.analyze("Four"); 
+    ///	    		
+    ///		assert_eq!(profile.patterns.len(), 4);
+	/// }
+	/// ```	
 	pub fn analyze(&mut self, entity: &str) {
 		let mut pattrn =  Pattern::new();
 		
@@ -307,7 +339,7 @@ impl Profile {
 				let starts = if idx == 0 { 1 } else { 0 };
 			 	let ends = if idx == pattern_chars.len()-1 { 1 } else { 0 };
 			 	let mut fact_options = vec![];
-			 	let mut prior_char = prev_char;
+			 	let prior_char = prev_char;
 			 	
 			 	// iterate through the processors (vec) that hold the lists (vec) of facts
 				for v in &self.facts {
