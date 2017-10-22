@@ -193,7 +193,7 @@ impl Profile {
 		}
 	}
 
-	/// This function converts an data point (&str) and adds it to the profile
+	/// This function converts an data point (&str) to a pattern and adds it to the profile
 	/// 
 	/// # Example
 	///

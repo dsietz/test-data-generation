@@ -153,8 +153,8 @@ impl Pattern {
 	}
 	
 	/// This function converts an entity (&str) into a tuplet (String, Vec<Fact>)</br>
-	/// _String_ = The symbolic pattern</br>
-	/// _Vec<Fact> = List of Facts extracted from the entity and relate to the symbolic pattern 
+	/// _String_ : The symbolic pattern</br>
+	/// _Vec<Fact>_ : List of Facts extracted from the entity and related to the symbolic pattern 
 	/// 
 	/// # Example
 	///
