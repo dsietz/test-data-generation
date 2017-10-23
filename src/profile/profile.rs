@@ -292,6 +292,30 @@ impl Profile {
 		}).collect::<Vec<(_,_)>>();	
 	}
 
+	/// This function prepares the size a pattern accumulated percentages order by percentage increasing
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///		profile.analyze("Four");  
+    ///		profile.analyze("Five");
+    ///		profile.analyze("Six");
+    ///	    		
+    ///     profile.pre_generate();
+    ///
+    ///		print!("The size ranks are {:?}", profile.size_ranks);
+    ///     // The size ranks are [(3, 50), (4, 83.33333333333333), (5, 100)] 
+    /// }
+	/// ```	
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
 		self.cum_patternmap();
