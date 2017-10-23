@@ -67,6 +67,7 @@ mod tests {
     // ensure Profile is providing the correct pattern ranks after analyzing the sample data
     fn profile_pregenerate_sizes(){
     	let mut profil =  Profile::new();
+
     	profil.analyze("Smith, Johny"); //12
     	profil.analyze("O'Brian, Hen"); //12 
     	profil.analyze("Dale, Danny");  //11

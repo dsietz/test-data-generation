@@ -292,6 +292,30 @@ impl Profile {
 		}).collect::<Vec<(_,_)>>();	
 	}
 
+	/// This function prepares the size a pattern accumulated percentages order by percentage increasing
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///		profile.analyze("Four");  
+    ///		profile.analyze("Five");
+    ///		profile.analyze("Six");
+    ///	    		
+    ///     profile.pre_generate();
+    ///
+    ///		print!("The size ranks are {:?}", profile.size_ranks);
+    ///     // The size ranks are [(3, 50), (4, 83.33333333333333), (5, 100)] 
+    /// }
+	/// ```	
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
 		self.cum_patternmap();
@@ -363,28 +387,6 @@ impl Profile {
 										facts.push(value.key.clone());
 									}
 							}
-							/*		
-							if starts == 1 {
-								// first char in the pattern cannot use the prior char in the logic
-								if value.starts_with == starts && 
-							   	   value.ends_with == ends && 
-							       value.pattern_placeholder == *c && 
-							       value.index_offset == idx as u32 {
-										facts.push(value.key);
-								}
-							} else {
-								// chars in the pattern that are not the first char can use the prior char in the logic
-								//  	   value.prior_key.unwrap() == prior_char
-								if value.starts_with == starts && 
-							   	   value.ends_with == ends && 
-							   	   value.pattern_placeholder == *c && 
-							   	   value.index_offset == idx as u32 &&
-							   	   value.prior_key.unwrap() == prior_char{
-							   	   		println!("pior_key:{:?} == prev_char{:?}",value.prior_key.unwrap(),prior_char);
-										facts.push(value.key);
-								}								
-							}
-							*/
 						}
 						
 						facts
