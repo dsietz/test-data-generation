@@ -244,55 +244,7 @@ impl Profile {
 		self.pattern_vals = self.patterns.values().cloned().collect();
 	} 
 	
-	// Reference: https://users.rust-lang.org/t/cannot-infer-an-appropriate-lifetime-for-autoref/13360/3
-	pub fn cum_patternmap(&mut self) {
-		// calculate the percentage by patterns
-		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}	
-		let n = self.patterns.len();
-		
-		for m in 0..n {
-			self.pattern_percentages.push((self.pattern_keys[m].clone(), (self.pattern_vals[m] as f64 / self.pattern_total as f64) * 100.0));
-		}
-
-		// sort the ranks by percentages in decreasing order
-		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 14.285714285714285), ("CvccvccpSCvccvc", 14.285714285714285), ("CvcvcccpSCcvcv", 14.285714285714285), ("CvcvpSCvccc", 14.285714285714285), ("V~CcvvcpSCvccc", 14.285714285714285)]
-		self.pattern_percentages.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
-
-		// calculate the cumulative sum of the pattern rankings
-		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)] 
-		let mut rank: f64 = 0.00;
-		
-		for pttrn in self.pattern_percentages.iter() {
-			let tmp = pttrn.1 + rank;
-			self.pattern_ranks.push((pttrn.0.clone(),tmp));
-			rank = tmp;
-		}
-	}
-	
-	/// calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
-	pub fn cum_sizemap(&mut self) {
-		// calculate the percentage by sizes
-		// -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
-		let mut size_ranks = SizeRankMap::new();
-		
-		for key in self.sizes.keys(){
-			size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
-		}
-	
-		// sort the ranks by percentages in decreasing order
-		// -> [(15, 57.14285714285714), (11, 28.57142857142857), (14, 14.285714285714285)]
-		let mut sizes = size_ranks.iter().collect::<Vec<_>>();
-		sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
-		
-		// calculate the cumulative sum of the size rankings
-		// -> [(15, 57.14285714285714), (11, 85.71428571428571), (14, 100)]
-		self.size_ranks = sizes.iter().scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
-			*state = (k, state.1 + &v);
-			Some(*state)
-		}).collect::<Vec<(_,_)>>();	
-	}
-
-	/// This function prepares the size a pattern accumulated percentages order by percentage increasing
+	/// This function generates realistic test data based on the sampel data that was analyzed.
 	/// 
 	/// # Example
 	///
@@ -303,51 +255,18 @@ impl Profile {
 	/// 
 	/// fn main() {
     /// 	let mut profile =  Profile::new();
-    ///		profile.analyze("One");
-    ///		profile.analyze("Two"); 
-    ///		profile.analyze("Three"); 
-    ///		profile.analyze("Four");  
-    ///		profile.analyze("Five");
-    ///		profile.analyze("Six");
+    ///
+    ///		profile.analyze("01/13/2017");
+    ///		profile.analyze("11/24/2017"); 
+    ///		profile.analyze("08/05/2017");
     ///	    		
     ///     profile.pre_generate();
     ///
-    ///		print!("The size ranks are {:?}", profile.size_ranks);
-    ///     // The size ranks are [(3, 50), (4, 83.33333333333333), (5, 100)] 
+    ///  	let generated = profile.apply_facts("##p##p####".to_string());
+    ///
+    ///     assert_eq!(generated.len(), 10);
     /// }
 	/// ```	
-	pub fn pre_generate(&mut self){
-		self.cum_sizemap();
-		self.cum_patternmap();
-	}
-	
-	pub fn generate(&mut self) -> String{
-		// first, determine the length of the entity
-		 // 1. get a random number
-	 	let mut s: f64 = 0 as f64;
-	 	random_percentage!(s);
-	 	 // 2. find the first size that falls within the percentage chance of occurring
-		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
-		
-		// second, determine the pattern to use
-		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();		
-		
-		// build the entity using facts that adhere to the pattern 
-		let generated = self.apply_facts(pattern.0);
-		
-		generated
-	}
-	
-	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
-		let mut vec_main = Vec::new();
-		
-		for _ in 0..p {  
-			vec_main.push(Vec::new());
-		}
-
-		vec_main
-	}
-
 	pub fn apply_facts(&self, pattern: String) -> String {
 		let pattern_chars = pattern.chars().collect::<Vec<char>>();
 		let mut generated = String::new();
@@ -373,7 +292,6 @@ impl Profile {
 						
 						// iterate through the list of facts				
 						for value in v {
-							// NOTE: Consider using previous pattern symbol, previous char, or index_offset to improve logic
 							if value.starts_with == starts && 
 							   value.ends_with == ends && 
 							   value.pattern_placeholder == *c && 
@@ -383,6 +301,13 @@ impl Profile {
 									// if the value.key's prior char matches the prior generated char, then weight the value.key 
 									// to increase the chance of it being used when generated
 									if value.prior_key.unwrap_or(' ') == prior_char {
+										facts.push(value.key.clone());
+										facts.push(value.key.clone());
+									}
+									
+									// if the value.key's index_offset matches the current index, then weight the value.key 
+									// to increase the chance of it being used when generated
+									if value.index_offset == idx as u32 {
 										facts.push(value.key.clone());
 										facts.push(value.key.clone());
 									}
@@ -417,7 +342,230 @@ impl Profile {
 		//println!("The generated value is.. {:?}", generated);
 		generated
 	}
+	
+	/// This function calculates the patterns to use by the chance they will occur (as cumulative percentage) in decreasing order
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///
+    ///    	profile.analyze("Smith, John");
+    ///    	profile.analyze("O'Brian, Henny"); 
+    ///    	profile.analyze("Dale, Danny"); 
+    ///    	profile.analyze("Rickets, Ronnae"); 
+    ///    	profile.analyze("Richard, Richie");
+    ///    	profile.analyze("Roberts, Blake");
+    ///    	profile.analyze("Conways, Sephen");
+    ///    	
+    ///    	profile.pre_generate();	
+    ///    	let test = [("CvccvccpSCvccvv".to_string(), 28.57142857142857 as f64), ("CcvccpSCvcc".to_string(), 42.857142857142854 as f64), ("CvccvccpSCvccvc".to_string(), 57.14285714285714 as f64), ("CvcvcccpSCcvcv".to_string(), 71.42857142857142 as f64), ("CvcvpSCvccc".to_string(), 85.7142857142857 as f64), ("V@CcvvcpSCvccc".to_string(), 99.99999999999997 as f64)];    		
+    ///    	    		
+    ///    	assert_eq!(profile.pattern_ranks, test);
+    /// }
+	/// ```	
+	pub fn cum_patternmap(&mut self) {
+		// Reference: https://users.rust-lang.org/t/cannot-infer-an-appropriate-lifetime-for-autoref/13360/3
+			
+		// calculate the percentage by patterns
+		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}	
+		let n = self.patterns.len();
+		
+		for m in 0..n {
+			self.pattern_percentages.push((self.pattern_keys[m].clone(), (self.pattern_vals[m] as f64 / self.pattern_total as f64) * 100.0));
+		}
 
+		// sort the ranks by percentages in decreasing order
+		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 14.285714285714285), ("CvccvccpSCvccvc", 14.285714285714285), ("CvcvcccpSCcvcv", 14.285714285714285), ("CvcvpSCvccc", 14.285714285714285), ("V~CcvvcpSCvccc", 14.285714285714285)]
+		self.pattern_percentages.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+
+		// calculate the cumulative sum of the pattern rankings
+		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)] 
+		let mut rank: f64 = 0.00;
+		
+		for pttrn in self.pattern_percentages.iter() {
+			let tmp = pttrn.1 + rank;
+			self.pattern_ranks.push((pttrn.0.clone(),tmp));
+			rank = tmp;
+		}
+	}
+	
+    /// This function calculates the sizes to use by the chance they will occur (as cumulative percentage) in decreasing order
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///		profile.analyze("Four");  
+    ///		profile.analyze("Five");
+    ///		profile.analyze("Six");
+    ///	    		
+    ///     profile.cum_sizemap();
+    ///
+    ///		print!("The size ranks are {:?}", profile.size_ranks);
+    ///     // The size ranks are [(3, 50), (4, 83.33333333333333), (5, 100)] 
+    /// }
+	/// ```	
+	pub fn cum_sizemap(&mut self) {
+		// calculate the percentage by sizes
+		// -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
+		let mut size_ranks = SizeRankMap::new();
+		
+		for key in self.sizes.keys(){
+			size_ranks.insert(*key, (*self.sizes.get(key).unwrap() as f64 / self.size_total as f64)*100.0);
+		}
+	
+		// sort the ranks by percentages in decreasing order
+		// -> [(15, 57.14285714285714), (11, 28.57142857142857), (14, 14.285714285714285)]
+		let mut sizes = size_ranks.iter().collect::<Vec<_>>();
+		sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+		
+		// calculate the cumulative sum of the size rankings
+		// -> [(15, 57.14285714285714), (11, 85.71428571428571), (14, 100)]
+		self.size_ranks = sizes.iter().scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
+			*state = (k, state.1 + &v);
+			Some(*state)
+		}).collect::<Vec<(_,_)>>();	
+	}
+	
+	/// This function generates realistic test data based on the sampel data that was analyzed.
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///		profile.analyze("Four");  
+    ///		profile.analyze("Five");
+    ///	    		
+    ///     profile.pre_generate();
+    ///
+    ///		print!("The test data {:?} was generated.", profile.generate());
+    /// }
+	/// ```	
+	pub fn generate(&mut self) -> String{
+		// first, determine the length of the entity
+		// 1. get a random number
+	 	let mut s: f64 = 0 as f64;
+	 	random_percentage!(s);
+	 	
+	 	 // 2. find the first size that falls within the percentage chance of occurring
+		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
+		
+		// second, determine the pattern to use
+		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();		
+		
+		// lastly, generate the test data using facts that adhere to the pattern 
+		let generated = self.apply_facts(pattern.0);
+		
+		generated
+	}
+	
+	/// This function is called from within the implementated structure and returns a list processors (Vec) with empty lists (Vec) for their Facts.
+	/// Each processor shares the load of generating the data based on the Facts it has been assigned to manage.
+	/// 
+	/// # Arguments
+	///
+	/// * `p: u8` - A number that sets the number of processors to start up to manage the Facts.</br>
+	///         Increasing the number of processors will speed up the generator be ditributing the workload.
+	///         The recommended number of processors is 1 per 10K data points (e.g.: profiling 20K names should be handled by 2 processors)</br>
+	///         NOTE: The default number of processors is 4.
+	/// 
+	fn new_facts(p: u8) -> Vec<Vec<Fact>> {
+		let mut vec_main = Vec::new();
+		
+		for _ in 0..p {  
+			vec_main.push(Vec::new());
+		}
+
+		vec_main
+	}
+	
+	/// This function prepares the size a pattern accumulated percentages order by percentage increasing
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///		profile.analyze("Four");  
+    ///		profile.analyze("Five");
+    ///		profile.analyze("Six");
+    ///	    		
+    ///     profile.pre_generate();
+    ///
+    ///		print!("The size ranks are {:?}", profile.size_ranks);
+    ///     // The size ranks are [(3, 50), (4, 83.33333333333333), (5, 100)] 
+    /// }
+	/// ```	
+	pub fn pre_generate(&mut self){
+		self.cum_sizemap();
+		self.cum_patternmap();
+	}
+
+	/// This function resets the patterns that the Profile has analyzed.
+	/// Call this method whenever you wish to "clear" the Profile 
+	/// 
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	/// 
+	/// fn main() {
+    /// 	let mut profile =  Profile::new();
+    ///
+    ///		profile.analyze("One");
+    ///		profile.analyze("Two"); 
+    ///		profile.analyze("Three"); 
+    ///    
+    ///     let x = profile.patterns.len();
+    ///
+    ///     profile.reset_analyze();
+    ///
+    ///		profile.analyze("Four");
+    ///		profile.analyze("Five"); 
+    ///		profile.analyze("Six");  
+    ///		profile.analyze("Seven"); 
+    ///		profile.analyze("Eight"); 
+    ///		profile.analyze("Nine"); 
+    ///		profile.analyze("Ten");
+    ///    
+    ///     let y = profile.patterns.len();
+    ///	    		
+    ///     assert_eq!(x, 3);
+    ///     assert_eq!(y, 5);
+    /// }
+	/// ```	
 	pub fn reset_analyze(&mut self) {
 		self.patterns = PatternMap::new();
 	}
