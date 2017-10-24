@@ -244,7 +244,7 @@ impl Profile {
 		self.pattern_vals = self.patterns.values().cloned().collect();
 	} 
 	
-	/// This function generates realistic test data based on the sampel data that was analyzed.
+	/// This function generates realistic test data based on the sample data that was analyzed.
 	/// 
 	/// # Example
 	///
