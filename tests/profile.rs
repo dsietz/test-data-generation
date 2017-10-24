@@ -6,32 +6,7 @@ use test_data_generation::profile;
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
-	use profile::profile::Profile;
-	
-	//shared functions
-
-    
-    #[test]
-    // ensure Profile is ranking sizes correctly
-    fn profile_rank_sizes(){
-    	let mut profil0 =  Profile::new();
-    	
-    	profil0.analyze("Smith, Johny");
-    	profil0.analyze("O'Brian, Henny"); 
-    	profil0.analyze("Dale, Danny"); 
-    	profil0.analyze("O'Henry, Al"); 
-    	profil0.analyze("Rickets, Ron"); 
-    	profil0.analyze("Mr. Wilberson");
-    	profil0.analyze("Po, Al"); 
-    	/*   		
-    	profil0.pre_generate();
-    	let s = *profil0.size_ranks;	
-		let r = 15.00 as f64;
-    	assert_eq!(s.iter().find(|&&x|&x.1 >= &r).unwrap().0, 15);
-    	*/
-    	
-    	true;
-    }        
+	use profile::profile::Profile;     
     
     #[test]
     // ensure Profile is analyzing all the sample data points
