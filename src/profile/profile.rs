@@ -271,7 +271,7 @@ impl Profile {
 		let pattern_chars = pattern.chars().collect::<Vec<char>>();
 		let mut generated = String::new();
 		let mut prev_char = ' ';
-		
+	
 		// iterate through the chars in the pattern string
 		for (idx, ch) in pattern_chars.iter().enumerate() {
 			//println!("pattern_chars index: {:?}",idx);	
@@ -283,13 +283,13 @@ impl Profile {
 			 	let ends = if idx == pattern_chars.len()-1 { 1 } else { 0 };
 			 	let mut fact_options = vec![];
 			 	let prior_char = prev_char;
-			 	
+		 	
 			 	// iterate through the processors (vec) that hold the lists (vec) of facts
 				for v in &self.facts {
 					//println!("list number {:?}", v.len());
 					let selected_facts = scope.spawn(move || {	
 						let mut facts = vec![];		
-						
+					
 						// iterate through the list of facts				
 						for value in v {
 							if value.starts_with == starts && 
@@ -297,7 +297,7 @@ impl Profile {
 							   value.pattern_placeholder == *c && 
 							   value.index_offset == idx as u32 {
 									facts.push(value.key.clone());
-									
+								
 									// if the value.key's prior char matches the prior generated char, then weight the value.key 
 									// to increase the chance of it being used when generated
 									if value.prior_key.unwrap_or(' ') == prior_char {
@@ -315,8 +315,7 @@ impl Profile {
 						}
 						
 						facts
-					});
-					
+					});					
 					//println!("list of selected facts for [{:?}] : {:?}",ch, selected_facts.join());
 					fact_options.extend_from_slice(&selected_facts.join());					
 				}
@@ -338,7 +337,7 @@ impl Profile {
 				}
 			}); 		
 		}
-		
+	
 		//println!("The generated value is.. {:?}", generated);
 		generated
 	}
@@ -465,20 +464,22 @@ impl Profile {
     /// }
 	/// ```	
 	pub fn generate(&mut self) -> String{
-		// first, determine the length of the entity
 		// 1. get a random number
 	 	let mut s: f64 = 0 as f64;
 	 	random_percentage!(s);
 	 	
-	 	 // 2. find the first size that falls within the percentage chance of occurring
-		let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
-		
-		// second, determine the pattern to use
-		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();		
-		
+	 	// 2. find the first pattern that falls within the percentage chance of occurring
+	 	// NOTE: The following 2 lines has been commented out because this doesn't need to 
+	 	//       happen since the patterns are already ranks by percent chance of occurring 
+	 	//       and therefore sizes (lengths) as well since the patterns include the full 
+	 	//       length of the entitiy analyzed.
+		//let size = self.size_ranks.iter().find(|&&x|&x.1 >= &s).unwrap().0;	 	
+		//let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s && x.0.len() == size as usize).unwrap().clone();
+		let pattern = self.pattern_ranks.iter().find(|x|&x.1 >= &s).unwrap().clone();		
+
 		// lastly, generate the test data using facts that adhere to the pattern 
 		let generated = self.apply_facts(pattern.0);
-		
+	
 		generated
 	}
 	
