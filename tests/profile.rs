@@ -120,21 +120,5 @@ mod tests {
     	let check = generated.contains("\'");
     	   		
     	assert_eq!(check, false);
-    } 
-    
-    #[test]
-    fn issue_42() {
-    	let mut profile =  Profile::new();
-	    profile.analyze("One");
-		profile.analyze("Two"); 
-		profile.analyze("Three"); 
-		profile.analyze("Four");  
-		profile.analyze("Five");
-	    		
-		profile.pre_generate();
-    
-		//print!("The test data {:?} was generated.", profile.generate());
-		
-		assert!(true)
     }
 }
