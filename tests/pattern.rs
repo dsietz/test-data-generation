@@ -2,8 +2,6 @@ extern crate test_data_generation;
 
 use test_data_generation::profile;
 
-
-// Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
 	use profile::pattern::Pattern;
