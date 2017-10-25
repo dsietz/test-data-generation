@@ -569,5 +569,6 @@ impl Profile {
 	/// ```	
 	pub fn reset_analyze(&mut self) {
 		self.patterns = PatternMap::new();
+		debug!("Profile patterns have been reset ...");
 	}
 }
