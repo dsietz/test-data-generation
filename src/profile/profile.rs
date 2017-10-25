@@ -530,6 +530,7 @@ impl Profile {
 	pub fn pre_generate(&mut self){
 		self.cum_sizemap();
 		self.cum_patternmap();
+		info!("Profile: preparing generator...");
 	}
 
 	/// This function resets the patterns that the Profile has analyzed.
@@ -569,6 +570,6 @@ impl Profile {
 	/// ```	
 	pub fn reset_analyze(&mut self) {
 		self.patterns = PatternMap::new();
-		debug!("Profile patterns have been reset ...");
+		info!("Profile: patterns have been reset ...");
 	}
 }

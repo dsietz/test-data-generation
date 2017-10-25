@@ -6,7 +6,16 @@ use test_data_generation::profile;
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
-	use profile::profile::Profile;     
+	use profile::profile::Profile; 
+	
+	#[test]
+    // ensure logging is working in the crate
+    fn logging_test(){
+    	let mut profile =  Profile::new();
+    	profile.reset_analyze();
+    	    		
+    	assert!(true);
+    }    
     
     #[test]
     // ensure Profile is analyzing all the sample data points
