@@ -19,9 +19,9 @@ or production environment (option #1 above)
 ---
 
 ### Creating an Algorithm from Sample Data
-The following utilities are part of the Test Data Generation project:
-1. Data Algorithm Creator
-2. Data Generator
+1. Using the test-data-generation-utility
+2. Using the test-data-generation-web
+
 
 #### Configuration
 |  file name  | default location | description |

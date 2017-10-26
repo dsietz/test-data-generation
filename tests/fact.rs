@@ -10,7 +10,7 @@ mod tests {
     // ensure Pattern is analyzing data into patterns
     fn create_fact(){
         //fact created for the character 'r' in the string "word"
-    	let mut fact =  Fact::new('r','c',0,0,2);
+    	let fact =  Fact::new('r','c',0,0,2);
     }
     
     #[test]

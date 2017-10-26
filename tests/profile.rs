@@ -2,7 +2,6 @@ extern crate test_data_generation;
 
 use test_data_generation::profile;
 
-
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
@@ -112,22 +111,16 @@ mod tests {
     	assert!(profil.generate().len() > 10);
     }
     
-    #[test]
-    #[ignore]
+        #[test]
     // issue #31
     // ensure Profile doesn't generate a name with a backslash preceding an apostrophe
-    // NOT FIXED
     fn profile_generate_with_apostrophe(){
     	let mut profil =  Profile::new();
     	profil.analyze("O'Brien");
-    	profil.analyze("O'Mac");
-    	profil.analyze("O'Connell");
-    	profil.analyze("O'Donnell");
     	
     	profil.pre_generate();	
     	let generated = profil.generate();
-    	let check = generated.contains("\'");
-    	   		
-    	assert_eq!(check, false);
+ 		
+    	assert_eq!(generated, "O'Brien");
     }
 }

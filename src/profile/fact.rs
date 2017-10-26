@@ -25,6 +25,7 @@
 //!     fact.set_prior_key('o');
 //! }
 //! ```
+
 #[derive(Debug)]
 
 /// Represents a Fact for a character in a sample data entity that has been analyzed
