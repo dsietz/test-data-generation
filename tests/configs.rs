@@ -7,9 +7,10 @@ mod tests {
 	use configs::Configs;
     
     #[test]
+    #[ignore]
     // ensure Configs reads a valid configuration file
     fn create_config_good_cfg_file(){
-    	let mut cfg =  Configs::new("./target/debug/config/tdg.yaml");
+    	let mut cfg =  Configs::new("./config/tdg.yaml");
     	
     	cfg.load_config_file();
     }
