@@ -273,10 +273,7 @@ impl Profile {
 		let mut prev_char = ' ';
 	
 		// iterate through the chars in the pattern string
-		for (idx, ch) in pattern_chars.iter().enumerate() {
-			//println!("pattern_chars index: {:?}",idx);	
-			//println!("prev_char{:?}",prev_char);
-					
+		for (idx, ch) in pattern_chars.iter().enumerate() {				
 			crossbeam::scope(|scope| {
 				let c = ch;
 				let starts = if idx == 0 { 1 } else { 0 };
@@ -286,7 +283,6 @@ impl Profile {
 		 	
 			 	// iterate through the processors (vec) that hold the lists (vec) of facts
 				for v in &self.facts {
-					//println!("list number {:?}", v.len());
 					let selected_facts = scope.spawn(move || {	
 						let mut facts = vec![];		
 					
@@ -297,7 +293,7 @@ impl Profile {
 							   value.pattern_placeholder == *c && 
 							   value.index_offset == idx as u32 {
 									facts.push(value.key.clone());
-								
+							
 									// if the value.key's prior char matches the prior generated char, then weight the value.key 
 									// to increase the chance of it being used when generated
 									if value.prior_key.unwrap_or(' ') == prior_char {
@@ -316,13 +312,12 @@ impl Profile {
 						
 						facts
 					});					
-					//println!("list of selected facts for [{:?}] : {:?}",ch, selected_facts.join());
+					
+					//append the selected_facts to the fact_options
 					fact_options.extend_from_slice(&selected_facts.join());					
 				}
 				
-				//select a fact to use as the generated char
-				//println!("list of selected facts for [{:?}] : {:?}",ch,fact_options);
-				
+				//select a fact to use as the generated char				
 				let mut x:u32 = 0;
 				let rnd_start = 0;
 				let rnd_end = fact_options.len()-1;
@@ -331,14 +326,12 @@ impl Profile {
 					generated.push(fact_options[0 as usize]);
 				}else{
 					random_between!(x, rnd_start, rnd_end);
-					//println!("{:?}",fact_options[x as usize]);
 					prev_char = fact_options[x as usize];
 					generated.push(prev_char);
 				}
 			}); 		
 		}
-	
-		//println!("The generated value is.. {:?}", generated);
+
 		generated
 	}
 	

@@ -51,7 +51,7 @@ impl DataSampleParser {
 	    let mut profil =  Profile::new();
     	
     	profil.analyze("Smith, John");
-    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("O'Brien, Henny"); 
     	profil.analyze("Dale, Danny"); 
     	profil.analyze("Rickets, Ronnae"); 
     	profil.analyze("Richard, Richie");

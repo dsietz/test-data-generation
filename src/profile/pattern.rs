@@ -108,7 +108,7 @@ impl Pattern {
 		// if you have to escape regex special characters: &*regex::escape(&*&c.to_string())
 		let mut x = self.regex_symbols.get("Unknown");
 		let mut found = false;
-			
+						
 		if !found && self.regex_consonant_upper.is_match(&c.to_string()) {
 			x = self.regex_symbols.get("ConsonantUpper"); 
 			found = true;
@@ -187,7 +187,7 @@ impl Pattern {
 			let mut sw      = 0;
 			let mut ew      = 0;
 			let     idx_off = i;	
-		
+					
 			// first char in entity
 			if i == 0 {
 				sw = 1;			

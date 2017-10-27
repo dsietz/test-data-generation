@@ -27,7 +27,6 @@ fn main() {
 	//borrowed content error when passing in params.get_config_file() as parameter
 	let dsp = DataSampleParser::new("/config/tdg.yaml");
 	
-	println!("generate date:{:?}", dsp.demo_date());
-	println!("generate date:{:?}", dsp.demo_person_name());
-	//println!("testing...");
+	println!("generate date:{}", dsp.demo_date());
+	println!("generate person:{}", dsp.demo_person_name());
 }
