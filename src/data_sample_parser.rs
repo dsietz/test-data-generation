@@ -109,25 +109,33 @@ impl DataSampleParser {
 	///		// initalize a new DataSampelParser
 	///		let dsp = DataSampleParser::new();
     ///	
-    /// 	assert!(dsp.analyze_csv_file("./tests/samples/sample-01.csv"));
+    /// 	assert_eq!(dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap(),1);
 	/// }
 	/// ```	
-	pub fn analyze_csv_file(&self, path: &'static str) -> bool {
-    	let mut f = match File::open(path){
-    		Ok(v) => v,
-    		Err(e) => {
-    			error!("Error: csv file {} couldn't be opened!",path);
-    			return false
-    		}
-    	};
-    	
-		let mut contents = String::new();
-		// try / catch here
-		f.read_to_string(&mut contents).expect("Something went wrong reading csv file");
+	pub fn analyze_csv_file(&self, path: &'static str) -> Result<i32, String>  {
+    	let mut file = try!(File::open(path).map_err(|e| {
+			error!("csv file {} couldn't be opened!",path);
+    		e.to_string()
+		}));
+ 
+		let mut data = String::new();
+		try!(file.read_to_string(&mut data).map_err(|e| {
+			error!("Something went wrong reading csv file {}!",path);
+    		//return Err(From::from(e))
+    		e.to_string()
+		}));
 		
-		true
+		/*
+		let mut rdr = Reader::new();
+		let mut bytes = data.as_bytes();
+		let mut count_fields = 0;
+		let mut count_records = 0;
+		*/
+		
+		info!("Successfully analyzed the csv file {}",path);
+		Ok(1)
 	}
-	
+		
 	/// This function generates date as strings using the a `demo` profile
 	/// 
 	/// # Example

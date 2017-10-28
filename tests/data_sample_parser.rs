@@ -13,7 +13,7 @@ mod tests {
     fn parse_csv_file(){
     	let mut dsp =  DataSampleParser::new();
     	
-    	assert!(dsp.analyze_csv_file("./tests/samples/sample-01.csv"));
+    	assert_eq!(dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap(), 1);
     }
     
     #[test]
@@ -21,6 +21,6 @@ mod tests {
     fn parse_csv_file_bad(){
     	let mut dsp =  DataSampleParser::new();
     	
-    	assert_eq!(dsp.analyze_csv_file("./badpath/sample-01.csv"), false);
+    	assert_eq!(dsp.analyze_csv_file("./badpath/sample-01.csv").is_err(), true);
     }
 }
