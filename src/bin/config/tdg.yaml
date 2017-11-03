@@ -3,4 +3,3 @@ data-algorithm-creator:
   data-source:
     delimited-string:
       delimiter: ","
-      value: "Hello,World,from,Test,Data,Generation"

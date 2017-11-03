@@ -364,6 +364,8 @@ impl Profile {
 	pub fn cum_patternmap(&mut self) {
 		// Reference: https://users.rust-lang.org/t/cannot-infer-an-appropriate-lifetime-for-autoref/13360/3
 			
+		debug!("calucating the cumulative percentage of occurences for data point patterns...");
+			
 		// calculate the percentage by patterns
 		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}	
 		let n = self.patterns.len();
@@ -412,6 +414,7 @@ impl Profile {
     /// }
 	/// ```	
 	pub fn cum_sizemap(&mut self) {
+		debug!("calucating the cumulative percentage of occurences for data point sizes...");
 		// calculate the percentage by sizes
 		// -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
 		let mut size_ranks = SizeRankMap::new();
@@ -521,6 +524,7 @@ impl Profile {
     /// }
 	/// ```	
 	pub fn pre_generate(&mut self){
+		info!("Preparing the profile for data generation...");
 		self.cum_sizemap();
 		self.cum_patternmap();
 		info!("Profile: preparing generator...");
@@ -562,6 +566,7 @@ impl Profile {
     /// }
 	/// ```	
 	pub fn reset_analyze(&mut self) {
+		info!("Resetting the profile ...");
 		self.patterns = PatternMap::new();
 		info!("Profile: patterns have been reset ...");
 	}

@@ -27,7 +27,9 @@ use profile::profile::{Profile};
 use std::fs::File;
 use std::result::Result;
 use std::io::prelude::*;
-use csv_core::{Reader, ReadFieldResult};
+//use csv_core::{Reader, ReadFieldResult};
+use csv;
+use csv::Reader;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -38,6 +40,7 @@ pub struct DataSampleParser{
 	/// Configs object that define the configuration settings
 	cfg: Option<Configs>,
 	/// List of Profiles objects identified by a unique profile name BTreeMap<String, Profile>
+	// 
 	profiles: ProfilesMap,
 }
 
@@ -107,33 +110,91 @@ impl DataSampleParser {
 	///	
 	/// fn main() {
 	///		// initalize a new DataSampelParser
-	///		let dsp = DataSampleParser::new();
+	///		let mut dsp = DataSampleParser::new();
     ///	
     /// 	assert_eq!(dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap(),1);
 	/// }
 	/// ```	
-	pub fn analyze_csv_file(&self, path: &'static str) -> Result<i32, String>  {
-    	let mut file = try!(File::open(path).map_err(|e| {
+	pub fn analyze_csv_file(&mut self, path: &'static str) -> Result<i32, String>  {
+		info!("Starting to analyzed the csv file {}",path);
+    	
+    	let file = try!(File::open(path).map_err(|e| {
 			error!("csv file {} couldn't be opened!",path);
     		e.to_string()
 		}));
- 
-		let mut data = String::new();
-		try!(file.read_to_string(&mut data).map_err(|e| {
-			error!("Something went wrong reading csv file {}!",path);
-    		//return Err(From::from(e))
-    		e.to_string()
-		}));
 		
-		/*
-		let mut rdr = Reader::new();
-		let mut bytes = data.as_bytes();
-		let mut count_fields = 0;
-		let mut count_records = 0;
-		*/
+		//let mut rdr = csv::Reader::from_reader(file);
+		let mut rdr = csv::ReaderBuilder::new()
+        	.has_headers(true)
+        	.quote(b'"')
+        	.delimiter(b',')
+        	.from_reader(file);
+        	
+		//iterate through the headers
+		for headers in rdr.headers() {
+			for header in headers.iter() {
+	        	//add a Profile to the list of profiles to represent the field (indexed using the header label)
+	        	let p = Profile::new();
+	        	self.profiles.insert(format!("{}",header), p);
+	        }
+		}
 		
-		info!("Successfully analyzed the csv file {}",path);
+		//create a Vec from all the keys (headers) in the profiles list
+		let profile_keys: Vec<_> = self.profiles.keys().cloned().collect();
+		let mut rec_cnt: u16 = <u16>::min_value();
+		
+		debug!("CSV headers: {:?}",profile_keys);
+		
+		//iterate through all the records
+	    for result in rdr.records() {
+	        let record = result.expect("a CSV record");
+	        
+	        //keep a count of the number of records analyzed
+	        rec_cnt = rec_cnt + 1;
+	        
+	        //iterate through all the fields
+	        for (idx, field) in record.iter().enumerate() {
+	        	// Print a debug version of the record.
+	        	debug!("Field Index: {}, Field Value: {}", idx, field);
+	        	
+	        	//select the profile based on the field name (header) and analyze the field value
+	        	self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
+	        }
+	    }
+	    
+	    info!("Successfully analyzed the csv file {}", path);
+		debug!("Analyzed {} records, {} fields", rec_cnt, self.profiles.len());
+		
+		//prepare the profiles for data generation
+		self.profiles.iter_mut().for_each(|p|p.1.pre_generate());
+		
 		Ok(1)
+	}
+	
+	
+	/// This function generates test data for the specified field name.
+	/// 
+	/// # Arguments
+	///
+	/// * `field: String` - The name of the field (e.g.: firstname) the represents the profile to use when generating the test data.</br>
+	///
+	/// # Example
+	///
+	/// ``` 
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///	
+    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    ///     println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
+	/// }
+	/// ```
+	pub fn generate_by_field_name(&mut self, field: String) -> String {
+		self.profiles.get_mut(&field).unwrap().generate().to_string()
 	}
 		
 	/// This function generates date as strings using the a `demo` profile

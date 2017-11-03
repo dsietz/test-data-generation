@@ -18,6 +18,15 @@ mod tests {
     
     #[test]
     // ensure DataSampleParser can analyze a csv formatted file
+    fn generate_field_from_csv_file(){
+    	let mut dsp =  DataSampleParser::new();
+    	
+    	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    	println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
+    }
+    
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted file
     fn parse_csv_file_bad(){
     	let mut dsp =  DataSampleParser::new();
     	

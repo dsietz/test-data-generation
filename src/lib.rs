@@ -9,7 +9,7 @@ extern crate clap;
 extern crate regex;
 extern crate rand;
 extern crate crossbeam;
-extern crate csv_core;
+extern crate csv;
 
 #[macro_use]
 pub mod macros;
