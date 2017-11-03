@@ -1,7 +1,7 @@
 ///
 /// Data Algorithm Creator 
 ///
-/// test-data-generation-utility.exe --tool="data-generator" --log="./config/log4rs.yaml" --config="./config/tdg.yaml"
+/// test-data-generation-utility.exe --tool="data-generator" --log="../../src/bin/config/log4rs.yaml" --config="../../src/bin/config/tdg.yaml"
 ///
 
 #[macro_use]
@@ -25,8 +25,15 @@ fn main() {
 	
 	// start up a Data Sample Parser
 	//borrowed content error when passing in params.get_config_file() as parameter
-	let dsp = DataSampleParser::new("/config/tdg.yaml");
+	let mut dsp = DataSampleParser::new_with("/config/tdg.yaml");
 	
+	info!("Demo ...");
 	println!("generate date:{}", dsp.demo_date());
 	println!("generate person:{}", dsp.demo_person_name());
+    
+    info!("Analyzing CSV file ...");	
+   	println!("reading csv file: {}", dsp.analyze_csv_file("C:/workspace/test-data-generation/tests/samples/sample-01.csv").unwrap());
+   	
+   	info!("Generating a first name based on the CSV file ...");	
+   	println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
 }
