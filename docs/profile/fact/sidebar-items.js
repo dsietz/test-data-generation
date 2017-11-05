@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Fact","Represents a Fact for a character in a sample data entity that has been analyzed"]]});

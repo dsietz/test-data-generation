@@ -27,6 +27,15 @@ mod tests {
     
     #[test]
     // ensure DataSampleParser can analyze a csv formatted file
+    fn generate_record_from_csv_file(){
+    	let mut dsp =  DataSampleParser::new();
+    	
+    	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    	assert_eq!(dsp.generate_record().len(), 2);
+    }    
+    
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted file
     fn parse_csv_file_bad(){
     	let mut dsp =  DataSampleParser::new();
     	
