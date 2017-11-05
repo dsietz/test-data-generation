@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["random_percentage",""]],"mod":[["configs","Configs"],["data",""],["data_sample_parser","The `data_sample_parser` module provides functionality to read sample data, parse and analyze it,  so that test data can be generated based on profiles."],["macros",""],["params",""],["profile",""]]});

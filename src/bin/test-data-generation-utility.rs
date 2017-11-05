@@ -36,4 +36,6 @@ fn main() {
    	
    	info!("Generating a first name based on the CSV file ...");	
    	println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
+   	
+   	println!("Generated data record: {:?}",dsp.generate_record());
 }

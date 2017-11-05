@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["FieldType","This enum is used to specify the possible data types a Field can represent"]],"struct":[["Field","Represents a Fact for a character in a sample data entity that has been analyzed"]],"trait":[["ConvertToBytes","this trait is used to overload the set() function"]]});

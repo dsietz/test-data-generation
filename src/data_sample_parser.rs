@@ -26,10 +26,10 @@ use configs::Configs;
 use profile::profile::{Profile};
 use std::fs::File;
 use std::result::Result;
-use std::io::prelude::*;
+//use std::io::prelude::*;
 //use csv_core::{Reader, ReadFieldResult};
 use csv;
-use csv::Reader;
+//use csv::Reader;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -170,32 +170,6 @@ impl DataSampleParser {
 		
 		Ok(1)
 	}
-	
-	
-	/// This function generates test data for the specified field name.
-	/// 
-	/// # Arguments
-	///
-	/// * `field: String` - The name of the field (e.g.: firstname) the represents the profile to use when generating the test data.</br>
-	///
-	/// # Example
-	///
-	/// ``` 
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::data_sample_parser::DataSampleParser;
-	///	
-	/// fn main() {
-	///		// initalize a new DataSampelParser
-	///		let mut dsp = DataSampleParser::new();
-    ///	
-    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
-    ///     println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
-	/// }
-	/// ```
-	pub fn generate_by_field_name(&mut self, field: String) -> String {
-		self.profiles.get_mut(&field).unwrap().generate().to_string()
-	}
 		
 	/// This function generates date as strings using the a `demo` profile
 	/// 
@@ -274,6 +248,58 @@ impl DataSampleParser {
     	
     	profil.pre_generate();	
     	profil.generate()
+	}
+	
+	/// This function generates test data for the specified field name.
+	/// 
+	/// # Arguments
+	///
+	/// * `field: String` - The name of the field (e.g.: firstname) the represents the profile to use when generating the test data.</br>
+	///
+	/// # Example
+	///
+	/// ``` 
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///	
+    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    ///     println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
+	/// }
+	/// ```
+	pub fn generate_by_field_name(&mut self, field: String) -> String {
+		self.profiles.get_mut(&field).unwrap().generate().to_string()
+	}
+	
+	/// This function Vec of generates test data fields.
+	/// 
+	/// # Example
+	///
+	/// ``` 
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///	
+    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    ///     println!("Generated data record: {:?}",dsp.generate_record());
+	/// }
+	/// ```
+	pub fn generate_record(&mut self) -> Vec<String> {
+		let mut record = Vec::new();
+		
+		for profile in self.profiles.iter_mut() {
+			record.push(profile.1.generate().to_string());
+		}
+		
+		record
 	}
 	
 	/// This function returns a boolean that indicates if the data sample parsing had issues
