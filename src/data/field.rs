@@ -61,12 +61,6 @@ impl Field {
 	pub fn new(field_name: String) -> Field {
 		Field{
 			name: field_name,
-			/*
-			data_type: match field_type {
-				FieldType::Text => None,
-				FieldType::Number => 2 as u8
-			},
-			*/
 			data_type: None,
 			value: Vec::new(),
 		}
@@ -86,29 +80,12 @@ impl Field {
 	///     fld.set("John".to_string());
 	/// }
 	/// ```
-	pub fn set<T:ConvertToBytes>(&mut self, val: T) {
+	pub fn set<T:ConvertToBytes + 'static>(&mut self, val: T) {
+		//set the field value
 		self.value = val.convert_to_bytes();
-	}
-	
-	/// This function sets the data type of the Field base on the value. 
-	/// 
-	/// #Example
-	/// 
-	/// ```
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::data::field::Field;
-	///	
-	/// fn main() {
-	/// 	let mut fld = Field::new("first name".to_string());
-	///     let n1 :u8 = 100;
-    ///  
-    ///		fld.set_field_type(&n1);
-	/// }
-	/// ```
-	pub fn set_field_type<T: ?Sized + Any>(&mut self, _s: &T){
+
+		//set the field type
 		self.data_type = Some(TypeId::of::<T>());
-		println!("data type is {:?}",self.data_type.unwrap());
 	}
 	
 	/// This function returns the value for the Field
@@ -132,9 +109,9 @@ impl Field {
 	pub fn get(&self) -> Box<Any> {
 		Box::new(String::from_utf8(self.value.to_vec()).unwrap())
 	}
-	
-	/*
-	/// This function sets the data type of the Field base on the value. 
+
+	/// This function gets the data type of the Field based on the value. 
+	/// It is used in combination with the get() function
 	/// 
 	/// #Example
 	/// 
@@ -142,19 +119,18 @@ impl Field {
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::data::field::Field;
+	/// use std::any::TypeId;
 	///	
 	/// fn main() {
 	/// 	let mut fld = Field::new("first name".to_string());
 	///     let n1 :u8 = 100;
     ///  
-    ///		fld.set_field_type(&n1);
+    ///		fld.set(n1);
+    ///     assert_eq!(fld.get_field_type(),TypeId::of::<u8>());
+    ///     //println!("The field value is {}", fld.get().downcast_ref::<T:fld.get_field_type()>().unwrap());
 	/// }
 	/// ```
-	pub fn get_field_type<T: ?Sized + Any>(&mut self, _s: &T) -> TypeId {
-		match TypeId {
-			None => Err("Field value not set"),
-			Some(self.data_type) => self.data_type.unwrap(),
-		}
+	pub fn get_field_type(&mut self) -> TypeId {
+		self.data_type.unwrap()
 	}
-	*/
 }
