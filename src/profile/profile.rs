@@ -161,7 +161,7 @@ impl Profile {
 	/// # Arguments
 	///
 	/// * `p: u8` - A number that sets the number of processors to start up to manage the Facts.</br>
-	///         Increasing the number of processors will speed up the generator be ditributing the workload.
+	///         Increasing the number of processors will speed up the generator be distributing the workload.
 	///         The recommended number of processors is 1 per 10K data points (e.g.: profiling 20K names should be handled by 2 processors)</br>
 	///         NOTE: The default number of processors is 4.
 	/// 

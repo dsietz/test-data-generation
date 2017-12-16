@@ -124,10 +124,10 @@ impl Field {
 	/// fn main() {
 	/// 	let mut fld = Field::new("first name".to_string());
 	///     let n1 :u8 = 100;
-    ///  
-    ///		fld.set(n1);
-    ///     assert_eq!(fld.get_field_type(),TypeId::of::<u8>());
-    ///     //println!("The field value is {}", fld.get().downcast_ref::<T:fld.get_field_type()>().unwrap());
+	///  
+	///		fld.set(n1);
+	///     assert_eq!(fld.get_field_type(),TypeId::of::<u8>());
+	///     //println!("The field value is {}", fld.get().downcast_ref::<T:fld.get_field_type()>().unwrap());
 	/// }
 	/// ```
 	pub fn get_field_type(&mut self) -> TypeId {
