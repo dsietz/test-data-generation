@@ -8,17 +8,23 @@ mod tests {
     
     #[test]
     // ensure Pattern is analyzing data into patterns
-    fn create_fact(){
+    fn new_fact(){
         //fact created for the character 'r' in the string "word"
     	let fact =  Fact::new('r','c',0,0,2);
+    }
+    #[test]
+    fn new_fact_from_serialized(){
+    	let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
+    	let mut fact = Fact::from_serialized(&serialized);
+    	assert_eq!(fact.pattern_placeholder, 'c');
     }
     
     #[test]
     // ensure A Fact can be exported (to be archived) as JSON
-    fn export_json(){
+    fn serialize(){
         //fact created for the character 'r' in the string "word"
     	let mut fact =  Fact::new('r','c',0,0,2);
-    	fact.export_to_json();
+    	println!("serialized = {}", fact.serialize());
     }
     
     #[test]
