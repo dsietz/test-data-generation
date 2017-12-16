@@ -4,7 +4,7 @@ appenders:
     kind: console
   requests:
     kind: file
-    path: "log/tdg.log"
+    path: "./target/debug/log/tdg.log"
     encoder:
       pattern: "{d} - {m}{n}"
 root:
