@@ -74,7 +74,45 @@ impl Fact {
 		}
 	}
 	
-	pub fn export_to_json(&mut self) ->String {
+	/// Constructs a new Fact from a serialized (JSON) string of the Fact object. This is used when restoring from "archive"
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::fact::Fact;
+	///	
+	/// fn main() {	
+	///		let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
+    ///		let mut fact = Fact::from_serialized(&serialized);
+    ///     fact.set_prior_key('a');
+    ///		fact.set_next_key('e');
+    ///
+    ///		assert_eq!(fact.pattern_placeholder, 'c');
+	/// }    	
+    /// ```	
+	pub fn from_serialized(serialized: &str) -> Fact {
+		serde_json::from_str(&serialized).unwrap()
+	}
+	
+	/// This function converts the Fact to a serialize JSON string.
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::fact::Fact;
+	///	
+	/// fn main() {
+	/// 	//fact created for the character 'r' in the string "word"
+    ///    	let mut fact =  Fact::new('r','c',0,0,2);
+    ///     println!("{}", fact.serialize());
+    ///     // {"key":"r","prior_key":null,"next_key":null,"pattern_placeholder":"c","starts_with":0,"ends_with":0,"index_offset":2}
+	/// }
+	/// 	
+	pub fn serialize(&mut self) ->String {
 		serde_json::to_string(&self).unwrap()
 	}
 	
