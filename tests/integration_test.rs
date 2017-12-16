@@ -26,7 +26,7 @@ mod tests {
 		println!("generate person:{}", dsp.demo_person_name());
     	
     	info!("Analyzing CSV file ...");	
-   		println!("reading csv file: {}", dsp.analyze_csv_file("./samples/sample-names.csv").unwrap());
+   		println!("reading csv file: {}", dsp.analyze_csv_file("./samples/sample-01.csv").unwrap());
    		
    		info!("Generating a first name based on the CSV file ...");	
    		println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
