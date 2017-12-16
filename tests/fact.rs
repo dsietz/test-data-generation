@@ -14,6 +14,14 @@ mod tests {
     }
     
     #[test]
+    // ensure A Fact can be exported (to be archived) as JSON
+    fn export_json(){
+        //fact created for the character 'r' in the string "word"
+    	let mut fact =  Fact::new('r','c',0,0,2);
+    	fact.export_to_json();
+    }
+    
+    #[test]
     // ensure Pattern is analyzing data into patterns
     fn set_next_key(){
         //fact created for the character 'r' in the string "word"

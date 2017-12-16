@@ -26,8 +26,9 @@
 //! }
 //! ```
 
-#[derive(Debug)]
+use serde_json;
 
+#[derive(Serialize, Deserialize, Debug)]
 /// Represents a Fact for a character in a sample data entity that has been analyzed
 pub struct Fact{
 	/// the char that the fact defines (.e.g: 'a', '1', '%', etc.)
@@ -71,6 +72,10 @@ impl Fact {
 			ends_with: ew,
 			index_offset: idx_off,
 		}
+	}
+	
+	pub fn export_to_json(&mut self) ->String {
+		serde_json::to_string(&self).unwrap()
 	}
 	
 	/// This function sets the next key attribute to the specified char.
