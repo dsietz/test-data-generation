@@ -2,11 +2,18 @@
 // https://stackoverflow.com/questions/25740916/how-do-you-actually-use-dynamically-sized-types-in-rust
 // https://stackoverflow.com/questions/24857831/is-there-any-downside-to-overloading-functions-in-rust-using-a-trait-generic-f
 
-use std::any::Any;
+use std::any::{Any, TypeId};
 
 /// this trait is used to overload the set() function
 pub trait ConvertToBytes {
 	fn convert_to_bytes<'a>(self) -> Vec<u8>;
+}
+
+/// implement the trait for the integer data type
+impl ConvertToBytes for u8 {
+	fn convert_to_bytes<'a>(self) -> Vec<u8> {
+		return vec![self]
+	}
 }
 
 /// implement the trait for the String data type
@@ -29,7 +36,7 @@ pub struct Field {
 	/// the textual name of the field
 	pub name: String,
 	/// the data type of the field value
-	data_type: u8,
+	pub data_type: Option<TypeId> ,
 	/// the value of the field
 	pub	value: Vec<u8>,
 }
@@ -45,19 +52,16 @@ impl Field {
 	/// use test_data_generation::data::field::{Field, FieldType};
 	///	
 	/// fn main() {
-	/// 	let mut fld = Field::new("field_1".to_string(), FieldType::Text);
+	/// 	let mut fld = Field::new("field_1".to_string());
 	///		
 	///		fld.set("John".to_string());
 	///		println!("The value is {}",fld.get().downcast_ref::<String>().unwrap());
 	/// }
 	/// ```
-	pub fn new(name: String, field_type: FieldType) -> Field {
+	pub fn new(field_name: String) -> Field {
 		Field{
-			name: String::new(),
-			data_type: match field_type {
-				FieldType::Text => 1 as u8,
-				FieldType::Number => 2 as u8
-			},
+			name: field_name,
+			data_type: None,
 			value: Vec::new(),
 		}
 	}
@@ -72,13 +76,16 @@ impl Field {
 	/// use test_data_generation::data::field::{Field, FieldType};
 	///	
 	/// fn main() {
-	/// 	let mut fld = Field::new("first name".to_string(), FieldType::Text);
+	/// 	let mut fld = Field::new("first name".to_string());
 	///     fld.set("John".to_string());
 	/// }
 	/// ```
-	pub fn set<T:ConvertToBytes>(&mut self, val:T) {
-		//println!("data type is {}",typeof(val));
+	pub fn set<T:ConvertToBytes + 'static>(&mut self, val: T) {
+		//set the field value
 		self.value = val.convert_to_bytes();
+
+		//set the field type
+		self.data_type = Some(TypeId::of::<T>());
 	}
 	
 	/// This function returns the value for the Field
@@ -93,7 +100,7 @@ impl Field {
 	/// use test_data_generation::data::field::{Field, FieldType};
 	///	
 	/// fn main() {
-	/// 	let mut fld = Field::new("field_1".to_string(), FieldType::Text);
+	/// 	let mut fld = Field::new("field_1".to_string());
 	///		
 	///		fld.set("John".to_string());
 	///		println!("The value is {}",fld.get().downcast_ref::<String>().unwrap());
@@ -101,5 +108,29 @@ impl Field {
 	/// ```
 	pub fn get(&self) -> Box<Any> {
 		Box::new(String::from_utf8(self.value.to_vec()).unwrap())
+	}
+
+	/// This function gets the data type of the Field based on the value. 
+	/// It is used in combination with the get() function
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data::field::Field;
+	/// use std::any::TypeId;
+	///	
+	/// fn main() {
+	/// 	let mut fld = Field::new("first name".to_string());
+	///     let n1 :u8 = 100;
+    ///  
+    ///		fld.set(n1);
+    ///     assert_eq!(fld.get_field_type(),TypeId::of::<u8>());
+    ///     //println!("The field value is {}", fld.get().downcast_ref::<T:fld.get_field_type()>().unwrap());
+	/// }
+	/// ```
+	pub fn get_field_type(&mut self) -> TypeId {
+		self.data_type.unwrap()
 	}
 }
