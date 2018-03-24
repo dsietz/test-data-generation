@@ -15,12 +15,12 @@ mod tests {
 		let start = SystemTime::now();
     
     	// 15K rows with 2 fields
-   		println!("reading csv file: {}", dsp.analyze_csv_file("./tests/samples/sample-names.csv").unwrap());		
+   		println!("reading csv file: {}", dsp.analyze_csv_file("./tests/samples/sample-names-1k.csv").unwrap());		
    		
    		let finish = SystemTime::now();
    		
    		//println!("started at {:?}", finish.duration_since(start));
    		// started at Ok(Duration { secs: 259, nanos: 522843800 })
-   		assert!(finish.duration_since(start).unwrap().as_secs() < 300);
+   		assert!(finish.duration_since(start).unwrap().as_secs() < 60);
     }  
 }

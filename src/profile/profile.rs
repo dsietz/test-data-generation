@@ -92,11 +92,13 @@ use profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
 use crossbeam;
+use serde_json;
 
 type PatternMap = BTreeMap<String, u32>;
 type SizeMap = BTreeMap<u32, u32>;
 type SizeRankMap  = BTreeMap<u32, f64>;
 
+#[derive(Serialize, Deserialize, Debug)]
 /// Represents a Profile for sample data that has been analyzed and can be used to generate realistic data
 pub struct Profile {
 	/// A list of symbolic patterns with a distinct count of occurrences
@@ -192,6 +194,28 @@ impl Profile {
 			facts: Profile::new_facts(p),
 		}
 	}
+	
+	/// Constructs a new Profile from a serialized (JSON) string of the Profile object. This is used when restoring from "archive"
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///	
+	/// fn main() {	
+	///		let serialized = "{\"patterns\":{\"VC\":1},\"pattern_total\":1,\"pattern_keys\":[\"VC\"],\"pattern_vals\":[1],\"pattern_percentages\":[],\"pattern_ranks\":[],\"sizes\":{\"2\":1},\"size_total\":1,\"size_ranks\":[],\"processors\":4,\"facts\":[[{\"key\":\"O\",\"prior_key\":null,\"next_key\":\"K\",\"pattern_placeholder\":\"V\",\"starts_with\":1,\"ends_with\":0,\"index_offset\":0}],[{\"key\":\"K\",\"prior_key\":\"O\",\"next_key\":null,\"pattern_placeholder\":\"C\",\"starts_with\":0,\"ends_with\":1,\"index_offset\":1}],[],[]]}";
+    ///		let mut profile = Profile::from_serialized(&serialized);
+    ///
+    ///     profile.pre_generate();
+    ///
+    ///     println!("The generated name is {:?}", profile.generate());
+	/// }    	
+    /// ```	
+	pub fn from_serialized(serialized: &str) -> Profile {
+		serde_json::from_str(&serialized).unwrap()
+	}	
 
 	/// This function converts an data point (&str) to a pattern and adds it to the profile
 	/// 
@@ -570,4 +594,28 @@ impl Profile {
 		self.patterns = PatternMap::new();
 		info!("Profile: patterns have been reset ...");
 	}
+	
+	/// This function converts the Profile to a serialize JSON string.
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///	
+	/// fn main() {
+	/// 	// analyze the dataset
+	///		let mut data_profile =  Profile::new();
+	///
+	///     // analyze the dataset
+	///		data_profile.analyze("OK");
+	///
+    ///     println!("{}", data_profile.serialize());
+    ///     // {"patterns":{"VC":1},"pattern_total":1,"pattern_keys":["VC"],"pattern_vals":[1],"pattern_percentages":[],"pattern_ranks":[],"sizes":{"2":1},"size_total":1,"size_ranks":[],"processors":4,"facts":[[{"key":"O","prior_key":null,"next_key":"K","pattern_placeholder":"V","starts_with":1,"ends_with":0,"index_offset":0}],[{"key":"K","prior_key":"O","next_key":null,"pattern_placeholder":"C","starts_with":0,"ends_with":1,"index_offset":1}],[],[]]}
+	/// }
+	/// 	
+	pub fn serialize(&mut self) ->String {
+		serde_json::to_string(&self).unwrap()
+	}	
 }
