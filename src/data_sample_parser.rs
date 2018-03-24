@@ -26,10 +26,8 @@ use configs::Configs;
 use profile::profile::{Profile};
 use std::fs::File;
 use std::result::Result;
-//use std::io::prelude::*;
-//use csv_core::{Reader, ReadFieldResult};
 use csv;
-//use csv::Reader;
+//use crossbeam;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -39,8 +37,7 @@ pub struct DataSampleParser{
 	pub issues: bool,
 	/// Configs object that define the configuration settings
 	cfg: Option<Configs>,
-	/// List of Profiles objects identified by a unique profile name BTreeMap<String, Profile>
-	// 
+	/// List of Profiles objects identified by a unique profile name BTreeMap<String, Profile> 
 	profiles: ProfilesMap,
 }
 
@@ -72,7 +69,7 @@ impl DataSampleParser {
 	///
 	/// # Arguments
 	///
-	/// * `path: &'static str` - The full path name (including the file name and extension) to the configuraiton file.</br>
+	/// * `path: &'static str` - The full path name (including the file name and extension) to the configuration file.</br>
 	/// 
 	/// #Example
 	/// 
@@ -84,7 +81,7 @@ impl DataSampleParser {
 	/// fn main() {
 	///		// initalize a new DataSampelParser
 	///	    // param: the path to the configuration  file
-	///		let dsp = DataSampleParser::new_with("/config/tdg.yaml");
+	///		let dsp = DataSampleParser::new_with("./config/tdg.yaml");
 	/// }
 	/// ```
 	pub fn new_with(path: &'static str) -> DataSampleParser {
@@ -115,21 +112,21 @@ impl DataSampleParser {
     /// 	assert_eq!(dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap(),1);
 	/// }
 	/// ```	
-	pub fn analyze_csv_file(&mut self, path: &'static str) -> Result<i32, String>  {
+	pub fn analyze_csv_file(&mut self, path: &'static str) -> Result<i32, String>  {	    	
 		info!("Starting to analyzed the csv file {}",path);
-    	
+	    	
     	let file = try!(File::open(path).map_err(|e| {
 			error!("csv file {} couldn't be opened!",path);
     		e.to_string()
 		}));
-		
+	
 		//let mut rdr = csv::Reader::from_reader(file);
 		let mut rdr = csv::ReaderBuilder::new()
         	.has_headers(true)
         	.quote(b'"')
         	.delimiter(b',')
-        	.from_reader(file);
-        	
+        	.from_reader(file);      	
+
 		//iterate through the headers
 		for headers in rdr.headers() {
 			for header in headers.iter() {
@@ -146,7 +143,7 @@ impl DataSampleParser {
 		debug!("CSV headers: {:?}",profile_keys);
 		
 		//iterate through all the records
-	    for result in rdr.records() {
+	    for result in rdr.records() { 
 	        let record = result.expect("a CSV record");
 	        
 	        //keep a count of the number of records analyzed
@@ -159,9 +156,33 @@ impl DataSampleParser {
 	        	
 	        	//select the profile based on the field name (header) and analyze the field value
 	        	self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
-	        }
+	        }        	              
 	    }
-	    
+		
+		/*		
+		// attempting to multithread the processing for updating the profiles		
+		crossbeam::scope(|scope| {			  		
+			//iterate through all the records
+	    	for result in rdr.records() {
+				scope.spawn(move || {	 
+	        		let record = result.expect("a CSV record");
+	        
+	        		//keep a count of the number of records analyzed
+	        		rec_cnt = rec_cnt + 1;
+	        
+	        		//iterate through all the fields
+	        		for (idx, field) in record.iter().enumerate() {
+	        			// Print a debug version of the record.
+	        			debug!("Field Index: {}, Field Value: {}", idx, field);
+	        	
+	        			//select the profile based on the field name (header) and analyze the field value
+	        			self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
+	        		} 
+				});        	              
+	    	}
+		});	
+		*/
+		      
 	    info!("Successfully analyzed the csv file {}", path);
 		debug!("Analyzed {} records, {} fields", rec_cnt, self.profiles.len());
 		
