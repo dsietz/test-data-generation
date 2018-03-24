@@ -108,6 +108,7 @@ impl Fact {
 	/// fn main() {
 	/// 	//fact created for the character 'r' in the string "word"
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
+    ///
     ///     println!("{}", fact.serialize());
     ///     // {"key":"r","prior_key":null,"next_key":null,"pattern_placeholder":"c","starts_with":0,"ends_with":0,"index_offset":2}
 	/// }

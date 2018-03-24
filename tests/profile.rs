@@ -8,6 +8,15 @@ mod tests {
 	use profile::profile::Profile; 
 	
 	#[test]
+    fn new_profile_from_serialized(){
+    	let serialized = "{\"patterns\":{\"VC\":1},\"pattern_total\":1,\"pattern_keys\":[\"VC\"],\"pattern_vals\":[1],\"pattern_percentages\":[],\"pattern_ranks\":[],\"sizes\":{\"2\":1},\"size_total\":1,\"size_ranks\":[],\"processors\":4,\"facts\":[[{\"key\":\"O\",\"prior_key\":null,\"next_key\":\"K\",\"pattern_placeholder\":\"V\",\"starts_with\":1,\"ends_with\":0,\"index_offset\":0}],[{\"key\":\"K\",\"prior_key\":\"O\",\"next_key\":null,\"pattern_placeholder\":\"C\",\"starts_with\":0,\"ends_with\":1,\"index_offset\":1}],[],[]]}";
+    	let mut profile = Profile::from_serialized(&serialized);
+    	profile.pre_generate();
+    	
+    	assert_eq!(profile.generate(), "OK");
+    }
+	
+	#[test]
     // ensure logging is working in the crate
     fn logging_test(){
     	let mut profile =  Profile::new();
@@ -111,7 +120,7 @@ mod tests {
     	assert!(profil.generate().len() > 10);
     }
     
-        #[test]
+    #[test]
     // issue #31
     // ensure Profile doesn't generate a name with a backslash preceding an apostrophe
     fn profile_generate_with_apostrophe(){
@@ -123,4 +132,16 @@ mod tests {
  		
     	assert_eq!(generated, "O'Brien");
     }
+    
+    #[test]
+    // ensure a Profile can be exported (to be archived) as JSON
+    fn serialize(){
+		let mut profil =  Profile::new();
+		
+		// analyze the dataset
+		profil.analyze("OK");
+		
+    	let serialized = profil.serialize();
+    	assert_eq!(serialized, "{\"patterns\":{\"VC\":1},\"pattern_total\":1,\"pattern_keys\":[\"VC\"],\"pattern_vals\":[1],\"pattern_percentages\":[],\"pattern_ranks\":[],\"sizes\":{\"2\":1},\"size_total\":1,\"size_ranks\":[],\"processors\":4,\"facts\":[[{\"key\":\"O\",\"prior_key\":null,\"next_key\":\"K\",\"pattern_placeholder\":\"V\",\"starts_with\":1,\"ends_with\":0,\"index_offset\":0}],[{\"key\":\"K\",\"prior_key\":\"O\",\"next_key\":null,\"pattern_placeholder\":\"C\",\"starts_with\":0,\"ends_with\":1,\"index_offset\":1}],[],[]]}");
+    }    
 }

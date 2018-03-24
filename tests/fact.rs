@@ -11,7 +11,10 @@ mod tests {
     fn new_fact(){
         //fact created for the character 'r' in the string "word"
     	let fact =  Fact::new('r','c',0,0,2);
+    	
+    	assert!(true);
     }
+    
     #[test]
     fn new_fact_from_serialized(){
     	let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
@@ -20,11 +23,13 @@ mod tests {
     }
     
     #[test]
-    // ensure A Fact can be exported (to be archived) as JSON
+    // ensure a Fact can be exported (to be archived) as JSON
     fn serialize(){
         //fact created for the character 'r' in the string "word"
     	let mut fact =  Fact::new('r','c',0,0,2);
-    	println!("serialized = {}", fact.serialize());
+    	let serialized = fact.serialize();
+    	
+		assert_eq!(serialized,"{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}");
     }
     
     #[test]
