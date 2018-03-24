@@ -15,7 +15,7 @@ mod tests {
     #[test]
     fn new_fact_from_serialized(){
     	let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
-    	let mut fact = Fact::from_serialized(&serialized);
+    	let fact = Fact::from_serialized(&serialized);
     	assert_eq!(fact.pattern_placeholder, 'c');
     }
     
