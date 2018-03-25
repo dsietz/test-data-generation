@@ -58,5 +58,16 @@ mod tests {
     	dsp.analyze_csv_file("./tests/samples/sample-00.csv").unwrap();
     	
     	assert_eq!(dsp.save("./tests/samples/sample-00-dsp").unwrap(), true);
-    }    
+    } 
+    
+    #[test]
+    // demo test
+    fn demo(){
+    	let mut dsp = DataSampleParser::new();
+    	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    	
+    	println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
+    	
+    	assert!(true);
+    }       
 }
