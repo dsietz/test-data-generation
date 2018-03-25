@@ -20,17 +20,59 @@
 //!		println!("generate person:{}", dsp.demo_person_name());
 //! }
 //! ```
+//!
+//! Save the algorithm ...
+//!
+//! Archive (export) the data sample parser object so that you can reuse the algorithm to generate test data at a later time.
+//! This enables you to persist the algorithm without having to store the actual data sample that was used to create the algorithm - 
+//! Which is important if you used 'real' data in your sample data.
+//!  
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::data_sample_parser::DataSampleParser;
+//!
+//! fn main() {
+//! 	// analyze the dataset
+//!		let mut dsp =  DataSampleParser::new();
+//!
+//!     assert_eq!(dsp.save("./tests/samples/empty-dsp").unwrap(), true);
+//! }
+//! ``` 
+//!
+//! Load an algorithm ...
+//! 
+//! Create a data sample parser from a previously saved (exported) archive file so you can generate test data based on the algorithm.</br>
+//! *NOTE:* In this example, there was only one data point in the data smaple that was analyzed (the word 'OK'). This was intentional 
+//! so the algorithm would be guaranteed to generate that same word. This was done ensure the assert_eq! returns true.  
+//!
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::data_sample_parser::DataSampleParser;
+//!	
+//! fn main() {	
+//!		let mut dsp = DataSampleParser::from_file("./tests/samples/sample-00-dsp");
+//!
+//!		assert_eq!(dsp.generate_record()[0], "OK".to_string());
+//! }
+//! ```    
 
 use std::collections::BTreeMap;
 use configs::Configs;
 use profile::profile::{Profile};
 use std::fs::File;
+use std::io;
+use std::io::Write;
+use std::io::prelude::*;
 use std::result::Result;
 use csv;
 //use crossbeam;
+use serde_json;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
+#[derive(Serialize, Deserialize, Debug)]
 /// Represents the Parser for sample data to be used 
 pub struct DataSampleParser{
 	/// indicates if there were issues parsing and anlyzing the data sample
@@ -69,7 +111,7 @@ impl DataSampleParser {
 	///
 	/// # Arguments
 	///
-	/// * `path: &'static str` - The full path name (including the file name and extension) to the configuration file.</br>
+	/// * `path: String - The full path name (including the file name and extension) to the configuration file.</br>
 	/// 
 	/// #Example
 	/// 
@@ -91,6 +133,50 @@ impl DataSampleParser {
             profiles: ProfilesMap::new(),
 		}
 	}
+	
+	/// Constructs a new DataSampleParser from a serialized (JSON) string. This is used when restoring from "archive"
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {	
+	///		let mut dsp = DataSampleParser::from_file("./tests/samples/sample-00-dsp");
+    ///
+    ///		assert_eq!(dsp.generate_record()[0], "OK".to_string());
+	/// }    	
+    /// ```	
+	pub fn from_file(path: &'static str) -> DataSampleParser {
+		// open the archive file	
+		let mut file = match File::open(format!("{}.json",&path)) {
+			Err(_e) => {
+				error!("Could not open file {:?}", &path.to_string());
+				panic!("Could not open file {:?}", &path.to_string());
+			},
+			Ok(f) => {
+				info!("Successfully opened file {:?}", &path.to_string());
+				f
+			},
+		};
+		
+		//read the archive file
+		let mut serialized = String::new();
+		match file.read_to_string(&mut serialized) {
+			Err(e) => {
+				error!("Could not read file {:?} because of {:?}", &path.to_string(), e.to_string());
+				panic!("Could not read file {:?} because of {:?}", &path.to_string(), e.to_string());
+			},
+			Ok(s) => {
+				info!("Successfully read file {:?}", &path.to_string());
+				s
+			},
+		};		
+	
+		serde_json::from_str(&serialized).unwrap()
+	}		
 	
 	/// This function analyzes sample data that is a csv formatted string and returns a boolean if successful.
 	/// 
@@ -342,5 +428,60 @@ impl DataSampleParser {
 	/// }
 	pub fn running_with_issues(&self) -> &bool{
 		&self.issues
+	}
+	
+	/// This function saves (exports) the DataSampleParser to a JSON file. 
+	/// This is useful when you wish to reuse the algorithm to generate more test data later.  
+	/// 
+	/// # Arguments
+	///
+	/// * `field: String` - The full path of the export file , excluding the file extension, (e.g.: "./test/data/custom-names").</br>	
+	/// 
+	/// #Errors
+	/// If this function encounters any form of I/O or other error, an error variant will be returned. 
+	/// Otherwise, the function returns Ok(true).</br>
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	/// 	// analyze the dataset
+	///		let mut dsp =  DataSampleParser::new();
+	///     dsp.analyze_csv_file("./tests/samples/sample-00.csv").unwrap();
+	///
+    ///     assert_eq!(dsp.save("./tests/samples/sample-00-dsp").unwrap(), true);
+	/// }
+	/// 	
+	pub fn save(&mut self, path: &'static str) -> Result<(bool), io::Error>  {
+		let dsp_json = serde_json::to_string(&self).unwrap();
+					
+		// Create the archive file	
+		let mut file = match File::create(format!("{}.json",&path)) {
+			Err(e) => {
+				error!("Could not create file {:?}", &path.to_string());
+				return Err(e);
+			},
+			Ok(f) => {
+				info!("Successfully exported to {:?}", &path.to_string());
+				f
+			},
+		};
+
+		// Write the json string to file, returns io::Result<()>
+    	match file.write_all(dsp_json.as_bytes()) {
+        	Err(e) => {
+            	error!("Could not write to file {}", &path.to_string());
+            	return Err(e);
+        	},
+        	Ok(_) => {
+        		info!("Successfully exported to {}", &path.to_string());
+        	},
+    	};	    	
+ 	
+		Ok(true)
 	}
 }
