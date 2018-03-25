@@ -55,7 +55,7 @@ The algorithm is built on the bases of:
 4. beginning and ending characters
 5. length of entity (string, date, number) 
 
-Example
+**Example**
 ```
 extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;

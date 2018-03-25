@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["PatternPlaceholder","Represents a placeholder for all the symbols used in pattern definitions"]]});

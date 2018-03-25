@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Params","A parameters manager object"]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["DataSampleParser","Represents the Parser for sample data to be used "]]});
