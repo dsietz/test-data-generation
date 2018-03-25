@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Pattern","Represents a symbolic pattern of an entity (String)"]]});
