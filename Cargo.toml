@@ -3,8 +3,22 @@ name = "test-data-generation"
 version = "0.0.1"
 authors = ["dsietz <davidsietz@yahoo.com>"]
 repository = "https://github.com/dsietz/test-data-generation.git"
-license = "Apache 2.0"
+documentation = "https://docs.rs/test-data-generation/"
 readme = "README.md"
+license = "Apache License 2.0"
+keywords = ["data", "testing", "generate", "parser", "sample"]
+categories = ["algorithms", "development-tools::testing", "parsing", "text-processing", "simulation"]
+description = """
+A simple to use, light-weight library that analyzes sample data to build algorithms and generates realistic test data.
+"""
+
+[badges]
+travis-ci = { repository = "dsietz/test-data-generation" }
+appveyor = { repository = "dsietz/test-data-generation" }
+coveralls = { repostiory = "dsietz/test-data-generation", branch = "master" }
+is-it-maintained-issue-resolution = { repository = "dsietz/test-data-generation" }
+is-it-maintained-open-issues = { repository = "dsietz/test-data-generation" }
+maintenance = {status = "actively-developed"}
 
 [dependencies]
 config       = "*"
@@ -20,3 +34,43 @@ regex        = "0.2"
 rand         = "0.3"
 crossbeam    = "0.3.2"
 csv          = "1.0.0-beta.5"
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 4
+
+[profile.test]
+opt-level = 1
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 4
+
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+[profile.doc]
+opt-level = 0
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 4

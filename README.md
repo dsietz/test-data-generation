@@ -1,8 +1,9 @@
 ## Test Data Generation
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Coverage Status](https://coveralls.io/repos/github/dsietz/test-data-generation/badge.svg?branch=master)](https://coveralls.io/github/dsietz/test-data-generation?branch=master)
 
 Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
-Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ejg8c33dn31nhv36/branch/master?svg=true)](https://ci.appveyor.com/project/kbknapp/clap-rs/branch/master)
+Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
 ### Description
 For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module 
