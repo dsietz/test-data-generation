@@ -1,3 +1,7 @@
+// Copyright 2018 David Sietz and [`test-data-generator` contributors](https://github.com/dsietz/test-data-generator/blob/master/CONTRIBUTORS.md).
+// Licensed under the MIT license
+// (see LICENSE or <https://opensource.org/licenses/Apache-2.0>)
+
 #![crate_type= "lib"]
 #![crate_name = "test_data_generation"]
 
