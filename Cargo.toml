@@ -2,7 +2,6 @@
 name = "test-data-generation"
 version = "0.0.1"
 authors = ["dsietz <davidsietz@yahoo.com>"]
-exclude = ["examples/*", "tests/*", "benches/*", "*.png"]
 repository = "https://github.com/dsietz/test-data-generation.git"
 documentation = "https://docs.rs/test-data-generation/"
 readme = "README.md"
