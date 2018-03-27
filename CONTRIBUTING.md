@@ -2,11 +2,12 @@
 
 #### Getting started (section in README)
 
-Contributions are welcome!
+We welcome your contributions!
 
-The easiest way for you to contribute right now is to use `Test Data Generation`, and provide constructive feedback, (e.g.: bugs, enhancement requests, product roadmap direction). 
+There are many ways you can contribute to this project. Since this project is in its infancy stage, the simplest way to contribute is to start using `Test Data Generation`. 
+Provide us with constructive feedback, (e.g.: bugs, enhancement requests, product roadmap direction).
 
-If you've just filed an issue, or you want to work on an [existing one](https://github.com/dsietz/test-data-generation/issues), tag me with @dsietz on an issue, and get you setup as a contributor.
+If you'd like to get more involved and contribute to the code, (e.g.: fixing an issue or providing an enhancement), just file a [request](https://github.com/dsietz/test-data-generation/issues), or you want to work on an [existing one](https://github.com/dsietz/test-data-generation/issues), tag me with @dsietz on an issue, and get you setup as a contributor.
 
 As a note, all contributions are expected to follow [the Rust Code of Conduct](https://www.rust-lang.org/en-US/conduct.html).
 
@@ -18,9 +19,6 @@ The source is split into four modules:
 - `lib.rs` contains top-level traits, module documentation, and helper functions
 - `builders.rs` contains all the configuration code
 - `errors.rs` contains error handling for finishing configuration
-- and `log_impl.rs` contains the implementation for `log::Log` which is created to run for the actual logging.
-
-Hopefully these modules are fairly separated, and it's clear when you'll need to work on multiple sections. Adding a new log implementation, for instance, will need to touch `builders.rs` for configuration, and `log_impl.rs` for the implementation - both pieces of code will connect via `builders::Dispatch::into_dispatch`, but besides that, things should be fairly separate.
 
 #### Pull requests
 
@@ -48,17 +46,4 @@ cargo test -- --skip test2
 cargo test test2
 ```
 
-To run the example program, use:
-
-```sh
-cargo run --example cmd-program # test less logging
-cargo run --example cmd-program -- --verbose # test more logging
-```
-
 Feel free to add tests and examples demonstrating new features as you see fit. Pull requests which solely add new/interesting example programs are also welcome.
-
-### Mentoring
-
-With all that said, contributing to a library, especially if new to rust, can be daunting.
-
-Feel free to email me at daboross @ daboross.net with any questions!
