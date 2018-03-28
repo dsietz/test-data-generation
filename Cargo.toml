@@ -74,3 +74,6 @@ rpath = false
 lto = false
 debug-assertions = true
 codegen-units = 4
+
+[package.metadata.docs.rs]
+features = ["doc"]

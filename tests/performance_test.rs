@@ -6,7 +6,7 @@ mod tests {
 	use std::time::{SystemTime};
 	
     #[test]
-    
+    #[ignore]
     // ensure that the crate (library) can be used in a executable
     fn analyze_performance_test(){
 		// start up a Data Sample Parser
