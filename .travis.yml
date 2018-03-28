@@ -1,40 +1,35 @@
-sudo: true
+sudo: false
 os: linux
 language: rust
 cache: cargo
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev
 rust:
   - stable
 matrix:
   allow_failures:
     - rust: nightly
-script:
-  - cargo build --all
-  - cargo test --all
-addons:
-  apt:
-    packages:
-    - binutils-dev 
-    - libcurl4-openssl-dev
-    - libelf-dev
-    - libdw-dev
-    - libiberty-dev
-    - cmake
-    - gcc
-    - zlib1g-dev   
-after_success:
+before_script:
   - |
-    wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-    tar xzf master.tar.gz &&
-    cd kcov-master &&
-    mkdir build &&
-    cd build &&
-    cmake .. &&
-    make &&
-    sudo make install &&
-    cd ../.. &&
-    rm -rf kcov-master &&
-    cargo clean &&
-    cargo test --no-run &&
-    for file in target/debug/*-*; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo --verify "target/cov/$(basename $file)" "$file"; done &&
-    kcov --coveralls-id=$TRAVIS_JOB_ID --merge target/cov target/cov/* &&
-    echo "Uploaded code coverage"
+      pip install 'travis-cargo<0.2' --user &&
+      export PATH=$HOME/.local/bin:$PATH    
+script:
+  - |
+      travis-cargo build &&
+      travis-cargo test -- --verbose &&
+      travis-cargo bench -- --no-run 
+after_success:
+  - travis-cargo coveralls --no-sudo --verify
+  - |    
+      [ $TRAVIS_BRANCH = master ] &&
+      [ $TRAVIS_PULL_REQUEST = false ] &&
+      travis-cargo --only stable doc --no-deps &&
+      travis-cargo --only stable doc-upload &&
+env:
+  global:
+    - TRAVIS_CARGO_NIGHTLY_FEATURE=nightly
