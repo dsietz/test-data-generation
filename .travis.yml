@@ -24,12 +24,12 @@ script:
       travis-cargo test -- --verbose &&
       travis-cargo bench -- --no-run 
 after_success:
-  - travis-cargo coveralls --no-sudo --verify
+  - travis-cargo coveralls --no-sudo --verify --kcov-options ="--coveralls-id=$TRAVIS_JOB_ID" --kcov-options="--exclude-pattern=/.cargo" --kcov-options="--clean"
   - |    
       [ $TRAVIS_BRANCH = master ] &&
       [ $TRAVIS_PULL_REQUEST = false ] &&
       travis-cargo --only stable doc --no-deps &&
-      travis-cargo --only stable doc-upload &&
+      travis-cargo --only stable doc-upload
 env:
   global:
     - TRAVIS_CARGO_NIGHTLY_FEATURE=nightly
