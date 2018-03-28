@@ -10,7 +10,6 @@ addons:
       - libdw-dev
       - binutils-dev
 rust:
-  - nightly
   - stable
 matrix:
   allow_failures:
@@ -22,12 +21,15 @@ before_script:
 script:
   - |
       travis-cargo build &&
-      travis-cargo test &&
-      travis-cargo bench &&
-      travis-cargo --only stable doc  
+      travis-cargo test -- --verbose &&
+      travis-cargo bench -- --no-run 
 after_success:
-  - travis-cargo --only stable doc-upload
   - travis-cargo coveralls --no-sudo --verify
+  - |    
+      [ $TRAVIS_BRANCH = master ] &&
+      [ $TRAVIS_PULL_REQUEST = false ] &&
+      travis-cargo --only stable doc --no-deps &&
+      travis-cargo --only stable doc-upload &&
 env:
   global:
     - TRAVIS_CARGO_NIGHTLY_FEATURE=nightly
