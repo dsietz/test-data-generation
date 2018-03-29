@@ -11,6 +11,12 @@ categories = ["algorithms", "development-tools::testing", "parsing", "text-proce
 description = """
 A simple to use, light-weight library that analyzes sample data to build algorithms and generates realistic test data.
 """
+exclude = [
+    "examples/*",
+    "target/*",
+	"tests/*",
+	"benches/*",
+]
 
 [badges]
 travis-ci = { repository = "dsietz/test-data-generation" }
