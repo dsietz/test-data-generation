@@ -1,6 +1,7 @@
 ## Test Data Generation
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Coverage Status](https://coveralls.io/repos/github/dsietz/test-data-generation/badge.svg?branch=master)](https://coveralls.io/github/dsietz/test-data-generation?branch=master)
+[![Docs.rs](https://docs.rs/test-data-generation/badge.svg)](https://docs.rs/test-data-generation)
 
 Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
@@ -120,6 +121,7 @@ fn main() {
     dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
     	
     assert_eq!(dsp.save("./tests/samples/sample-01-dsp").unwrap(), true);
+}
 ```
 
 and use it at a later time.
@@ -132,6 +134,7 @@ fn main() {
     let mut dsp = DataSampleParser::from_file("./tests/samples/sample-01-dsp");
     	
 	println!("Sample data is {:?}", dsp.generate_record()[0]);
+}
 ```
 
 ## How to Contribute

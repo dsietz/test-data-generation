@@ -8,9 +8,7 @@ readme = "README.md"
 license = "Apache-2.0"
 keywords = ["data", "testing", "generate", "parser", "sample"]
 categories = ["algorithms", "development-tools::testing", "parsing", "text-processing", "simulation"]
-description = """
-A simple to use, light-weight library that analyzes sample data to build algorithms and generates realistic test data.
-"""
+description = "A simple to use, light-weight library that analyzes sample data to build algorithms and generates realistic test data."
 exclude = [
     "examples/*",
     "target/*",
@@ -27,7 +25,7 @@ is-it-maintained-open-issues = { repository = "dsietz/test-data-generation" }
 maintenance = {status = "actively-developed"}
 
 [dependencies]
-config       = "*"
+config       = "0.8.0"
 lazy_static  = "0.2"
 log          = "0.3"
 log4rs       = "0.7.0"
