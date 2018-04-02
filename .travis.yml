@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 os: linux
 language: rust
 cache: cargo
@@ -21,19 +21,25 @@ before_script:
 script:
   - |
       travis-cargo build &&
-      travis-cargo test -- --verbose &&
+      travis-cargo test &&
       travis-cargo bench -- --no-run 
 after_success:
   - |
-      wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-      tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build && cmake .. && make &&
-      sudo make install && cd ../.. &&
-      kcov --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/test-data-generation-*
-  - |    
-      [ $TRAVIS_BRANCH = master ] &&
-      [ $TRAVIS_PULL_REQUEST = false ] &&
-      travis-cargo --only stable doc -- --no-deps &&
-      travis-cargo --only stable doc-upload
+    wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+    tar xzf master.tar.gz &&
+    cd kcov-master &&
+    mkdir build &&
+    cd build &&
+    cmake .. &&
+    make &&
+    sudo make install &&
+    cd ../.. &&
+    rm -rf kcov-master &&
+    cargo clean &&
+    cargo test --no-run &&
+    for file in target/debug/*-*; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo --verify "target/cov/$(basename $file)" "$file"; done &&
+    kcov --coveralls-id=$TRAVIS_JOB_ID --merge target/cov target/cov/* &&
+    echo "Uploaded code coverage"
 env:
   global:
     - TRAVIS_CARGO_NIGHTLY_FEATURE=nightly

@@ -20,6 +20,5 @@ Cargo.lock
 
 # Backup files.
 *.bak
-
-# non-related custom directories
-docs
+*.bk
+*.orig
