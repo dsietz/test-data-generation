@@ -8,6 +8,27 @@ mod tests {
 	use profile::profile::Profile; 
 	
 	#[test]
+    fn save_profile(){
+		let mut profile =  Profile::new();
+		profile.analyze("Smith, John");
+    	profile.analyze("O'Brian, Henny"); 
+    	profile.analyze("Dale, Danny"); 
+    	profile.analyze("Rickets, Ronney");
+    
+    	profile.pre_generate(); 
+	
+        assert_eq!(profile.save("./tests/samples/sample-00-profile").unwrap(), true);
+	}
+	
+	#[test]
+    fn new_profile_from_file(){
+		let mut profile = Profile::from_file("./tests/samples/sample-00-profile");
+    	profile.pre_generate();
+    
+    	assert!(profile.generate().len() > 0);
+    }	
+	
+	#[test]
     fn new_profile_from_serialized(){
     	let serialized = "{\"patterns\":{\"VC\":1},\"pattern_total\":1,\"pattern_keys\":[\"VC\"],\"pattern_vals\":[1],\"pattern_percentages\":[],\"pattern_ranks\":[],\"sizes\":{\"2\":1},\"size_total\":1,\"size_ranks\":[],\"processors\":4,\"facts\":[[{\"key\":\"O\",\"prior_key\":null,\"next_key\":\"K\",\"pattern_placeholder\":\"V\",\"starts_with\":1,\"ends_with\":0,\"index_offset\":0}],[{\"key\":\"K\",\"prior_key\":\"O\",\"next_key\":null,\"pattern_placeholder\":\"C\",\"starts_with\":0,\"ends_with\":1,\"index_offset\":1}],[],[]]}";
     	let mut profile = Profile::from_serialized(&serialized);

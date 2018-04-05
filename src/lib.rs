@@ -35,6 +35,35 @@
 //!    	println!("The generated name is {:?}", data_profile.generate());
 //! }
 //! ``` 
+//!
+//! You can also export (archive as JSON file) the profile for later use. 
+//! This allows for the algorithm to be retrieved without having to store the actual data that was analyzed.
+//!
+//!	```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::profile::profile::Profile;
+//!	
+//! fn main() {	
+//!		//create a profile and analyze some data
+//!		let mut old_profile =  Profile::new();
+//!		old_profile.analyze("Smith, John");
+//!		old_profile.analyze("O'Brian, Henny"); 
+//!		old_profile.analyze("Dale, Danny"); 
+//!		old_profile.analyze("Rickets, Ronney");
+//!		
+//!		old_profile.pre_generate(); 
+//!		
+//!		//save the profile for later
+//!		assert_eq!(old_profile.save("./tests/samples/sample-00-profile").unwrap(), true);
+//!		
+//!		// create a new profile from the archive json file
+//!		let mut new_profile = Profile::from_file("./tests/samples/sample-00-profile");
+//!
+//!		// generate some data. NOTE that the pre-generate() was already called prior to saving
+//!     println!("The generated name is {:?}", new_profile.generate());
+//! }   
+//! ```
 //! 
 //! ### Data Sample Parser
 //! 

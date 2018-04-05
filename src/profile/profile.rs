@@ -86,6 +86,35 @@
 //!    	println!("The generated date is {:?}", data_profile.generate());
 //! }
 //! ```
+//!
+//! You can also export (archive as JSON file) the profile for later use. 
+//! This allows for the algorithm to be retrieved without having to store the actual data that was analyzed.
+//!
+//!	```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::profile::profile::Profile;
+//!	
+//! fn main() {	
+//!		//create a profile and analyze some data
+//!		let mut old_profile =  Profile::new();
+//!		old_profile.analyze("Smith, John");
+//!		old_profile.analyze("O'Brian, Henny"); 
+//!		old_profile.analyze("Dale, Danny"); 
+//!		old_profile.analyze("Rickets, Ronney");
+//!		
+//!		old_profile.pre_generate(); 
+//!		
+//!		//save the profile for later
+//!		assert_eq!(old_profile.save("./tests/samples/sample-00-profile").unwrap(), true);
+//!		
+//!		// create a new profile from the archive json file
+//!		let mut new_profile = Profile::from_file("./tests/samples/sample-00-profile");
+//!
+//!		// generate some data. NOTE that the pre-generate() was already called prior to saving
+//!     println!("The generated name is {:?}", new_profile.generate());
+//! }   
+//!
 
 use profile::pattern::{Pattern};
 use profile::fact::{Fact};
@@ -93,6 +122,10 @@ use std::collections::BTreeMap;
 use std::ops::AddAssign;
 use crossbeam;
 use serde_json;
+use std::fs::File;
+use std::io;
+use std::io::Write;
+use std::io::prelude::*;
 
 type PatternMap = BTreeMap<String, u32>;
 type SizeMap = BTreeMap<u32, u32>;
@@ -194,6 +227,57 @@ impl Profile {
 			facts: Profile::new_facts(p),
 		}
 	}
+	
+	/// Constructs a new Profile from an exported JSON file. This is used when restoring from "archive"
+	/// 
+	/// # Arguments
+	///
+	/// * `field: String` - The full path of the export file , excluding the file extension, (e.g.: "./test/data/custom-names").</br>
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///	
+	/// fn main() {	
+	///		let mut profile = Profile::from_file("./tests/samples/sample-00-profile");
+    ///
+    ///     profile.pre_generate();
+    ///
+    ///     println!("The generated name is {:?}", profile.generate());
+	/// }    	
+    /// ```	
+	pub fn from_file(path: &'static str) -> Profile {
+		// open the archive file	
+		let mut file = match File::open(format!("{}.json",&path)) {
+			Err(_e) => {
+				error!("Could not open file {:?}", &path.to_string());
+				panic!("Could not open file {:?}", &path.to_string());
+			},
+			Ok(f) => {
+				info!("Successfully opened file {:?}", &path.to_string());
+				f
+			},
+		};
+		
+		//read the archive file
+		let mut serialized = String::new();
+		match file.read_to_string(&mut serialized) {
+			Err(e) => {
+				error!("Could not read file {:?} because of {:?}", &path.to_string(), e.to_string());
+				panic!("Could not read file {:?} because of {:?}", &path.to_string(), e.to_string());
+			},
+			Ok(s) => {
+				info!("Successfully read file {:?}", &path.to_string());
+				s
+			},
+		};		
+	
+		serde_json::from_str(&serialized).unwrap()
+	}		
+	
 	
 	/// Constructs a new Profile from a serialized (JSON) string of the Profile object. This is used when restoring from "archive"
 	/// 
@@ -594,6 +678,66 @@ impl Profile {
 		self.patterns = PatternMap::new();
 		info!("Profile: patterns have been reset ...");
 	}
+	
+	/// This function saves (exports) the Profile to a JSON file. 
+	/// This is useful when you wish to reuse the algorithm to generate more test data later.  
+	/// 
+	/// # Arguments
+	///
+	/// * `field: String` - The full path of the export file , excluding the file extension, (e.g.: "./test/data/custom-names").</br>	
+	/// 
+	/// #Errors
+	/// If this function encounters any form of I/O or other error, an error variant will be returned. 
+	/// Otherwise, the function returns Ok(true).</br>
+	/// 
+	/// #Example
+	/// 
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///	
+	/// fn main() {
+	/// 	// analyze the dataset
+	///		let mut profile =  Profile::new();
+	///     profile.analyze("Smith, John");
+    ///		profile.analyze("O'Brian, Henny"); 
+    ///		profile.analyze("Dale, Danny"); 
+    ///		profile.analyze("Rickets, Ronney");
+    ///
+    ///		profile.pre_generate(); 
+	///
+    ///     assert_eq!(profile.save("./tests/samples/sample-00-profile").unwrap(), true);
+	/// }
+	/// 	
+	pub fn save(&mut self, path: &'static str) -> Result<(bool), io::Error>  {
+		let dsp_json = serde_json::to_string(&self).unwrap();
+					
+		// Create the archive file	
+		let mut file = match File::create(format!("{}.json",&path)) {
+			Err(e) => {
+				error!("Could not create file {:?}", &path.to_string());
+				return Err(e);
+			},
+			Ok(f) => {
+				info!("Successfully exported to {:?}", &path.to_string());
+				f
+			},
+		};
+
+		// Write the json string to file, returns io::Result<()>
+    	match file.write_all(dsp_json.as_bytes()) {
+        	Err(e) => {
+            	error!("Could not write to file {}", &path.to_string());
+            	return Err(e);
+        	},
+        	Ok(_) => {
+        		info!("Successfully exported to {}", &path.to_string());
+        	},
+    	};	    	
+ 	
+		Ok(true)
+	}	
 	
 	/// This function converts the Profile to a serialize JSON string.
 	/// 
