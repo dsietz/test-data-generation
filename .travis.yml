@@ -41,7 +41,7 @@ after_success:
     rm -rf kcov-master &&
     cargo clean &&
     cargo test --no-run &&
-    for file in target/debug/*-*; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo --verify "target/cov/$(basename $file)" "$file"; done &&
+    for file in target/debug/*-*[^\.d]; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
     kcov --coveralls-id=$TRAVIS_JOB_ID --merge target/cov target/cov/* &&
     echo "Uploaded code coverage"
 env:
