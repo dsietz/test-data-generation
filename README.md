@@ -35,14 +35,10 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.0.1:
+Here's whats new in 0.0.2:
 
-* **Demo Mode:**  demonstrate the functionality of generating dates and peopl's names
-* **Analyze CSV file**: parse a csv file (mutli fields) and create an algorithm
-* **Save Data Sample Parser**: save the data sample parser (with its algorithm, but not sampel data) as a json file
-* **load Data Sample Parser**: load a json file of a previoulsy saved the data sample parser
-* **generate record**: generate a test data record
-* **genrate by field name**: generate test data by the record's field name
+* **Save Profile**: save the profile (with its algorithm, but not sample data) as a json file
+* **load Profile**: load a json file of a previously saved the profile
 * Updated the `README.md`
 
 ## About
@@ -89,6 +85,16 @@ fn main() {
    	 		
     // generate some data
    	println!("The generated name is {:?}", data_profile.generate());
+   	
+   	// save the profile (algorithm) for later
+   	assert_eq!(data_profile.save("./tests/samples/sample-00-profile").unwrap(), true);
+   	
+   	// later... create a new profile from the saved archive file
+   	let mut new_profile = Profile::from_file("./tests/samples/sample-00-profile");
+    new_profile.pre_generate();
+    
+    // generate some data
+   	println!("The generated name is {:?}", new_profile.generate());	
 }
 ``` 
 

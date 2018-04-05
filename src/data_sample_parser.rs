@@ -134,7 +134,7 @@ impl DataSampleParser {
 		}
 	}
 	
-	/// Constructs a new DataSampleParser from a serialized (JSON) string. This is used when restoring from "archive"
+	/// Constructs a new DataSampleParser from an exported JSON file. This is used when restoring from "archive"
 	/// 
 	/// #Example
 	/// 
