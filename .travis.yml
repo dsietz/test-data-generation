@@ -23,10 +23,16 @@ addons:
     - gcc
     - zlib1g-dev       
 script:
+  - |    
+      [ $TRAVIS_BRANCH = master ] &&
+      [ $TRAVIS_PULL_REQUEST = false ] &&
+      travis-cargo build --release
   - |
-      travis-cargo build &&
+      [ $TRAVIS_BRANCH = development ] &&
+      travis-cargo build
+  - |
       travis-cargo test &&
-      travis-cargo bench -- --no-run 
+      travis-cargo bench -- --no-run
 after_success:
   - |
     wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&

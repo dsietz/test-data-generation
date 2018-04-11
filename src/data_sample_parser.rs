@@ -408,7 +408,40 @@ impl DataSampleParser {
 		
 		record
 	}
-	
+/*	
+	/// This function creates a csv file of generated test data.
+	/// prior to calling this funciton, you need to call the analyze_csv_file() function.	
+	/// 
+	/// # Arguments
+	///
+	/// * `row_count: u32` - The number of rows to generate.</br>
+	/// * `path: &'static str` - The full path name where to save the csv file.</br>
+	/// 
+	/// # Example
+	///
+	/// ``` 
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///	
+    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    ///     dsp.generate_csv(100, "./tests/samples/generated-01.csv").unwrap();
+	/// }
+	/// ```
+	pub fn generate_csv(&mut self, row_count: u32, path: &'static str) -> Result<i32, String> {
+		let mut record = Vec::new();
+		
+		for profile in self.profiles.iter_mut() {
+			record.push(profile.1.generate().to_string());
+		}
+		
+		record
+	}	
+*/	
 	/// This function returns a boolean that indicates if the data sample parsing had issues
 	/// 
 	/// # Example

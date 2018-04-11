@@ -152,10 +152,3 @@ Details on how to contribute can be found in the [CONTRIBUTING](./CONTRIBUTING.m
 test-data-generation is primarily distributed under the terms of the Apache License (Version 2.0).
 
 See ![LICENSE-APACHE](.:LICENSE-APACHE "Apache License") for details.
-
-### Documentation
-Documentation for this crate is built without dependencies. 
-```
-cargo doc --no-deps
-```
-

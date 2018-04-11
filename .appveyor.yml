@@ -14,4 +14,9 @@ install:
 build: false
 test_script:
   - cargo build
+    on:
+      branch: development
+  - cargo build --release
+    on:
+      branch: master
   - cargo test
