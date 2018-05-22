@@ -22,3 +22,6 @@ Cargo.lock
 *.bak
 *.bk
 *.orig
+
+# Generated file due to testing
+/tests/samples/generated-01.csv

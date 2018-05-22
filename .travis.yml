@@ -23,7 +23,6 @@ addons:
     - gcc
     - zlib1g-dev       
 script:
-  - |
       travis-cargo build &&
       travis-cargo test &&
       travis-cargo bench -- --no-run 

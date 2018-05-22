@@ -67,6 +67,8 @@ use std::io::Write;
 use std::io::prelude::*;
 use std::result::Result;
 use csv;
+use std::error::Error;
+use csv::WriterBuilder;
 //use crossbeam;
 use serde_json;
 
@@ -179,6 +181,12 @@ impl DataSampleParser {
 	}		
 	
 	/// This function analyzes sample data that is a csv formatted string and returns a boolean if successful.
+	/// _NOTE:_ The csv properties are as follows:
+	///       + headers are included as first line
+	///       + double quote wrap text
+	///       + double quote escapes is enabled			
+	///       + delimiter is a comma
+	///
 	/// 
 	/// # Arguments
 	///
@@ -206,10 +214,10 @@ impl DataSampleParser {
     		e.to_string()
 		}));
 	
-		//let mut rdr = csv::Reader::from_reader(file);
 		let mut rdr = csv::ReaderBuilder::new()
         	.has_headers(true)
         	.quote(b'"')
+        	.double_quote(true)
         	.delimiter(b',')
         	.from_reader(file);      	
 
@@ -407,6 +415,94 @@ impl DataSampleParser {
 		}
 		
 		record
+	}
+	
+	/// This function creates a csv file of generated test data.
+	/// Prior to calling this funciton, you need to call the analyze_csv_file() function.	
+	/// _NOTE:_ The csv properties are as follows:
+	///       + headers are included as first line
+	///       + double quotes wrap text
+	///       + double quote escapes is enabled		
+	///       + delimiter is a comma
+	///
+	/// 
+	/// # Arguments
+	///
+	/// * `row_count: u32` - The number of rows to generate.</br>
+	/// * `path: &'static str` - The full path name where to save the csv file.</br>
+	/// 
+	/// # Example
+	///
+	/// ``` 
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///	
+    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    ///     dsp.generate_csv(100, "./tests/samples/generated-01.csv").unwrap();
+	/// }
+	/// ```
+	pub fn generate_csv(&mut self, row_count: u32, path: &'static str) -> Result<(), Box<Error>> {
+		info!("generating csv file {}", path);
+		
+		let mut wtr = try!(WriterBuilder::new()
+		    .has_headers(true)
+        	.quote(b'"')
+        	.double_quote(true)
+        	.delimiter(b',')
+        	.from_path(path).map_err(|e| {
+			error!("csv file {} couldn't be created!",path);
+    		e.to_string()
+		}));
+		
+		let headers = self.extract_headers();
+		wtr.write_record(&headers)?;
+		
+		for r in 0..row_count {
+			let mut record = Vec::new();
+		
+			for profile in self.profiles.iter_mut() {
+				record.push(profile.1.generate());
+			}
+		
+			wtr.write_record(&record)?;
+		}
+		
+		wtr.flush()?;
+		
+		Ok(())
+	}	
+	
+	/// This function returns a vector of header names
+	/// 
+	/// # Example
+	///
+	/// ``` 
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///	
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///	
+    /// 	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    ///     let headers = dsp.extract_headers();
+    ///
+    ///		assert_eq!(headers.len(), 2);
+	/// }	
+	pub fn extract_headers(&mut self) -> Vec<String> {
+		let mut headers = vec!();
+		
+		for profile in self.profiles.iter_mut() {
+			headers.push(profile.0.to_string());
+		}
+		
+		headers
 	}
 	
 	/// This function returns a boolean that indicates if the data sample parsing had issues
