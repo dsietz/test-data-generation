@@ -5,9 +5,10 @@ use test_data_generation::data_sample_parser;
 #[cfg(test)]
 mod tests {
 	use data_sample_parser::DataSampleParser;
-	//use std::fs::File;
-	//use std::io::prelude::*;
-    
+	use std::fs::File;
+	use std::io::prelude::*;
+	use std::io::BufReader;
+	
     #[test]
     // ensure the Data Sample Parser can be restored from archived file
     fn from_file(){
@@ -69,5 +70,43 @@ mod tests {
     	println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
     	
     	assert!(true);
-    }       
+    }
+    
+    #[test]
+    // ensure the DataSampleParser object can generate test data as a csv file
+    fn extract_headers_from_sample(){
+    	let mut dsp =  DataSampleParser::new();  
+    	
+    	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    	let headers = dsp.extract_headers();
+    	
+    	assert_eq!(headers.len(), 2);
+    }         
+    
+    #[test]
+    // ensure the DataSampleParser object can generate test data as a csv file
+    fn generate_csv_test_data_from_sample(){
+    	let mut dsp =  DataSampleParser::new();  
+    	
+    	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    	dsp.generate_csv(100, "./tests/samples/generated-01.csv").unwrap();
+    	
+		let generated_row_count = match File::open(format!("{}","./tests/samples/generated-01.csv")) {
+			Err(_e) => {
+				0
+			},
+			Ok(f) => {
+				let mut count = 0;
+				let bf = BufReader::new(f);
+				
+				for _line in bf.lines() {
+					count += 1;
+				}
+				
+				count 
+			},
+		};
+    	
+    	assert_eq!(generated_row_count, 101);
+    }   
 }

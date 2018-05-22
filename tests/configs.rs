@@ -27,7 +27,7 @@ mod tests {
     #[test]
     fn new_fact_from_serialized(){
     	let serialized = "{\"file\":\"./tests/config/tdg.yaml\"}";
-    	let mut cfg = Configs::from_serialized(&serialized);
+    	let cfg = Configs::from_serialized(&serialized);
     	
     	assert_eq!(cfg.get_config_file_path(), "./tests/config/tdg.yaml");
     }
