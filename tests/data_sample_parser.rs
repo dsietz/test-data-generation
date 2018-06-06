@@ -62,6 +62,23 @@ mod tests {
     } 
     
     #[test]
+    // ensure the DataSampleParser object can convert a string to a vector of numbers for each char
+    fn string_to_vector(){
+    	let mut dsp =  DataSampleParser::new(); 
+    	
+    	assert_eq!(dsp.string_to_vector(String::from("hello")), [104 as f64, 101 as f64, 108 as f64, 108 as f64, 111 as f64]);
+    }     
+    
+    
+    #[test]
+    // ensure the DataSampleParser object can recognize the difference between realistic data and unrealistic generated data
+    fn realistic_data_test(){
+    	let mut dsp =  DataSampleParser::new(); 
+
+    	assert_eq!(dsp.realistic_test("Hello", "Hello").unwrap(),1 as f64);
+    }    
+    
+    #[test]
     // demo test
     fn demo(){
     	let mut dsp = DataSampleParser::new();
