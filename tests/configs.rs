@@ -7,7 +7,6 @@ mod tests {
 	use configs::Configs;
     
     #[test]
-    #[ignore]
     // ensure Configs reads a valid configuration file
     fn create_config_good_cfg_file(){
     	let mut cfg =  Configs::new("./tests/config/tdg.yaml");
@@ -15,8 +14,8 @@ mod tests {
     	cfg.load_config_file();
     }
     
-    #[test]
-    #[ignore]    
+    #[test]   
+    #[should_panic(expected = "Error: Configuration file not found at ./badpath/tdg.yaml")]
     // ensure Configs errors when reading an invalid configuration file
     fn create_config_bad_cfg_file(){
     	let mut cfg =  Configs::new("./badpath/tdg.yaml");

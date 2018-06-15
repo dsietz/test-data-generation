@@ -8,25 +8,39 @@ mod tests {
 	use profile::profile::Profile; 
 	
 	#[test]
-    fn save_profile(){
-		let mut profile =  Profile::new();
-		profile.analyze("Smith, John");
-    	profile.analyze("O'Brian, Henny"); 
-    	profile.analyze("Dale, Danny"); 
-    	profile.analyze("Rickets, Ronney");
+    // ensure logging is working in the crate
+    fn logging_test(){
+    	let mut profile =  Profile::new();
+    	profile.reset_analyze();
+    	    		
+    	assert!(true);
+    }   
     
-    	profile.pre_generate(); 
-	
-        assert_eq!(profile.save("./tests/samples/sample-00-profile").unwrap(), true);
-	}
-	
 	#[test]
     fn new_profile_from_file(){
 		let mut profile = Profile::from_file("./tests/samples/sample-00-profile");
     	profile.pre_generate();
     
     	assert!(profile.generate().len() > 0);
-    }	
+    }
+    
+    #[test]
+    #[should_panic]
+    fn new_profile_from_file_bad_data(){
+		let mut profile = Profile::from_file("./tests/samples/not-readable");
+    	profile.pre_generate();
+    
+    	assert!(profile.generate().len() > 0);
+    }	    
+    
+    #[test]
+    #[should_panic(expected = "Could not open file \"./tests/samples/bad-path\"")]
+    fn new_profile_from_file_bad_path(){
+		let mut profile = Profile::from_file("./tests/samples/bad-path");
+    	profile.pre_generate();
+    
+    	assert!(profile.generate().len() > 0);
+    }		
 	
 	#[test]
     fn new_profile_from_serialized(){
@@ -36,15 +50,13 @@ mod tests {
     	
     	assert_eq!(profile.generate(), "OK");
     }
+    
+    #[test]
+    fn new_profile_new_with(){
+		let profile =  Profile::new_with(10);
 	
-	#[test]
-    // ensure logging is working in the crate
-    fn logging_test(){
-    	let mut profile =  Profile::new();
-    	profile.reset_analyze();
-    	    		
-    	assert!(true);
-    }    
+        assert_eq!(profile.processors, 10);
+	}     
     
     #[test]
     // ensure Profile is analyzing all the sample data points
@@ -57,57 +69,6 @@ mod tests {
     	    		
     	assert_eq!(profil.patterns.len(), 4);
     }
-    
-    #[test]
-    // ensure Profile is providing the correct pattern ranks after analyzing the sample data
-    fn profile_pregenerate_patterns(){
-    	let mut profil =  Profile::new();
-    	profil.analyze("Smith, John");
-    	profil.analyze("O'Brian, Henny"); 
-    	profil.analyze("Dale, Danny"); 
-    	profil.analyze("Rickets, Ronnae"); 
-    	profil.analyze("Richard, Richie");
-    	profil.analyze("Roberts, Blake");
-    	profil.analyze("Conways, Sephen");
-    	
-    	profil.pre_generate();	
-    	let test = [("CvccvccpSCvccvv".to_string(), 28.57142857142857 as f64), ("CcvccpSCvcc".to_string(), 42.857142857142854 as f64), ("CvccvccpSCvccvc".to_string(), 57.14285714285714 as f64), ("CvcvcccpSCcvcv".to_string(), 71.42857142857142 as f64), ("CvcvpSCvccc".to_string(), 85.7142857142857 as f64), ("V@CcvvcpSCvccc".to_string(), 99.99999999999997 as f64)];    		
-    	    		
-    	assert_eq!(profil.pattern_ranks, test);
-    }
-
-    #[test]
-    // ensure Profile is providing the correct pattern ranks after analyzing the sample data
-    fn profile_pregenerate_sizes(){
-    	let mut profil =  Profile::new();
-
-    	profil.analyze("Smith, Johny"); //12
-    	profil.analyze("O'Brian, Hen"); //12 
-    	profil.analyze("Dale, Danny");  //11
-    	profil.analyze("O'Henry, Al");  //11
-    	profil.analyze("Rickets, Ro");  //11
-    	profil.analyze("Mr. Wilbers");  //11
-    	profil.analyze("Po, Al");       //6  
-    	
-    	profil.pre_generate();	
-    	let test = [(11, 57.14285714285714), (12, 85.71428571428571), (6, 100 as f64)];    		
-    	    		
-    	assert_eq!(profil.size_ranks, test);
-    }
-    
-    #[test]
-    // ensure Profile is able to find the facts that relate to a pattern
-    fn profile_apply_facts_string(){
-    	let mut profil =  Profile::new();
-    	profil.analyze("First");
-    	profil.analyze("Next");
-    	profil.analyze("Last");
-    	
-    	profil.pre_generate();	
-    	let generated = profil.apply_facts("Cvcc".to_string());
-    	   		
-    	assert_eq!(4, generated.len());
-    } 
     
     #[test]
     // ensure Profile is able to find the facts that relate to a pattern
@@ -123,7 +84,21 @@ mod tests {
     	   		
     	assert_eq!(10, generated.len());
     }       
-        
+
+    #[test]
+    // ensure Profile is able to find the facts that relate to a pattern
+    fn profile_apply_facts_string(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("First");
+    	profil.analyze("Next");
+    	profil.analyze("Last");
+    	
+    	profil.pre_generate();	
+    	let generated = profil.apply_facts("Cvcc".to_string());
+    	   		
+    	assert_eq!(4, generated.len());
+    } 
+            
     #[test]
     // ensure Profile is generating correct test data
     fn profile_generate(){
@@ -153,6 +128,57 @@ mod tests {
  		
     	assert_eq!(generated, "O'Brien");
     }
+    
+    #[test]
+    // ensure Profile is providing the correct pattern ranks after analyzing the sample data
+    fn profile_pregenerate_patterns(){
+    	let mut profil =  Profile::new();
+    	profil.analyze("Smith, John");
+    	profil.analyze("O'Brian, Henny"); 
+    	profil.analyze("Dale, Danny"); 
+    	profil.analyze("Rickets, Ronnae"); 
+    	profil.analyze("Richard, Richie");
+    	profil.analyze("Roberts, Blake");
+    	profil.analyze("Conways, Sephen");
+    	
+    	profil.pre_generate();	
+    	let test = [("CvccvccpSCvccvv".to_string(), 28.57142857142857 as f64), ("CcvccpSCvcc".to_string(), 42.857142857142854 as f64), ("CvccvccpSCvccvc".to_string(), 57.14285714285714 as f64), ("CvcvcccpSCcvcv".to_string(), 71.42857142857142 as f64), ("CvcvpSCvccc".to_string(), 85.7142857142857 as f64), ("V@CcvvcpSCvccc".to_string(), 99.99999999999997 as f64)];    		
+    	    		
+    	assert_eq!(profil.pattern_ranks, test);
+    }    
+    
+    #[test]
+    // ensure Profile is providing the correct pattern ranks after analyzing the sample data
+    fn profile_pregenerate_sizes(){
+    	let mut profil =  Profile::new();
+
+    	profil.analyze("Smith, Johny"); //12
+    	profil.analyze("O'Brian, Hen"); //12 
+    	profil.analyze("Dale, Danny");  //11
+    	profil.analyze("O'Henry, Al");  //11
+    	profil.analyze("Rickets, Ro");  //11
+    	profil.analyze("Mr. Wilbers");  //11
+    	profil.analyze("Po, Al");       //6  
+    	
+    	profil.pre_generate();	
+    	let test = [(11, 57.14285714285714), (12, 85.71428571428571), (6, 100 as f64)];    		
+    	    		
+    	assert_eq!(profil.size_ranks, test);
+    }    
+    
+	#[test]
+    fn save_profile(){
+		let mut profile =  Profile::new();
+		profile.analyze("Smith, John");
+    	profile.analyze("O'Brian, Henny"); 
+    	profile.analyze("Dale, Danny"); 
+    	profile.analyze("Rickets, Ronney");
+    
+    	profile.pre_generate(); 
+	
+        assert_eq!(profile.save("./tests/samples/sample-00-profile").unwrap(), true);
+	}
+	    
     
     #[test]
     // ensure a Profile can be exported (to be archived) as JSON

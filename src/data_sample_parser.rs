@@ -56,7 +56,23 @@
 //!
 //!		assert_eq!(dsp.generate_record()[0], "OK".to_string());
 //! }
-//! ```    
+//! ```  
+//!
+//! You can also generate a new csv file based on the data sample provided.
+//!
+//! ```
+//! extern crate test_data_generation;
+//!
+//! use test_data_generation::data_sample_parser::DataSampleParser;
+//!	
+//! fn main() {	
+//!     let mut dsp =  DataSampleParser::new();  
+//!    	
+//!    	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+//!    	dsp.generate_csv(100, "./tests/samples/generated-01.csv").unwrap(); 
+//! }
+//! ```   
+//!
 
 use std::collections::BTreeMap;
 use configs::Configs;
@@ -71,6 +87,9 @@ use std::error::Error;
 use csv::WriterBuilder;
 //use crossbeam;
 use serde_json;
+use oozie::similarity;
+use std::collections::HashMap;
+
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -579,5 +598,61 @@ impl DataSampleParser {
     	};	    	
  	
 		Ok(true)
+	}
+	
+	pub fn string_to_vector(&mut self, text: String) -> Vec<f64>{
+		let vu8 = text.into_bytes();
+		let mut vf64 = vec!();
+		
+		for b in &vu8 {
+			vf64.push(*b as f64);
+		}
+		
+		vf64
+	}
+	
+	pub fn realistic_test(&mut self, generated_data: &'static str, sample_data: &'static str) -> Result<f64, Box<Error>> {
+		//https://docs.rs/GSL/0.4.31/rgsl/statistics/fn.correlation.html
+		//http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/
+		// pearson's chi square test
+		// cosine similarity - http://blog.christianperone.com/2013/09/machine-learning-cosine-similarity-for-vector-space-models-part-iii/
+		
+		let mut str_gen = String::from(generated_data); 
+		let mut str_smpl = String::from(sample_data); 
+		
+		while str_gen.len() < str_smpl.len() {
+			str_gen.push(' ');
+		}
+		
+		while str_smpl.len() < str_gen.len() {
+			str_smpl.push(' ');
+		}
+		
+		let gen_data = self.string_to_vector(str_gen);
+		let smpl_data = self.string_to_vector(str_smpl);
+		
+		let mut gen_map: HashMap<usize, f64> = HashMap::new();
+		let gen_sz = gen_data.len();
+		for gd in gen_data {
+			gen_map.insert(gen_sz, gd);
+		}
+		
+		let mut smpl_map: HashMap<usize, f64> = HashMap::new();
+		let smpl_sz = smpl_data.len();
+		for sd in smpl_data {
+			smpl_map.insert(smpl_sz, sd);
+		}
+		
+		
+		let cos = similarity::cosine(&gen_map, &smpl_map, gen_sz);
+		println!("cosine simularity {:?}", cos);
+		//let v = vec!(111 as f64, 101 as f64);
+		//let avg_gen_data = statistical::mean(&gen_data);
+		
+		//println!("{}",avg_gen_data);
+		//let corr = statistical::correlation(gen_data, 1 as usize, sam_data, 1 as usize, sam_data.len());
+		//println!("the Correlation Coefficient is {}",avg_gen_data);
+		
+		Ok(1 as f64)
 	}
 }

@@ -143,6 +143,20 @@ fn main() {
 }
 ```
 
+You can also generate a new csv file based on the data sample provided.
+
+```
+extern crate test_data_generation;
+use test_data_generation::data_sample_parser::DataSampleParser;
+
+fn main() {	
+    let mut dsp =  DataSampleParser::new();  
+    	
+  	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
+    dsp.generate_csv(100, "./tests/samples/generated-01.csv").unwrap(); 
+}
+```
+
 ## How to Contribute
 
 Details on how to contribute can be found in the [CONTRIBUTING](./CONTRIBUTING.md) file.
