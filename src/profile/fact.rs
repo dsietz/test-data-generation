@@ -1,5 +1,5 @@
 //! The `profile` module provides functionality to create a profile on a data sample (Strings) based on the following attributes:
-//! 
+//!
 //! - symbolic patterns</br>
 //! - lengths</br>
 //! - pattern probability</br>
@@ -13,7 +13,7 @@
 //! extern crate test_data_generation;
 //!
 //! use test_data_generation::profile::fact::Fact;
-//! 
+//!
 //! fn main() {
 //!     //fact created for the character 'r' in the string "word"
 //!    	let mut fact =  Fact::new('r','c',0,0,2);
@@ -49,14 +49,22 @@ pub struct Fact{
 
 impl Fact {
 	/// Constructs a new Fact
-	/// 
+	///
+	/// # Arguments
+	///
+	/// * `k: char` - The char that the Fact represents (also known as the `key`).</br>
+	/// * `pp: char` - The char that represents the patter placeholder for the key.</br>
+	/// * `sw: u32` - Indicates is the key is the first char in the entity. (0=no, 1=yes)</br>
+	/// * `ew: u32` - Indicates is the key is the last char in the entity. (0=no, 1=yes)</br>
+	/// * `idx_off: u32` - The index that represents the postion of the key from the beginning of the entity (zero based).</br>
+	///
 	/// #Example
-	/// 
+	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::fact::Fact;
-	///	
+	///
 	/// fn main() {
 	/// 	//fact created for the character 'r' in the string "word"
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
@@ -73,38 +81,42 @@ impl Fact {
 			index_offset: idx_off,
 		}
 	}
-	
+
 	/// Constructs a new Fact from a serialized (JSON) string of the Fact object. This is used when restoring from "archive"
-	/// 
+	///
+	/// # Arguments
+	///
+	/// * `serialized: &str` - The JSON string that represents the archived Fact object.</br>
+	///
 	/// #Example
-	/// 
+	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::fact::Fact;
-	///	
-	/// fn main() {	
+	///
+	/// fn main() {
 	///		let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
     ///		let mut fact = Fact::from_serialized(&serialized);
     ///     fact.set_prior_key('a');
     ///		fact.set_next_key('e');
     ///
     ///		assert_eq!(fact.pattern_placeholder, 'c');
-	/// }    	
-    /// ```	
+	/// }
+    /// ```
 	pub fn from_serialized(serialized: &str) -> Fact {
 		serde_json::from_str(&serialized).unwrap()
 	}
-	
+
 	/// This function converts the Fact to a serialize JSON string.
-	/// 
+	///
 	/// #Example
-	/// 
+	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::fact::Fact;
-	///	
+	///
 	/// fn main() {
 	/// 	//fact created for the character 'r' in the string "word"
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
@@ -112,53 +124,53 @@ impl Fact {
     ///     println!("{}", fact.serialize());
     ///     // {"key":"r","prior_key":null,"next_key":null,"pattern_placeholder":"c","starts_with":0,"ends_with":0,"index_offset":2}
 	/// }
-	/// 	
+	///
 	pub fn serialize(&mut self) ->String {
 		serde_json::to_string(&self).unwrap()
 	}
-	
+
 	/// This function sets the next key attribute to the specified char.
-	/// 
+	///
 	/// # Arguments
 	///
 	/// * `nk: char` - The character that represents the next character in the entity
 	///
 	/// #Example
-	/// 
+	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::fact::Fact;
-	///	
+	///
 	/// fn main() {
 	/// 	//fact created for the character 'r' in the string "word"
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
     ///     fact.set_next_key('d');
 	/// }
-	/// 
+	///
 	pub fn set_next_key(&mut self, nk: char) {
 		self.next_key = Some(nk);
 	}
-	
+
 	/// This function sets the prior key attribute to the specified char.
-	/// 
+	///
 	/// # Arguments
 	///
 	/// * `pk: char` - The character that represents the prior character in the entity
 	///
 	/// #Example
-	/// 
+	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::fact::Fact;
-	///	
+	///
 	/// fn main() {
 	/// 	//fact created for the character 'r' in the string "word"
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
     ///     fact.set_prior_key('o');
 	/// }
-	/// 	
+	///
 	pub fn set_prior_key(&mut self, pk: char) {
 		self.prior_key = Some(pk);
 	}

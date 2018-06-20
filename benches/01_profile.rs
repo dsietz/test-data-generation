@@ -4,12 +4,12 @@ extern crate test_data_generation;
 extern crate test;
 
 use test_data_generation::profile;
-use profile::profile::Profile; 
+use profile::profile::Profile;
 use test::Bencher;
 
 #[bench]
-fn analyze_csv_file(b: &mut Bencher) {
+fn analyze_word(b: &mut Bencher) {
 	let mut profil =  Profile::new();
-	
-    b.iter(|profil| profil.analyze("Smith, John"));
+
+    b.iter(|profil| profil.analyze("Word"));
 }
