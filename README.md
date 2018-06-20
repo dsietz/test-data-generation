@@ -7,23 +7,23 @@ Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?br
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
 ### Description
-For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module 
-that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for 
-persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or 
+For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module
+that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for
+persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or
 wrapped into a web service or stand-alone utility.   
 
 **PROBLEM**
 </br>
 In order to make test data represent production, (a.k.a. realistic) you need to perform one of the following:
 + load data from a production environment into the non-production environment, which requires ETL (e.g.: masking, obfuscation, etc.)
-+ stand up a pre-loaded "profile" database that is randomly sampled, which requires preparing sample data from either another test data source 
++ stand up a pre-loaded "profile" database that is randomly sampled, which requires preparing sample data from either another test data source
 or production environment (option #1 above)
 
 **SOLUTION**
 </br>
- Incorporate this library in your software's testing source code by loading an algorithm from a previously analyzed data sample and generating 
+ Incorporate this library in your software's testing source code by loading an algorithm from a previously analyzed data sample and generating
  test data during your tests runtime.
- 
+
 ---
 
 ### Table of Contents
@@ -35,15 +35,27 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.0.2:
+Here's whats new in 0.0.5:
 
-* **Save Profile**: save the profile (with its algorithm, but not sample data) as a json file
-* **load Profile**: load a json file of a previously saved the profile
-* Updated the `README.md`
+* The following test_data_generation::data_sample_parser::DataSampleParser functions takes _&String_ instead of _&'static str_ as the path parameter.
+> - analyze_csv_file
+> - from_file
+> - generate_csv
+> - with_new
+> - save
+* The following test_data_generation::configs::Configs functions takes _&String_ instead of _&'static str_ as the path parameter.
+> - new
+* Added the test_data_generation::data_sample_parser::DataSampleParserfunction _analyze_csv_data_ function so that the csv data doesn't need to 'land' in order to be analyzed.
+This is helpful when wrapping the test data generation library in a REST service for instance.
+* Added thetest_data_generation::profile::profile::Profile _factualize_ function so that the processing of building Facts can be multi-threaded in the future
+* Added thetest_data_generation::profile::pattern::Pattern _factualize_ function so that the processing of building Facts can be multi-threaded in the future.
+* Refactored the following items
+> - test_data_generation::profile::Profile function apply_facts renamed to generate_from_pattern
+* Improved documentation
 
 ## About
 
-`test data generation` uses [Markov decision process](https://en.wikipedia.org/wiki/Markov_decision_process) machine learning to create algorithms that enable test data generation on the fly without the overhead 
+`test data generation` uses [Markov decision process](https://en.wikipedia.org/wiki/Markov_decision_process) machine learning to create algorithms that enable test data generation on the fly without the overhead
 of test data databases, security data provisioning (e.g.: masking, obfuscation), or standing up remote services.
 
 The algorithm is built on the bases of:
@@ -51,56 +63,56 @@ The algorithm is built on the bases of:
 2. frequency of patterns
 3. character locations
 4. beginning and ending characters
-5. length of entity (string, date, number) 
+5. length of entity (string, date, number)
 
 ## Usage
 
-The are multiple ways to use the Test Data Generation library. It all depends on your intent. 
+The are multiple ways to use the Test Data Generation library. It all depends on your intent.
 
 ### Profile
 
-The easiest way is to use a Profile. The `profile` module provides functionality to create a profile on a data sample (Strings). 
+The easiest way is to use a Profile. The `profile` module provides functionality to create a profile on a data sample (Strings).
 Once a profile has been made, data can be generated by calling the _pre_generate()_ and _generate()_ functions, in that order.
 
 ```
 extern crate test_data_generation;
 
 use test_data_generation::profile::profile::Profile;
- 
+
 fn main() {
     // analyze the dataset
 	let mut data_profile =  Profile::new();
 
     // analyze the dataset
 	data_profile.analyze("Smith, John");
-	data_profile.analyze("Doe, John"); 
-	data_profile.analyze("Dale, Danny"); 
+	data_profile.analyze("Doe, John");
+	data_profile.analyze("Dale, Danny");
 	data_profile.analyze("Rickets, Ronney");
 
     // confirm 4 data samples were analyzed   		
    	assert_eq!(data_profile.patterns.len(), 4);
-   	
+
     // prepare the generator
     data_profile.pre_generate();
-   	 		
+
     // generate some data
    	println!("The generated name is {:?}", data_profile.generate());
-   	
+
    	// save the profile (algorithm) for later
-   	assert_eq!(data_profile.save("./tests/samples/sample-00-profile").unwrap(), true);
-   	
+   	assert_eq!(data_profile.save(&String::from("./tests/samples/sample-00-profile")).unwrap(), true);
+
    	// later... create a new profile from the saved archive file
-   	let mut new_profile = Profile::from_file("./tests/samples/sample-00-profile");
+   	let mut new_profile = Profile::from_file(&String::from("./tests/samples/sample-00-profile"));
     new_profile.pre_generate();
-    
+
     // generate some data
-   	println!("The generated name is {:?}", new_profile.generate());	
+   	println!("The generated name is {:?}", new_profile.generate());
 }
-``` 
+```
 
 ### Data Sample Parser
 
-If you are using CSV files of data samples, then you may wish to use a Data Sample Parser. 
+If you are using CSV files of data samples, then you may wish to use a Data Sample Parser.
 The `data_sample_parser` module provides functionality to read sample data, parse and analyze it, so that test data can be generated based on profiles.
 
 ```
@@ -109,14 +121,14 @@ use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
     let mut dsp = DataSampleParser::new();
-    dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
-    	
+    dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+
     println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
     // My new name is Abbon Aady
 }
 ```
 
-You can also save the Data Sample Parser (the algorithm) as an archive file (json) ... 
+You can also save the Data Sample Parser (the algorithm) as an archive file (json) ...
 
 ```
 extern crate test_data_generation;
@@ -124,9 +136,9 @@ use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
     let mut dsp =  DataSampleParser::new();  
-    dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
-    	
-    assert_eq!(dsp.save("./tests/samples/sample-01-dsp").unwrap(), true);
+    dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+
+    assert_eq!(dsp.save(&String::from("./tests/samples/sample-01-dsp")).unwrap(), true);
 }
 ```
 
@@ -137,8 +149,8 @@ extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
-    let mut dsp = DataSampleParser::from_file("./tests/samples/sample-01-dsp");
-    	
+    let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-01-dsp"));
+
 	println!("Sample data is {:?}", dsp.generate_record()[0]);
 }
 ```
@@ -149,11 +161,11 @@ You can also generate a new csv file based on the data sample provided.
 extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;
 
-fn main() {	
+fn main() {
     let mut dsp =  DataSampleParser::new();  
-    	
-  	dsp.analyze_csv_file("./tests/samples/sample-01.csv").unwrap();
-    dsp.generate_csv(100, "./tests/samples/generated-01.csv").unwrap(); 
+
+  	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
 }
 ```
 
@@ -165,4 +177,4 @@ Details on how to contribute can be found in the [CONTRIBUTING](./CONTRIBUTING.m
 
 test-data-generation is primarily distributed under the terms of the Apache License (Version 2.0).
 
-See ![LICENSE-APACHE](.:LICENSE-APACHE "Apache License") for details.
+See ![LICENSE-APACHE "Apache License](./LICENSE-APACHE) for details.

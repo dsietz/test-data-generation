@@ -6,14 +6,14 @@
 //! extern crate test_data_generation;
 //!
 //! use test_data_generation::profile::pattern::Pattern;
-//! 
+//!
 //! fn main() {
 //!     // return the symbolic pattern for Hello World
 //!		let mut pattern =  Pattern::new();
 //!     // Note: analyze() returns a tuple (String, Vec<Fact>)
-//!    	let symbolic_pattern = pattern.analyze("Hello World").0;  		
+//!    	let symbolic_pattern = pattern.analyze("Hello World").0;
 //!
-//!     // confirm that the symbolic pattern is correct 
+//!     // confirm that the symbolic pattern is correct
 //! 	assert_eq!( symbolic_pattern, "CvccvSCvccc");
 //! }
 //! ```
@@ -22,14 +22,14 @@
 //! extern crate test_data_generation;
 //!
 //! use test_data_generation::profile::pattern::Pattern;
-//! 
+//!
 //! fn main() {
 //!     // return the symbolic pattern for a date format
 //!		let mut pattern =  Pattern::new();
 //!     // analyze() returns a tuple (String, Vec<Fact>)
-//!    	let symbolic_pattern = pattern.analyze("12/31/2017").0;  		
+//!    	let symbolic_pattern = pattern.analyze("12/31/2017").0;
 //!
-//!     // confirm that the symbolic pattern is correct 
+//!     // confirm that the symbolic pattern is correct
 //! 	assert_eq!( symbolic_pattern, "##p##p####");
 //! }
 //! ```
@@ -37,12 +37,13 @@
 use regex::Regex;
 use profile::pattern_placeholder::PatternPlaceholder;
 use profile::fact::Fact;
+//use crossbeam;
 
 /// Represents a symbolic pattern of an entity (String)
 pub struct Pattern{
 	/// The size (length) of the pattern
 	pub size: u32,
-	/// The PatternPlaceholder that has all the symbols used to represent a char found by a regex rule 
+	/// The PatternPlaceholder that has all the symbols used to represent a char found by a regex rule
 	regex_symbols: PatternPlaceholder,
 	/// The regex rule used to find upper case consonants
 	regex_consonant_upper: Regex,
@@ -62,14 +63,14 @@ pub struct Pattern{
 
 impl Pattern {
 	/// Constructs a new Pattern
-	/// 
+	///
 	/// #Example
-	/// 
+	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::pattern::Pattern;
-	///	
+	///
 	/// fn main() {
 	/// 	let mut pattern =  Pattern::new();
 	/// }
@@ -87,146 +88,151 @@ impl Pattern {
 			regex_space: Regex::new(r"[\s]").unwrap(),
 		}
 	}
-	
-	/// This function converts a char into a pattern symbol 
-	/// 
+
+	/// This function converts a char into a pattern symbol
+	///
 	/// # Example
 	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::pattern::Pattern;
-	/// 
+	///
 	/// fn main() {
 	///		let pattern =  Pattern::new();
-	/// 
+	///
 	/// 	println!("The pattern symbol for 'A' is {:?}", pattern.symbolize_char(&'A'));
 	///     // The pattern symbol for 'A' is V
 	/// }
-	/// ```	
+	/// ```
 	pub fn symbolize_char(&self, c: &char) -> char{
 		// if you have to escape regex special characters: &*regex::escape(&*&c.to_string())
 		let mut x = self.regex_symbols.get("Unknown");
 		let mut found = false;
-						
+
 		if !found && self.regex_consonant_upper.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("ConsonantUpper"); 
+			x = self.regex_symbols.get("ConsonantUpper");
 			found = true;
 		}
-			
+
 		if !found && self.regex_consonant_lower.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("ConsonantLower"); 
+			x = self.regex_symbols.get("ConsonantLower");
 			found = true;
 		}
-			
+
 		if !found && self.regex_vowel_upper.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("VowelUpper");  
+			x = self.regex_symbols.get("VowelUpper");
 			found = true;
 		}
-			
+
 		if !found && self.regex_vowel_lower.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("VowelLower");  
+			x = self.regex_symbols.get("VowelLower");
 			found = true;
 		}
-			
+
 		if !found && self.regex_numeric.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("Numeric");  
+			x = self.regex_symbols.get("Numeric");
 			found = true;
 		}
-			
+
 		if !found && self.regex_space.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("WhiteSpace"); 
-			found = true; 
-		}
-			
-		if !found && self.regex_punctuation.is_match(&c.to_string()) {
-			x = self.regex_symbols.get("Punctuation");  
+			x = self.regex_symbols.get("WhiteSpace");
 			found = true;
 		}
-			
+
+		if !found && self.regex_punctuation.is_match(&c.to_string()) {
+			x = self.regex_symbols.get("Punctuation");
+			found = true;
+		}
+
 		// if not matched, then use "Unknown" placeholder symbol
 		if !found {
 			x = self.regex_symbols.get("Unknown");
 		}
-			
+
 		x
 	}
-	
+
 	/// This function converts an entity (&str) into a tuplet (String, Vec<Fact>)</br>
-	/// _String_ : The symbolic pattern</br>
-	/// _Vec<Fact>_ : List of Facts extracted from the entity and related to the symbolic pattern 
-	/// 
+	///
+	/// # Arguments
+	///
+	/// * `entity: String` - The textual str of the value to anaylze.</br>
+	///
 	/// # Example
 	///
 	/// ```
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::pattern::Pattern;
-	/// 
+	///
 	/// fn main() {
 	///		let mut pattern =  Pattern::new();
-	/// 
+	///
 	/// 	assert_eq!(pattern.analyze("Hello World").0, "CvccvSCvccc");
 	/// }
-	/// ```	
+	/// ```
 	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
 		// record the length of the passed value
 		self.size = entity.len() as u32;
-		
+
 		// String to hold the pattern
 		let mut pttrn = String::new();
-		
+
 		// Vec to hold all the Facts to be returned
 		let mut facts = Vec::new();
-		
+
 		// record the pattern of the passed value
-		for (i, c) in entity.chars().enumerate() {
-			let mut pk      = None;
-			let mut nk      = None;
-			let     pp      = self.symbolize_char(&c);
-			let mut sw      = 0;
-			let mut ew      = 0;
-			let     idx_off = i;	
-					
-			// first char in entity
-			if i == 0 {
-				sw = 1;			
-			}
-			
-			// last char in entity
-			if i == (self.size as usize)-1 {
-				ew = 1;				
-			}
-			
-			// not the first
-			if i > 0 {
-				pk = entity.chars().nth(i-1);
-			}
-			
-			// not the last
-			if i < (self.size as usize)-1 {
-				nk = entity.chars().nth(i+1);
-			}
-			
-			// store the Facts in a HashMap of HashMaps that will be evenly distributed 
-			// so the MapReduce can be performed for multiple threads calculating when aggregating 
-			// on the Facts
-			let mut f = Fact::new(c,pp,sw,ew,(idx_off as u32));
-			
-			// only if there is a next key
-			if nk.is_some() {
-				&f.set_next_key(nk.unwrap());
-			}
-			
-			// only if there is a prior key
-			if pk.is_some() {
-				&f.set_prior_key(pk.unwrap());
-			}
-			
-			pttrn = [&pttrn, &*pp.to_string()].concat();		
-			facts.push(f);
+		for (i, _c) in entity.chars().enumerate() {
+			let fact = self.factualize(&entity,i as u32);
+			pttrn.push_str(&*fact.pattern_placeholder.to_string());
+			facts.push(fact);
 		}
-		
+
 		(pttrn, facts)
 	}
+
+	/// This function converts a char in an entity (&str) based on the index specified into a Fact</br>
+	///
+	/// # Arguments
+	///
+	/// * `entity: String` - The textual str of the value to anaylze.</br>
+	/// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
+	///
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::pattern::Pattern;
+	///
+	/// fn main() {
+	///		let mut pattern =  Pattern::new();
+	///		let fact = pattern.factualize("Word",0);
+	///     // will return a Fact that represents the char `W`
+	/// }
+	/// ```
+	pub fn factualize(&mut self, entity: &str, idx: u32) -> Fact {
+		let c = entity.chars().nth(idx as usize).unwrap();
+		let pp = self.symbolize_char(&c);
+		let pk = if idx > 0 {entity.chars().nth(idx as usize -1)} else {None};
+		let nk = if idx < entity.len() as u32 -1 {entity.chars().nth(idx as usize +1)} else {None};
+		let sw = if idx == 0 {1} else {0};
+		let ew = if idx == entity.len() as u32 -1 {1} else {0};
+
+		let mut fact = Fact::new(c,pp,sw,ew,idx);
+
+		// only if there is a next key
+		if nk.is_some() {
+			&fact.set_next_key(nk.unwrap());
+		}
+
+		// only if there is a prior key
+		if pk.is_some() {
+			&fact.set_prior_key(pk.unwrap());
+		}
+
+		fact
+	}
+
 }
