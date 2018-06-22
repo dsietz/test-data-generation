@@ -499,16 +499,10 @@ impl Profile {
 	///
 	/// fn main() {
     /// 	let mut profile =  Profile::new();
-    ///
-    ///		profile.analyze("One");
-    ///		profile.analyze("Two");
-    ///		profile.analyze("Three");
-    ///		profile.analyze("Four");
-    ///		profile.analyze("Five");
-    ///
-    ///     profile.pre_generate();
-    ///
-    ///		print!("The test data {:?} was generated.", profile.generate());
+    ///		let results = profile.factualize("Word");
+	///
+	///     assert_eq!(results.0,"Cvcc".to_string());
+	///     assert_eq!(results.1.len(),4);
     /// }
 	/// ```
 	pub fn factualize(&self, entity: &str) -> (String, Vec<Fact>) {
@@ -546,8 +540,7 @@ impl Profile {
 	/// ```
 	pub fn generate(&mut self) -> String{
 		// 1. get a random number
-	 	let mut s: f64 = 0 as f64;
-	 	random_percentage!(s);
+	 	let s: f64 = random_percentage!();
 
 	 	// 2. find the first pattern that falls within the percentage chance of occurring
 	 	// NOTE: The following 2 lines has been commented out because this doesn't need to
@@ -642,14 +635,13 @@ impl Profile {
 				}
 
 				//select a fact to use as the generated char
-				let mut x:u32 = 0;
 				let rnd_start = 0;
 				let rnd_end = fact_options.len()-1;
 
 				if rnd_start >= rnd_end {
 					generated.push(fact_options[0 as usize]);
 				}else{
-					random_between!(x, rnd_start, rnd_end);
+					let x: u32 = random_between!(rnd_start, rnd_end);
 					prev_char = fact_options[x as usize];
 					generated.push(prev_char);
 				}

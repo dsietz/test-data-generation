@@ -37,6 +37,14 @@ or production environment (option #1 above)
 
 Here's whats new in 0.0.5:
 
+* Added the following new module and functions to the test_data_generation::shared module
+> - string_to_static_str(s: String) -> &'static str
+* The following macros have been modified with 'returns', instead of 'sets'
+> - random_percentage
+> - random_between
+* Added the following macros data_test_generation::profile
+> - symbolize_char -> char
+> -  factualize_entity -> (String, Vec<Fact>)
 * The following test_data_generation::data_sample_parser::DataSampleParser functions takes _&String_ instead of _&'static str_ as the path parameter.
 > - analyze_csv_file
 > - from_file
@@ -47,8 +55,8 @@ Here's whats new in 0.0.5:
 > - new
 * Added the test_data_generation::data_sample_parser::DataSampleParserfunction _analyze_csv_data_ function so that the csv data doesn't need to 'land' in order to be analyzed.
 This is helpful when wrapping the test data generation library in a REST service for instance.
-* Added thetest_data_generation::profile::profile::Profile _factualize_ function so that the processing of building Facts can be multi-threaded in the future
-* Added thetest_data_generation::profile::pattern::Pattern _factualize_ function so that the processing of building Facts can be multi-threaded in the future.
+* Added the test_data_generation::profile::profile::Profile _factualize_ function so that the processing of building Facts can be multi-threaded in the future
+* Added the test_data_generation::profile::pattern::Pattern _factualize_ function so that the processing of building Facts can be multi-threaded in the future.
 * Refactored the following items
 > - test_data_generation::profile::Profile function apply_facts renamed to generate_from_pattern
 * Improved documentation
