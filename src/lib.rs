@@ -146,6 +146,7 @@ extern crate oozie;
 
 #[macro_use]
 pub mod macros;
+pub mod shared;
 pub mod data_sample_parser;
 pub mod configs;
 pub mod profile;

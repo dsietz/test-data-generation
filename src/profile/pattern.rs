@@ -37,7 +37,6 @@
 use regex::Regex;
 use profile::pattern_placeholder::PatternPlaceholder;
 use profile::fact::Fact;
-//use crossbeam;
 
 /// Represents a symbolic pattern of an entity (String)
 pub struct Pattern{
@@ -184,11 +183,13 @@ impl Pattern {
 
 		// record the pattern of the passed value
 		for (i, _c) in entity.chars().enumerate() {
-			let fact = self.factualize(&entity,i as u32);
+			//let fact = self.factualize(&entity, i as u32);
+			let idx: u32 = i as u32;
+			let fact = factualize_entity!(entity, idx);
 			pttrn.push_str(&*fact.pattern_placeholder.to_string());
 			facts.push(fact);
 		}
-
+		
 		(pttrn, facts)
 	}
 
@@ -214,7 +215,8 @@ impl Pattern {
 	/// ```
 	pub fn factualize(&mut self, entity: &str, idx: u32) -> Fact {
 		let c = entity.chars().nth(idx as usize).unwrap();
-		let pp = self.symbolize_char(&c);
+		//let pp = self.symbolize_char(&c);
+		let pp = symbolize_char!(c);
 		let pk = if idx > 0 {entity.chars().nth(idx as usize -1)} else {None};
 		let nk = if idx < entity.len() as u32 -1 {entity.chars().nth(idx as usize +1)} else {None};
 		let sw = if idx == 0 {1} else {0};
