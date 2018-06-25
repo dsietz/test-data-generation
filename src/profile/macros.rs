@@ -80,23 +80,20 @@ macro_rules! symbolize_char {
     };
 }
 
-/// This macro takes a string and returns the pattern and vector of applied fact objects.
-/// Returns tuple (String, Vec<Fact>)
+/// This macro converts a char in an entity (&str) based on the index specified into a Fact</br>
 ///
 /// # Arguments
 ///
 /// * `entity: String` - The textual str of the value to anaylze.</br>
+/// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
 ///
 /// # Example
 ///
-/// ```
-/// # #[macro_use]
+/// ```/// # #[macro_use]
 /// # extern crate test_data_generation;
 /// # fn main() {
-///		let results = profile.factualize("Word");
-///
-///     assert_eq!(results.0,"Cvcc".to_string());
-///     assert_eq!(results.1.len(),4);
+///		//let fact = factualize_entity!("Word",0);
+///     // will return a Fact that represents the char `W`
 /// # }
 /// ```
 macro_rules! factualize_entity {

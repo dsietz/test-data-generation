@@ -88,7 +88,6 @@ use csv::WriterBuilder;
 use serde_json;
 use oozie::similarity;
 use std::collections::HashMap;
-//use crossbeam;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 

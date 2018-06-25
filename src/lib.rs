@@ -150,4 +150,3 @@ pub mod shared;
 pub mod data_sample_parser;
 pub mod configs;
 pub mod profile;
-pub mod data;
