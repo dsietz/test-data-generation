@@ -86,8 +86,7 @@ use csv;
 use std::error::Error;
 use csv::WriterBuilder;
 use serde_json;
-use oozie::similarity;
-use std::collections::HashMap;
+use levenshtein;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -445,6 +444,34 @@ impl DataSampleParser {
     	profil.generate()
 	}
 
+	/// This function returns a vector of header names
+	///
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///
+    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    ///     let headers = dsp.extract_headers();
+    ///
+    ///		assert_eq!(headers.len(), 2);
+	/// }
+	pub fn extract_headers(&mut self) -> Vec<String> {
+		let mut headers = vec!();
+
+		for profile in self.profiles.iter_mut() {
+			headers.push(profile.0.to_string());
+		}
+
+		headers
+	}
+
 	/// This function generates test data for the specified field name.
 	///
 	/// # Arguments
@@ -557,9 +584,15 @@ impl DataSampleParser {
 		Ok(())
 	}
 
-	/// This function returns a vector of header names
+	/// This function calculates the levenshtein distance between 2 strings.
+	/// See: https://crates.io/crates/levenshtein
 	///
-	/// # Example
+	/// # Arguments
+	///
+	/// * `control: &String` - The string to compare against. This would be the real data from the data sample.</br>
+	/// * `experiment: &String` - The string to compare. This would be the generated data for which you want to find the distance.</br>
+	///
+	/// #Example
 	///
 	/// ```
 	/// extern crate test_data_generation;
@@ -567,23 +600,48 @@ impl DataSampleParser {
 	/// use test_data_generation::data_sample_parser::DataSampleParser;
 	///
 	/// fn main() {
-	///		// initalize a new DataSampelParser
-	///		let mut dsp = DataSampleParser::new();
-    ///
-    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
-    ///     let headers = dsp.extract_headers();
-    ///
-    ///		assert_eq!(headers.len(), 2);
+	/// 	// analyze the dataset
+	///		let mut dsp =  DataSampleParser::new();
+	///
+	///     assert_eq!(dsp.levenshtein_distance(&"kitten".to_string(), &"sitting".to_string()), 3 as usize);
 	/// }
-	pub fn extract_headers(&mut self) -> Vec<String> {
-		let mut headers = vec!();
-
-		for profile in self.profiles.iter_mut() {
-			headers.push(profile.0.to_string());
-		}
-
-		headers
+	///
+	pub fn levenshtein_distance(&mut self, control: &String, experiment: &String) -> usize {
+		// https://docs.rs/levenshtein/1.0.3/levenshtein/fn.levenshtein.html
+		levenshtein::levenshtein(control, experiment)
 	}
+
+	/// This function calculates the percent difference between 2 strings.
+	///
+	/// # Arguments
+	///
+	/// * `control: &String` - The string to compare against. This would be the real data from the data sample.</br>
+	/// * `experiment: &String` - The string to compare. This would be the generated data for which you want to find the percent difference.</br>
+	///
+	/// #Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///
+	/// fn main() {
+	/// 	// analyze the dataset
+	///		let mut dsp =  DataSampleParser::new();
+	///
+	///     assert_eq!(dsp.realistic_test(&"kitten".to_string(), &"sitting".to_string()), 76.92307692307692 as f64);
+	/// }
+	///
+	pub fn realistic_test(&mut self, control: &String, experiment: &String) -> f64 {
+		//https://docs.rs/GSL/0.4.31/rgsl/statistics/fn.correlation.html
+		//http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/
+		// pearson's chi square test
+		// cosine similarity - http://blog.christianperone.com/2013/09/machine-learning-cosine-similarity-for-vector-space-models-part-iii/
+		let ld: f64 = levenshtein::levenshtein(control, experiment) as f64;
+		let total: f64 = control.len() as f64 + experiment.len() as f64;
+		let diff: f64 = total - ld;
+		(1 as f64 - ((total - diff)/total)) * 100   as f64
+	}	
 
 	/// This function returns a boolean that indicates if the data sample parsing had issues
 	///
@@ -659,61 +717,5 @@ impl DataSampleParser {
     	};
 
 		Ok(true)
-	}
-
-	pub fn string_to_vector(&mut self, text: String) -> Vec<f64>{
-		let vu8 = text.into_bytes();
-		let mut vf64 = vec!();
-
-		for b in &vu8 {
-			vf64.push(*b as f64);
-		}
-
-		vf64
-	}
-
-	pub fn realistic_test(&mut self, generated_data: &'static str, sample_data: &'static str) -> Result<f64, Box<Error>> {
-		//https://docs.rs/GSL/0.4.31/rgsl/statistics/fn.correlation.html
-		//http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/
-		// pearson's chi square test
-		// cosine similarity - http://blog.christianperone.com/2013/09/machine-learning-cosine-similarity-for-vector-space-models-part-iii/
-
-		let mut str_gen = String::from(generated_data);
-		let mut str_smpl = String::from(sample_data);
-
-		while str_gen.len() < str_smpl.len() {
-			str_gen.push(' ');
-		}
-
-		while str_smpl.len() < str_gen.len() {
-			str_smpl.push(' ');
-		}
-
-		let gen_data = self.string_to_vector(str_gen);
-		let smpl_data = self.string_to_vector(str_smpl);
-
-		let mut gen_map: HashMap<usize, f64> = HashMap::new();
-		let gen_sz = gen_data.len();
-		for gd in gen_data {
-			gen_map.insert(gen_sz, gd);
-		}
-
-		let mut smpl_map: HashMap<usize, f64> = HashMap::new();
-		let smpl_sz = smpl_data.len();
-		for sd in smpl_data {
-			smpl_map.insert(smpl_sz, sd);
-		}
-
-
-		let cos = similarity::cosine(&gen_map, &smpl_map, gen_sz);
-		println!("cosine simularity {:?}", cos);
-		//let v = vec!(111 as f64, 101 as f64);
-		//let avg_gen_data = statistical::mean(&gen_data);
-
-		//println!("{}",avg_gen_data);
-		//let corr = statistical::correlation(gen_data, 1 as usize, sam_data, 1 as usize, sam_data.len());
-		//println!("the Correlation Coefficient is {}",avg_gen_data);
-
-		Ok(1 as f64)
 	}
 }
