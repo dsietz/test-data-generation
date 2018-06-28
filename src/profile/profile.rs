@@ -651,6 +651,107 @@ impl Profile {
 		generated
 	}
 
+	/// This function learns by measuring how realistic the test data it generates to the sample data that was provided.
+	///
+	/// # Arguments
+	///
+	/// * `control_list: Vec<String>` - The list of strings to compare against. This would be the real data from the data sample.</br>
+	///
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///
+	/// fn main() {
+	/// 	let mut profil =  Profile::new();
+	/// 	let sample_data = vec!("Smith, John".to_string(),"Doe, John".to_string(),"Dale, Danny".to_string(),"Rickets, Ronney".to_string());
+	///
+	/// 	for sample in sample_data.iter().clone() {
+	/// 		profil.analyze(&sample);
+	/// 	}
+	///
+	/// 	// in order to learn the profile must be prepared with pre_genrate()
+	///		// so it can generate data to learn from
+	///		profil.pre_generate();
+	///
+	/// 	let learning = profil.learn_from_entity(sample_data).unwrap();
+	///
+	/// 	assert_eq!(learning, true);
+    /// }
+	/// ```
+	pub fn learn_from_entity(&mut self, control_list: Vec<String>) -> Result<bool, String> {
+		for _n in 0..10 {
+			let experiment = self.generate();
+			let mut percent_similarity: Vec<f64> = Vec::new();
+
+			for control in control_list.iter().clone() {
+				debug!("Comparing {} with {} ...", &control, &experiment);
+				percent_similarity.push(self.realistic_test(&control, &experiment));
+			}
+
+			let percent = percent_similarity.iter().sum::<f64>() as f64 / percent_similarity.len() as f64;
+			debug!("Percent similarity is {} ...", &percent);
+
+			if percent >= 80 as f64 {
+				self.analyze(&experiment);
+			}
+		}
+
+		Ok(true)
+	}
+
+	/// This function calculates the levenshtein distance between 2 strings.
+	/// See: https://crates.io/crates/levenshtein
+	///
+	/// # Arguments
+	///
+	/// * `control: &String` - The string to compare against. This would be the real data from the data sample.</br>
+	/// * `experiment: &String` - The string to compare. This would be the generated data for which you want to find the distance.</br>
+	///
+	/// #Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///
+	/// fn main() {
+	///		let mut profile =  Profile::new();
+	///
+	///     assert_eq!(profile.levenshtein_distance(&"kitten".to_string(), &"sitting".to_string()), 3 as usize);
+	/// }
+	///
+	pub fn levenshtein_distance(&mut self, control: &String, experiment: &String) -> usize {
+		// https://docs.rs/levenshtein/1.0.3/levenshtein/fn.levenshtein.html
+		levenshtein_distance!(control, experiment)
+	}
+
+	/// This function calculates the percent difference between 2 strings.
+	///
+	/// # Arguments
+	///
+	/// * `control: &String` - The string to compare against. This would be the real data from the data sample.</br>
+	/// * `experiment: &String` - The string to compare. This would be the generated data for which you want to find the percent difference.</br>
+	///
+	/// #Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::profile::profile::Profile;
+	///
+	/// fn main() {
+	///		let mut profile =  Profile::new();
+	///
+	///     assert_eq!(profile.realistic_test(&"kitten".to_string(), &"sitting".to_string()), 76.92307692307692 as f64);
+	/// }
+	///
+	pub fn realistic_test(&mut self, control: &String, experiment: &String) -> f64 {
+		realistic_test!(control, experiment)
+	}
+
 	/// This function is called from within the implementated structure and returns a list processors (Vec) with empty lists (Vec) for their Facts.
 	/// Each processor shares the load of generating the data based on the Facts it has been assigned to manage.
 	///

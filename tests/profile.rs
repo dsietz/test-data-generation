@@ -14,6 +14,7 @@ mod tests {
 
 		assert_eq!(profile.apply_facts(results.0, results.1).unwrap(),1);
 	}
+
 	#[test]
     // ensure a Profile can convert a str to an array of facts and the pattern
     fn factualize(){
@@ -24,6 +25,36 @@ mod tests {
 
     	assert_eq!(t.0,"Cvcc");
     }
+
+	#[test]
+    fn levenshtein_test(){
+    	let mut profil =  Profile::new();
+
+    	assert_eq!(profil.levenshtein_distance(&"kitten".to_string(), &"sitting".to_string()), 3 as usize);
+    }
+
+	#[test]
+	fn realistic_data_test(){
+		let mut profil =  Profile::new();
+
+		assert_eq!(profil.realistic_test(&"kitten".to_string(), &"sitting".to_string()), 76.92307692307692 as f64);
+	}
+
+	#[test]
+	fn learn_from_entity(){
+		let mut profil =  Profile::new();
+		let sample_data = vec!("Smith, John".to_string(),"Doe, John".to_string(),"Dale, Danny".to_string(),"Rickets, Ronney".to_string());
+
+		for sample in sample_data.iter().clone() {
+			profil.analyze(&sample);
+		}
+
+		profil.pre_generate();
+
+		let learning = profil.learn_from_entity(sample_data).unwrap();
+
+		assert_eq!(learning, true);
+	}
 
 	#[test]
     // ensure logging is working in the crate

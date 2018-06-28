@@ -18,6 +18,17 @@ mod tests {
     	assert_eq!(dsp.generate_record()[0], "OK".to_string());
     }
 
+	#[test]
+	// ensure the Data Sample Parser can read all the headers from teh csv file
+	fn read_headers(){
+		let mut dsp = DataSampleParser::new();
+
+	    dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+	    let headers = dsp.extract_headers();
+	   
+	    assert_eq!(headers.len(), 2);
+	}
+
     #[test]
     // ensure DataSampleParser can analyze a csv formatted file
     fn parse_csv_file(){

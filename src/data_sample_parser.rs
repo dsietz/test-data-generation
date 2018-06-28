@@ -86,7 +86,6 @@ use csv;
 use std::error::Error;
 use csv::WriterBuilder;
 use serde_json;
-use levenshtein;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -608,7 +607,7 @@ impl DataSampleParser {
 	///
 	pub fn levenshtein_distance(&mut self, control: &String, experiment: &String) -> usize {
 		// https://docs.rs/levenshtein/1.0.3/levenshtein/fn.levenshtein.html
-		levenshtein::levenshtein(control, experiment)
+		levenshtein_distance!(control, experiment)
 	}
 
 	/// This function calculates the percent difference between 2 strings.
@@ -637,11 +636,8 @@ impl DataSampleParser {
 		//http://www.statisticshowto.com/probability-and-statistics/correlation-coefficient-formula/
 		// pearson's chi square test
 		// cosine similarity - http://blog.christianperone.com/2013/09/machine-learning-cosine-similarity-for-vector-space-models-part-iii/
-		let ld: f64 = levenshtein::levenshtein(control, experiment) as f64;
-		let total: f64 = control.len() as f64 + experiment.len() as f64;
-		let diff: f64 = total - ld;
-		(1 as f64 - ((total - diff)/total)) * 100   as f64
-	}	
+		realistic_test!(control, experiment)
+	}
 
 	/// This function returns a boolean that indicates if the data sample parsing had issues
 	///
