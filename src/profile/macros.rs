@@ -96,6 +96,7 @@ macro_rules! symbolize_char {
 ///     // will return a Fact that represents the char `W`
 /// # }
 /// ```
+#[macro_export]
 macro_rules! factualize_entity {
     ( $entity:ident, $idx:ident ) => {
         {

@@ -35,12 +35,16 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.0.6:
+Here's whats new in 0.0.7:
 
-* Removed obsolete module test_data_generation::data
-* Added functionality to determine how realist the generate test data is compared to the sample data.
+* Converted the following functionality to macros so they could be referenced in multiple modules.
 > - test_data_generation::data_sample_parser::DataSampleParser::levenshtein_distance()
 > - test_data_generation::data_sample_parser::DataSampleParser::realistic_test()
+* Added the following functions to test_data_generation::profile::profile::Profile
+> This is the beginning of how profiles can learn if they are generating realistic data and make adjustments
+> - levenshtein_distance()
+> - realistic_test()
+> - learn_from_entity()
 
 ## About
 
@@ -166,4 +170,4 @@ Details on how to contribute can be found in the [CONTRIBUTING](./CONTRIBUTING.m
 
 test-data-generation is primarily distributed under the terms of the Apache License (Version 2.0).
 
-See ![LICENSE-APACHE "Apache License](./LICENSE-APACHE) for details.
+See [LICENSE-APACHE "Apache License](./LICENSE-APACHE) for details.
