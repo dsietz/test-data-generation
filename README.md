@@ -171,3 +171,6 @@ Details on how to contribute can be found in the [CONTRIBUTING](./CONTRIBUTING.m
 test-data-generation is primarily distributed under the terms of the Apache License (Version 2.0).
 
 See [LICENSE-APACHE "Apache License](./LICENSE-APACHE) for details.
+
+## Presentations
+ See [An Introduciton to Test Data Generation](./An Introduciton to Test Data Generation.pptx) for a presentation of complete overview of the Test Data Generation crate.
