@@ -173,4 +173,5 @@ test-data-generation is primarily distributed under the terms of the Apache Lice
 See [LICENSE-APACHE "Apache License](./LICENSE-APACHE) for details.
 
 ## Presentations
- See [An Introduciton to Test Data Generation][./An Introduciton to Test Data Generation.pptx) for a presentation of complete overview of the Test Data Generation crate.
+
+ See [An Introduciton to Test Data Generation](./An Introduciton to Test Data Generation.pptx) for a presentation of complete overview of the Test Data Generation crate.
