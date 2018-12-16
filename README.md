@@ -7,10 +7,7 @@ Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?br
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
 ### Description
-For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module
-that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for
-persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or
-wrapped into a web service or stand-alone utility.   
+For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or wrapped into a web service or stand-alone utility.   
 
 **PROBLEM**
 </br>
@@ -35,16 +32,11 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.0.7:
+Here's whats new in 0.1.0:
 
-* Converted the following functionality to macros so they could be referenced in multiple modules.
-> - test_data_generation::data_sample_parser::DataSampleParser::levenshtein_distance()
-> - test_data_generation::data_sample_parser::DataSampleParser::realistic_test()
-* Added the following functions to test_data_generation::profile::profile::Profile
-> This is the beginning of how profiles can learn if they are generating realistic data and make adjustments
-> - levenshtein_distance()
-> - realistic_test()
-> - learn_from_entity()
+This project and codebase for this crate has change 
+1. Maintainance mode has been chaged to __Passively Maintained__
+2. The contributor model has changed to [Meritocracy](./CONTRIBUTING.md)
 
 ## About
 

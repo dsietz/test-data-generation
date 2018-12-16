@@ -300,41 +300,27 @@ impl DataSampleParser {
 		let mut rec_cnt: u16 = <u16>::min_value();
 
 		debug!("CSV headers: {:?}",profile_keys);
-/*
+
 		// Multi-Threading START
-		let mut records_analysis = Vec::new();
+/*
+		let records: Result<Vec<StringRecord>, csv::Error> = rdr.records().collect();
+		for record in records.unwrap().par_iter() {
+			//let record = result.expect("a CSV record");
 
-		crossbeam::scope(|scope|{
-			for row in rdr.records() {
-				//keep a count of the number of records analyzed
-	        	rec_cnt = rec_cnt + 1;
+			//keep a count of the number of records analyzed
+			rec_cnt = rec_cnt + 1;
 
-				let analysis = scope.spawn(move|| -> Vec<(String, Vec<Fact>)>{
-					let record = row.expect("a CSV record");
-					let mut record_analysis = Vec::new();
+			//iterate through all the fields
+			for (idx, field) in record.iter().enumerate() {
+				// Print a debug version of the record.
+				debug!("Field Index: {}, Field Value: {}", idx, field);
 
-					//iterate through all the fields
-	        		for (idx, field) in record.iter().enumerate() {
-						let p = Profile::new();
-						record_analysis.insert(idx, p.factualize(field));
-					}
-
-					record_analysis
-				}).join();
-
-				records_analysis.push(analysis);
-			}
-		});
-
-		for analysis in records_analysis {
-			for (idx, factual) in analysis.into_iter().enumerate()  {
-				let pattern = factual.0;
-				let facts = factual.1;
-				self.profiles.get_mut(&profile_keys[idx]).unwrap().apply_facts(pattern, facts);
+				//select the profile based on the field name (header) and analyze the field value
+				self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
 			}
 		}
-		// Multi-Threading END
 */
+		// Multi-Threading END
 
 		// Single-Threading START
 		//iterate through all the records

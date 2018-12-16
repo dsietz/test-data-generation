@@ -143,6 +143,7 @@ extern crate rand;
 extern crate crossbeam;
 extern crate csv;
 extern crate levenshtein;
+extern crate rayon;
 
 #[macro_use]
 pub mod macros;
