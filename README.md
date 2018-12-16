@@ -37,6 +37,7 @@ Here's whats new in 0.1.0:
 This project and codebase for this crate has change 
 1. Maintainance mode has been chaged to __Passively Maintained__
 2. The contributor model has changed to [Meritocracy](./CONTRIBUTING.md)
+3. Implemented rayon crate (for multi-threading items in an iterator)
 
 ## About
 
