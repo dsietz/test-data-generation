@@ -62,7 +62,7 @@ fn init() -> PlaceholderMap{
 impl PatternPlaceholder {
 	/// Constructs a new PatternPlaceholder
 	/// 
-	/// #Example
+	/// # Example
 	/// 
 	/// ```
 	/// extern crate test_data_generation;
@@ -88,13 +88,12 @@ impl PatternPlaceholder {
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::profile::pattern_placeholder::PatternPlaceholder;
-	/// 
+	///	
 	/// fn main() {
-	///		let placeholder =  PatternPlaceholder::new();
-	/// 
-	/// 	println!("Upper case vowel symbol: {:?}", placeholder.get(&"VowelUpper".to_string()));
+	/// 	let placeholder = PatternPlaceholder::new();
+	///     println!("Upper case vowel symbol: {:?}", placeholder.get(&"VowelUpper".to_string()));
 	/// }
-	/// ```	
+	/// ```
 	pub fn get(&self, key: &str) -> char {
 		*self.placeholder.get(key).unwrap()
 	}
