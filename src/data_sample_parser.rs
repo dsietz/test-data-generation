@@ -275,8 +275,6 @@ impl DataSampleParser {
 	/// }
 	/// ```
 	pub fn analyze_csv_data(&mut self, data: &String) -> Result<i32, String>  {
-		println!("{}",data);
-
 		debug!("Starting to analyzed the csv data {}",data);
 
 		let mut rdr = csv::ReaderBuilder::new()
