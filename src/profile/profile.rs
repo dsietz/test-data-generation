@@ -587,11 +587,11 @@ impl Profile {
 	pub fn generate_from_pattern(&self, pattern: String) -> String {
 		let pattern_chars = pattern.chars().collect::<Vec<char>>();
 		let mut generated = String::new();
-		let mut prev_char = ' ';
+		let prev_char = ' ';
 
 		// iterate through the chars in the pattern string
 		for (idx, ch) in pattern_chars.iter().enumerate() {
-			crossbeam::scope(|scope| {
+			match crossbeam::scope(|scope| {
 				let c = ch;
 				let starts = if idx == 0 { 1 } else { 0 };
 			 	let ends = if idx == pattern_chars.len()-1 { 1 } else { 0 };
@@ -600,7 +600,7 @@ impl Profile {
 
 			 	// iterate through the processors (vec) that hold the lists (vec) of facts
 				for v in &self.facts {
-					let selected_facts = scope.spawn(move || {
+					let selected_facts = scope.spawn(move |_| {
 						let mut facts = vec![];
 
 						// iterate through the list of facts
@@ -630,8 +630,15 @@ impl Profile {
 						facts
 					});
 
-					//append the selected_facts to the fact_options
-					fact_options.extend_from_slice(&selected_facts.join());
+					//append the selected_facts to the fact_options 
+					//fact_options.extend_from_slice(&selected_facts.join());
+					match selected_facts.join() {
+						Ok(sf) => fact_options.extend_from_slice(&sf),
+						Err(err) => {
+							error!("{:?}", err);
+							panic!("{:?}", err);
+						}
+					}
 				}
 
 				//select a fact to use as the generated char
@@ -639,13 +646,21 @@ impl Profile {
 				let rnd_end = fact_options.len()-1;
 
 				if rnd_start >= rnd_end {
-					generated.push(fact_options[0 as usize]);
+					//generated.push(fact_options[0 as usize]);					
+					fact_options[0 as usize]
 				}else{
 					let x: u32 = random_between!(rnd_start, rnd_end);
-					prev_char = fact_options[x as usize];
-					generated.push(prev_char);
+					//prev_char = fact_options[x as usize];
+					//generated.push(prev_char);
+					fact_options[x as usize]
 				}
-			});
+			}) {
+				Ok(c) => generated.push(c),
+				Err(err) => {
+					error!("{:?}", err);
+					panic!("{:?}", err);
+				},
+			}
 		}
 
 		generated
@@ -875,7 +890,7 @@ impl Profile {
     ///     assert_eq!(profile.save("./tests/samples/sample-00-profile").unwrap(), true);
 	/// }
 	///
-	pub fn save(&mut self, path: &'static str) -> Result<(bool), io::Error>  {
+	pub fn save(&mut self, path: &'static str) -> Result<bool, io::Error>  {
 		let dsp_json = serde_json::to_string(&self).unwrap();
 
 		// Create the archive file
