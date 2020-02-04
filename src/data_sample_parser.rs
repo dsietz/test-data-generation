@@ -83,6 +83,7 @@ use std::io::Write;
 use std::io::prelude::*;
 use std::result::Result;
 use csv;
+//use csv::StringRecord;
 use std::error::Error;
 use csv::WriterBuilder;
 use serde_json;
@@ -228,10 +229,10 @@ impl DataSampleParser {
 	pub fn analyze_csv_file(&mut self, path: &String) -> Result<i32, String>  {
 		info!("Starting to analyzed the csv file {}",path);
 
-    	let mut file = try!(File::open(path).map_err(|e| {
+    	let mut file = (File::open(path).map_err(|e| {
 			error!("csv file {} couldn't be opened!",path);
     		e.to_string()
-		}));
+		}))?;
 
 		let mut data = String::new();
     	file.read_to_string(&mut data).map_err(|e| {
@@ -316,8 +317,7 @@ impl DataSampleParser {
 				//select the profile based on the field name (header) and analyze the field value
 				self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
 			}
-		}
-*/
+*/		
 		// Multi-Threading END
 
 		// Single-Threading START
@@ -536,10 +536,10 @@ impl DataSampleParser {
     ///     dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
 	/// }
 	/// ```
-	pub fn generate_csv(&mut self, row_count: u32, path: &String) -> Result<(), Box<Error>> {
+	pub fn generate_csv(&mut self, row_count: u32, path: &String) -> Result<(), Box<dyn Error>> {
 		info!("generating csv file {}", path);
 
-		let mut wtr = try!(WriterBuilder::new()
+		let mut wtr = (WriterBuilder::new()
 		    .has_headers(true)
         	.quote(b'"')
         	.double_quote(true)
@@ -547,7 +547,7 @@ impl DataSampleParser {
         	.from_path(path).map_err(|e| {
 			error!("csv file {} couldn't be created!",path);
     		e.to_string()
-		}));
+		}))?;
 
 		let headers = self.extract_headers();
 		wtr.write_record(&headers)?;
@@ -670,7 +670,7 @@ impl DataSampleParser {
     ///     assert_eq!(dsp.save(&String::from("./tests/samples/sample-00-dsp")).unwrap(), true);
 	/// }
 	///
-	pub fn save(&mut self, path: &String) -> Result<(bool), io::Error>  {
+	pub fn save(&mut self, path: &String) -> Result<bool, io::Error>  {
 		let dsp_json = serde_json::to_string(&self).unwrap();
 
 		// Create the archive file

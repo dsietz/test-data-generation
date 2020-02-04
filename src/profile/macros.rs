@@ -19,7 +19,7 @@
 macro_rules! symbolize_char {
     ( $c:ident ) => {
         {
-            let mut pattern = Pattern {
+            let pattern = Pattern {
     			size: 0,
                 regex_symbols: PatternPlaceholder::new(),
     			regex_consonant_upper: Regex::new(r"[B-DF-HJ-NP-TV-Z]").unwrap(),
