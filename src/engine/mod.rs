@@ -276,6 +276,90 @@ impl PatternDefinition {
             pattern: Pattern::default(),
 		}
     }	
+
+    /// This function converts an entity (&str) into a tuplet (String, Vec<Fact>)</br>
+	///
+	/// # Arguments
+	///
+	/// * `entity: String` - The textual str of the value to anaylze.</br>
+	///
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::engine::PatternDefinition;
+	///
+	/// fn main() {
+	///		let mut pttrn_def = PatternDefinition::new();
+	///
+	/// 	assert_eq!(pttrn_def.analyze("Hello World").0, "CvccvSCvccc");
+	/// }
+	/// ```
+	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
+		// record the length of the passed value
+		//self.size = entity.len() as u32;
+
+		// String to hold the pattern
+		let mut pttrn = String::new();
+
+		// Vec to hold all the Facts to be returned
+		let mut facts = Vec::new();
+
+		// record the pattern of the passed value
+		for (i, _c) in entity.chars().enumerate() {
+			//let fact = self.factualize(&entity, i as u32);
+			let idx: u32 = i as u32;
+			let fact = self.factualize(entity, idx);
+			pttrn.push_str(&*fact.pattern_placeholder.to_string());
+			facts.push(fact);
+		}
+		
+		(pttrn, facts)
+	}
+
+    /// This function converts a char in an entity (&str) based on the index specified into a Fact</br>
+	///
+	/// # Arguments
+	///
+	/// * `entity: String` - The textual str of the value to anaylze.</br>
+	/// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
+	///
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::engine::PatternDefinition;
+	///
+	/// fn main() {
+	///		let mut pttrn_def = PatternDefinition::new();
+	///		let fact = pttrn_def.factualize("Word",0);
+	///     // will return a Fact that represents the char `W`
+	/// }
+	/// ```
+	pub fn factualize(&mut self, entity: &str, idx: u32) -> Fact {
+		let c = entity.chars().nth(idx as usize).unwrap();
+		let pp = self.symbolize_char(c);
+		let pk = if idx > 0 {entity.chars().nth(idx as usize -1)} else {None};
+		let nk = if idx < entity.len() as u32 -1 {entity.chars().nth(idx as usize +1)} else {None};
+		let sw = if idx == 0 {1} else {0};
+		let ew = if idx == entity.len() as u32 -1 {1} else {0};
+
+		let mut fact = Fact::new(c,pp,sw,ew,idx);
+
+		// only if there is a next key
+		if nk.is_some() {
+			&fact.set_next_key(nk.unwrap());
+		}
+
+		// only if there is a prior key
+		if pk.is_some() {
+			&fact.set_prior_key(pk.unwrap());
+		}
+
+		fact
+	}
     
     /// This function returns a pattern symbol that represents the type of character 
 	/// 
@@ -306,7 +390,7 @@ impl PatternDefinition {
 	///
 	/// fn main() {
 	/// 	let pttrn_def = PatternDefinition::new();
-	/// 	println!("The pattern symbol for 'A' is {:?}", pttrn_def.symbolize_char(&'A'));
+	/// 	println!("The pattern symbol for 'A' is {:?}", pttrn_def.symbolize_char('A'));
 	///     // The pattern symbol for 'A' is V
 	/// }
 	/// ```
@@ -415,4 +499,25 @@ mod tests {
 
     	assert_eq!(pttrn_def.symbolize_char('A'), 'V');
     }
+
+    #[test]
+    fn test_pattern_definition_factualize(){
+    	let mut pttrn_def = PatternDefinition::new();
+    	let mut fact1 = pttrn_def.factualize("Word",1);
+		let mut fact2 = Fact::new('o','v',0,0,1);
+		fact2.set_prior_key('W');
+		fact2.set_next_key('r');
+
+    	assert_eq!(fact1.serialize(), fact2.serialize());
+    }
+
+    #[test]
+    fn test_pattern_definition_analyze(){
+    	let mut pttrn_def = PatternDefinition::new();
+    	let word = pttrn_def.analyze("HELlo0?^@");
+
+        assert_eq!(word.0, "CVCcv#pp@");
+        assert_eq!(word.1.len(), 9);
+    }
+
 }
