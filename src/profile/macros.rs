@@ -5,16 +5,6 @@
 ///
 /// * `c: char` - The char in the entity to convert to a symbolic pattern char.</br>
 ///
-/// # Example
-///
-/// ```
-/// # #[macro_use]
-/// # extern crate test_data_generation;
-/// # fn main() {
-/// 	//let symbol: char = symbolize_char!(&'A');
-///     //assert_eq!('V', symbol);
-/// # }
-/// ```
 #[macro_export]
 macro_rules! symbolize_char {
     ( $c:ident ) => {
@@ -87,18 +77,9 @@ macro_rules! symbolize_char {
 /// * `entity: String` - The textual str of the value to anaylze.</br>
 /// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
 ///
-/// # Example
-///
-/// ```/// # #[macro_use]
-/// # extern crate test_data_generation;
-/// # fn main() {
-///		//let fact = factualize_entity!("Word",0);
-///     // will return a Fact that represents the char `W`
-/// # }
-/// ```
 #[macro_export]
 macro_rules! factualize_entity {
-    ( $entity:ident, $idx:ident ) => {
+    ( $entity:expr, $idx:expr ) => {
         {
             let c = $entity.chars().nth($idx as usize).unwrap();
             let pp = symbolize_char!(c);

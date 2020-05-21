@@ -145,9 +145,12 @@ extern crate csv;
 extern crate levenshtein;
 extern crate rayon;
 
+
 #[macro_use]
 pub mod macros;
 pub mod shared;
 pub mod data_sample_parser;
 pub mod configs;
 pub mod profile;
+
+pub mod engine;

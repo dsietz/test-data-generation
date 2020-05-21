@@ -327,7 +327,7 @@ impl Profile {
 	pub fn analyze(&mut self, entity: &str) {
 		let rslt = self.factualize(entity);
 		let _t = self.apply_facts(rslt.0, rslt.1).map_err(|e| {
-			error!("Warning: Couldn't apply the patternand facts for the entity {}!", entity);
+			error!("Warning: Couldn't apply the pattern and facts for the entity {}!", entity);
     		e.to_string()
 		});
 	}
