@@ -1,6 +1,5 @@
 [package]
 name = "test-data-generation"
-edition = "2018"
 version = "0.2.0"
 authors = ["dsietz <davidsietz@yahoo.com>"]
 repository = "https://github.com/dsietz/test-data-generation.git"
