@@ -4,7 +4,7 @@ use test_data_generation::data_sample_parser;
 
 #[cfg(test)]
 mod tests {
-	use data_sample_parser::DataSampleParser;
+	use crate::data_sample_parser::DataSampleParser;
 	use std::fs::File;
 	use std::io::prelude::*;
 	use std::io::BufReader;

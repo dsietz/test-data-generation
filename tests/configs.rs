@@ -4,7 +4,7 @@ use test_data_generation::configs;
 
 #[cfg(test)]
 mod tests {
-	use configs::Configs;
+	use crate::configs::Configs;
 
     #[test]
     // ensure Configs reads a valid configuration file

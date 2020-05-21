@@ -35,8 +35,8 @@
 //! ```
 
 use regex::Regex;
-use profile::pattern_placeholder::PatternPlaceholder;
-use profile::fact::Fact;
+use crate::profile::pattern_placeholder::PatternPlaceholder;
+use crate::profile::fact::Fact;
 
 /// Represents a symbolic pattern of an entity (String)
 pub struct Pattern{

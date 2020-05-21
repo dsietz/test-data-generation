@@ -4,7 +4,7 @@ use test_data_generation::profile;
 
 #[cfg(test)]
 mod tests {
-	use profile::fact::Fact;
+	use crate::profile::fact::Fact;
     
     #[test]
     // ensure Pattern is analyzing data into patterns

@@ -75,8 +75,8 @@
 //!
 
 use std::collections::BTreeMap;
-use configs::Configs;
-use profile::profile::{Profile};
+use crate::configs::Configs;
+use crate::profile::profile::{Profile};
 use std::fs::File;
 use std::io;
 use std::io::Write;

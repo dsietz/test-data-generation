@@ -5,8 +5,8 @@ use test_data_generation::profile::profile;
 
 #[cfg(test)]
 mod tests {
-	use data_sample_parser::DataSampleParser;
-	use profile::Profile;
+	use crate::data_sample_parser::DataSampleParser;
+	use crate::profile::Profile;
 	use std::time::{Instant};
 
 	#[ignore]

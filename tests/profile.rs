@@ -5,7 +5,7 @@ use test_data_generation::profile;
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {
-	use profile::profile::Profile;
+	use crate::profile::profile::Profile;
 
 	#[test]
 	fn apply_facts(){

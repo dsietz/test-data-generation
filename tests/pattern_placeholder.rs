@@ -6,7 +6,7 @@ use test_data_generation::profile;
 // Conditionally compile the module `test` only when the test-suite is run.
 #[cfg(test)]
 mod tests {    
-	use profile::pattern_placeholder::PatternPlaceholder;
+	use crate::profile::pattern_placeholder::PatternPlaceholder;
 
 	// shared functions
 	pub fn upper_vowel_symbol() -> char {

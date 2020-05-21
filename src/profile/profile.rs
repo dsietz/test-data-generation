@@ -116,8 +116,8 @@
 //! }
 //!
 
-use profile::pattern::{Pattern};
-use profile::fact::{Fact};
+use crate::profile::pattern::{Pattern};
+use crate::profile::fact::{Fact};
 use std::collections::BTreeMap;
 use std::ops::AddAssign;
 use crossbeam;
