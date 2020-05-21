@@ -286,18 +286,20 @@ impl PatternDefinition {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::engine::PatternDefinition;
 	///
 	/// fn main() {
 	///		let mut pttrn_def = PatternDefinition::new();
-	///
-	/// 	assert_eq!(pttrn_def.analyze("Hello World").0, "CvccvSCvccc");
+    ///     async {
+    ///         let rslt = pttrn_def.analyze("Hello World").await;
+    ///         assert_eq!(rslt.0, "CvccvSCvccc");
+    ///     };
 	/// }
 	/// ```
-	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
+	pub async fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
 		// record the length of the passed value
 		//self.size = entity.len() as u32;
 
@@ -328,7 +330,7 @@ impl PatternDefinition {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::engine::PatternDefinition;
@@ -384,7 +386,7 @@ impl PatternDefinition {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::engine::PatternDefinition;
@@ -514,10 +516,12 @@ mod tests {
 
     #[test]
     fn test_pattern_definition_analyze(){
-    	let mut pttrn_def = PatternDefinition::new();
-    	let word = pttrn_def.analyze("HELlo0?^@");
-
-        assert_eq!(word.0, "CVCcv#pp@");
-        assert_eq!(word.1.len(), 9);
+        let mut pttrn_def = PatternDefinition::new();
+        async {    
+            let word = pttrn_def.analyze("HELlo0?^@").await;
+        
+            assert_eq!(word.0, "CVCcv#pp@");
+            assert_eq!(word.1.len(), 9);
+        };
     }
 }
