@@ -54,6 +54,7 @@ use regex::Regex;
 use serde_json;
 use std::collections::BTreeMap;
 
+
 #[allow(dead_code)]
 type PatternMap  = BTreeMap<String, char>;
 
@@ -519,5 +520,4 @@ mod tests {
         assert_eq!(word.0, "CVCcv#pp@");
         assert_eq!(word.1.len(), 9);
     }
-
 }

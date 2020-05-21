@@ -144,6 +144,7 @@ extern crate crossbeam;
 extern crate csv;
 extern crate levenshtein;
 extern crate rayon;
+extern crate async_trait;
 
 
 #[macro_use]
