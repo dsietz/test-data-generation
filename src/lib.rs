@@ -145,7 +145,8 @@ extern crate csv;
 extern crate levenshtein;
 extern crate rayon;
 extern crate async_trait;
-
+extern crate async_std;
+//#[macro_use] extern crate futures;
 
 #[macro_use]
 pub mod macros;

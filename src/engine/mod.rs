@@ -53,6 +53,9 @@
 use regex::Regex;
 use serde_json;
 use std::collections::BTreeMap;
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
+use std::thread;
 
 
 #[allow(dead_code)]
@@ -293,13 +296,13 @@ impl PatternDefinition {
 	///
 	/// fn main() {
 	///		let mut pttrn_def = PatternDefinition::new();
-    ///     async {
-    ///         let rslt = pttrn_def.analyze("Hello World").await;
+    ///     //async {
+    ///         let rslt = pttrn_def.analyze("Hello World");
     ///         assert_eq!(rslt.0, "CvccvSCvccc");
-    ///     };
+    ///     //}
 	/// }
 	/// ```
-	pub async fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
+	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
 		// record the length of the passed value
 		//self.size = entity.len() as u32;
 
@@ -447,10 +450,49 @@ impl PatternDefinition {
 }
 
 
+trait Engine {
+    fn analyze_entities(entities: Vec<&'static str>) -> Vec<(String, Vec<Fact>)> {
+        let (tx, rx): (Sender<(String, Vec<Fact>)>, Receiver<(String, Vec<Fact>)>) = mpsc::channel();
+        let mut children = Vec::new();
+    
+        for entity in entities.clone() {
+            let thread_tx = tx.clone();
+            let child = thread::spawn(move || {
+                thread_tx.send(PatternDefinition::new().analyze(entity)).unwrap();
+                debug!("PatternDefinition::analyze thread finished for {}", entity);
+            });
+    
+            children.push(child);
+        }
+    
+        let mut results = Vec::new();
+        for entity in entities {
+            results.push(
+                match rx.recv() {
+                    Ok(result) => result,
+                    Err(_) => {
+                        error!("Error: Could not anaylze the entity: {}", entity);
+                        panic!("Error: Could not anaylze the data!")
+                    }
+                }
+            );
+        }
+        
+        for child in children {
+            child.join().expect("Error: Could not anaylze the data!");
+        }
+
+        results
+    }
+}
+
 // Unit Tests
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    struct Xtest{}
+    impl Engine for Xtest{}
 
     #[test]
     fn test_fact_new(){
@@ -516,12 +558,20 @@ mod tests {
 
     #[test]
     fn test_pattern_definition_analyze(){
-        let mut pttrn_def = PatternDefinition::new();
-        async {    
-            let word = pttrn_def.analyze("HELlo0?^@").await;
+        let mut pttrn_def = PatternDefinition::new(); 
+        let word = pttrn_def.analyze("HELlo0?^@");
         
-            assert_eq!(word.0, "CVCcv#pp@");
-            assert_eq!(word.1.len(), 9);
-        };
+        assert_eq!(word.0, "CVCcv#pp@");
+        assert_eq!(word.1.len(), 9);
     }
+
+    #[test]
+    fn test_pattern_definition_analyze_multithread(){
+        let words = vec!("word-one","word-two","word-three","word-four","word-five");
+
+        let results = Xtest::analyze_entities(words);
+
+        println!("{:?}", results);
+        assert_eq!(results.len(), 5);
+    } 
 }
