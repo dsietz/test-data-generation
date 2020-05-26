@@ -1,29 +1,30 @@
 extern crate test_data_generation;
 
 use test_data_generation::data_sample_parser;
-use test_data_generation::profile::profile;
 
 #[cfg(test)]
 mod tests {
 	use crate::data_sample_parser::DataSampleParser;
-	use crate::profile::Profile;
+	use test_data_generation::engine::{Engine};
 	use std::time::{Instant};
 
-	#[ignore]
+	struct Xtest{}
+    impl Engine for Xtest{}
+
 	#[test]
-    // ensure DataSampleParser can analyze a csv formatted file
+    // Performance Test 
     fn analyzing_word(){
-    	let mut profile = Profile::new();
 		let now = Instant::now();
+		let words = vec!("word-one","word-two","word-three","word-four","word-five");
 
-		profile.analyze("Word");
+        let _results = Xtest::analyze_entities(words);
 
-		let d = now.elapsed().subsec_nanos();
+		let d = now.elapsed().subsec_millis();
 
-		// should run in 1/1000 of a second (1 millisecond)
-		if d > 1000000 {
-			panic!("Failed: The execution time took {:?} nanoseconds.", d);
-		}
+		// should run in less than 10 millisecond
+		if d > 10 {
+			panic!("Failed: The execution time took {:?} milliseconds.", d);
+        }
     }
 
 	#[ignore]

@@ -450,7 +450,7 @@ impl PatternDefinition {
 }
 
 
-trait Engine {
+pub trait Engine {
     fn analyze_entities(entities: Vec<&'static str>) -> Vec<(String, Vec<Fact>)> {
         let (tx, rx): (Sender<(String, Vec<Fact>)>, Receiver<(String, Vec<Fact>)>) = mpsc::channel();
         let mut children = Vec::new();
