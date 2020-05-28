@@ -9,7 +9,7 @@ use csv::Reader;
 ///
 /// # Example
 ///
-/// ```
+/// ```rust
 /// extern crate test_data_generation;
 ///
 /// use test_data_generation::shared;
@@ -28,6 +28,44 @@ pub fn string_to_static_str(s: String) -> &'static str {
 }
 
 pub trait CsvManipulator {
+    /// This function parses all the rows and splits the columns into separate Vectors
+    /// 
+    /// # Arguments
+    /// * `rdr: Reader<&[u8]>` - The csv::Reader that has read the csv file and is ready to process the data.</br>
+    ///  
+    /// ```rust
+    /// extern crate test_data_generation;
+    /// extern crate csv;
+    /// 
+    /// use test_data_generation::shared::CsvManipulator;
+    /// use csv::Reader;
+    /// 
+    /// fn main() {
+    ///     struct CsvMngr {}
+    ///     impl CsvManipulator for CsvMngr {}
+    ///
+    ///     let mut data = String::from("");
+	///     data.push_str("\"firstname\",\"lastname\"\n");
+	///     data.push_str("\"Aaron\",\"Aaberg\"\n");
+	///     data.push_str("\"Aaron\",\"Aaby\"\n");
+	///     data.push_str("\"Abbey\",\"Aadland\"\n");
+	///     data.push_str("\"Abbie\",\"Aagaard\"\n");
+    ///     data.push_str("\"Abby\",\"Aakre\"");
+    ///     
+    ///     let rdr: Reader<&[u8]> = csv::ReaderBuilder::new()
+    ///     .has_headers(true)
+    ///     .quote(b'"')
+    ///     .double_quote(true)
+    ///     .delimiter(b',')
+    ///     .from_reader(data.as_bytes());///       
+    ///     let columns = CsvMngr::read_as_columns(rdr);
+    ///     let column0 = vec!("Aaron", "Aaron", "Abbey", "Abbie", "Abby");
+    ///     let column1 = vec!("Aaberg", "Aaby", "Aadland", "Aagaard", "Aakre");
+    ///     
+    ///     println!("firstname: {:?}", column0);
+    ///     println!("lastname: {:?}", column1);
+    /// }
+    /// ```
     fn read_as_columns(mut rdr: Reader<&[u8]>) -> Vec<Vec<String>> {
         let mut columns = Vec::new();
         

@@ -451,7 +451,6 @@ impl PatternDefinition {
     }
 }
 
-//#[async_trait]
 pub trait Engine {
     fn analyze_entities(entities: Vec<String>) -> Vec<(String, Vec<Fact>)> {
         let (tx, rx): (Sender<(String, Vec<Fact>)>, Receiver<(String, Vec<Fact>)>) = mpsc::channel();

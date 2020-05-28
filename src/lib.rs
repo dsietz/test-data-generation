@@ -124,8 +124,6 @@
 //!    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
 //! }
 //! ```
-//!
-
 #![crate_type= "lib"]
 #![crate_name = "test_data_generation"]
 
@@ -143,9 +141,6 @@ extern crate rand;
 extern crate crossbeam;
 extern crate csv;
 extern crate levenshtein;
-extern crate rayon;
-extern crate async_trait;
-extern crate async_std;
 
 use crate::engine::{Fact, PatternDefinition};
 use std::collections::BTreeMap;
@@ -195,7 +190,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -225,7 +220,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -263,7 +258,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -298,7 +293,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -346,7 +341,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -372,7 +367,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -404,7 +399,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
     /// use test_data_generation::engine::{Fact, PatternDefinition};
@@ -449,7 +444,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -503,7 +498,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -550,7 +545,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -596,7 +591,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -705,7 +700,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -758,7 +753,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -783,7 +778,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -822,7 +817,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -854,7 +849,7 @@ impl Profile {
 	///
 	/// # Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -903,7 +898,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -954,7 +949,7 @@ impl Profile {
 	///
 	/// #Example
 	///
-	/// ```
+	/// ```rust
 	/// extern crate test_data_generation;
 	///
 	/// use test_data_generation::Profile;
@@ -980,7 +975,6 @@ pub mod macros;
 pub mod shared;
 pub mod data_sample_parser;
 pub mod configs;
-pub mod profile;
 pub mod engine;
 
 // Unit Tests
