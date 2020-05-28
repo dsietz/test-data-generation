@@ -367,7 +367,7 @@ impl DataSampleParser {
 
 		// Multi-Threading START
 		let columns = Self::read_as_columns(rdr);
-		let col_cnt = columns.len();
+		//let col_cnt = columns.len();
 		let rec_cnt = columns[0].len();
 		self.analyze_columns(profile_keys, columns);
 
