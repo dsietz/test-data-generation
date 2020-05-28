@@ -82,4 +82,14 @@ mod tests {
         assert_eq!(columns[0], column0);
         assert_eq!(columns[1], column1);
     }
+
+    #[test]
+    // ensure the conversion of String to &'static str
+    fn test_to_static_str(){
+        let static_str: &'static str = "Hello World";
+        let my_string = String::from("Hello World");
+        let my_static_str =  string_to_static_str(my_string);
+
+        assert_eq!(static_str, my_static_str);
+    }
 }

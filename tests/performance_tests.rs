@@ -11,6 +11,7 @@ mod tests {
 	struct Xtest{}
     impl Engine for Xtest{}
 
+	#[ignore]
 	#[test]
     // Performance Test 
     fn analyzing_word(){
@@ -27,6 +28,7 @@ mod tests {
         }
     }
 
+	#[ignore]
 	#[test]
     // ensure DataSampleParser can analyze a csv formatted file
     fn analyzing_csv_file_15k(){
