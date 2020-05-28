@@ -76,7 +76,9 @@
 
 use std::collections::BTreeMap;
 use crate::configs::Configs;
-use crate::profile::profile::{Profile};
+use crate::Profile;
+use crate::engine::{Engine, EngineContainer};
+use crate::shared::CsvManipulator;
 use std::fs::File;
 use std::io;
 use std::io::Write;
@@ -87,6 +89,10 @@ use csv;
 use std::error::Error;
 use csv::WriterBuilder;
 use serde_json;
+
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
+use std::thread;
 
 type ProfilesMap = BTreeMap<String, Profile>;
 
@@ -100,6 +106,9 @@ pub struct DataSampleParser{
 	/// List of Profiles objects identified by a unique profile name BTreeMap<String, Profile>
 	profiles: ProfilesMap,
 }
+
+impl CsvManipulator for DataSampleParser {}
+impl Engine for DataSampleParser {}
 
 impl DataSampleParser {
 	/// Constructs a new DataSampleParser
@@ -200,6 +209,62 @@ impl DataSampleParser {
 		serde_json::from_str(&serialized).unwrap()
 	}
 
+	fn analyze_columns(&mut self, profile_keys: Vec<String>, columns: Vec<Vec<String>>) {
+		let col_cnt = columns.len();
+		let (tx, rx): (Sender<Result<Profile, String>>, Receiver<Result<Profile, String>>) = mpsc::channel();
+		let mut jobs = Vec::new();
+		
+	    //iterate through all the columns
+	    for (idx, column) in columns.iter().enumerate() {
+			let thread_tx = tx.clone();
+			let container = EngineContainer {
+				profile: self.profiles.get(&profile_keys[idx]).unwrap().clone(),
+				entities: column.to_vec(),
+			};
+
+			let job = thread::spawn(move || {
+				let result = Self::profile_entities_with_container(container);
+				thread_tx.send(result).unwrap();
+			});
+
+			jobs.push(job);
+		}
+		
+		let mut results = Vec::with_capacity(col_cnt);
+		for _ in 0..col_cnt {
+			results.push(rx.recv());
+		}
+
+		for job in jobs {
+			job.join().expect("Error: Could not run the job");
+		}
+
+		for result in results {
+			match result {
+				Ok(msg) => {
+					//received from sender
+					match msg {
+						Ok(p) => {
+							let id = p.clone().id.unwrap();
+							debug!("Profile {} has finished analyzing the entities.", id);
+							self.profiles.insert(id, p);
+						},
+						Err(e) => {
+							error!("Profile wasn't able to analyzing the entities. Error: {}", e);
+						}
+					}
+					
+				},
+				Err(e) => {
+					// could not receive from sender
+					error!("Receiver wasn't able to receive message from sender which was analyzing entities for the profile. Error: {}", e);
+					panic!("Receiver wasn't able to receive message from sender which was analyzing entities for the profile. Error: {}", e);
+				},
+			}
+		}		
+		// Multi-Threading END
+	}
+
 	/// This function analyzes sample data that is a csv formatted file and returns a boolean if successful.
 	/// _NOTE:_ The csv properties are as follows:
 	///       + headers are included as first line
@@ -289,55 +354,22 @@ impl DataSampleParser {
 		for headers in rdr.headers() {
 			for header in headers.iter() {
 	        	//add a Profile to the list of profiles to represent the field (indexed using the header label)
-	        	let p = Profile::new();
-	        	self.profiles.insert(format!("{}",header), p);
+	        	let p = Profile::new_with_id(format!("{}",header));
+				self.profiles.insert(format!("{}",header), p);
 	        }
 		}
 
 		//create a Vec from all the keys (headers) in the profiles list
 		let profile_keys: Vec<_> = self.profiles.keys().cloned().collect();
-		let mut rec_cnt: u16 = <u16>::min_value();
+		//let mut rec_cnt: u16 = <u16>::min_value();
 
 		debug!("CSV headers: {:?}",profile_keys);
 
 		// Multi-Threading START
-/*
-		let records: Result<Vec<StringRecord>, csv::Error> = rdr.records().collect();
-		for record in records.unwrap().par_iter() {
-			//let record = result.expect("a CSV record");
-
-			//keep a count of the number of records analyzed
-			rec_cnt = rec_cnt + 1;
-
-			//iterate through all the fields
-			for (idx, field) in record.iter().enumerate() {
-				// Print a debug version of the record.
-				debug!("Field Index: {}, Field Value: {}", idx, field);
-
-				//select the profile based on the field name (header) and analyze the field value
-				self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
-			}
-*/		
-		// Multi-Threading END
-
-		// Single-Threading START
-		//iterate through all the records
-	    for result in rdr.records() {
-	        let record = result.expect("a CSV record");
-
-	        //keep a count of the number of records analyzed
-	        rec_cnt = rec_cnt + 1;
-
-	        //iterate through all the fields
-	        for (idx, field) in record.iter().enumerate() {
-	        	// Print a debug version of the record.
-	        	debug!("Field Index: {}, Field Value: {}", idx, field);
-
-	        	//select the profile based on the field name (header) and analyze the field value
-	        	self.profiles.get_mut(&profile_keys[idx]).unwrap().analyze(field);
-	        }
-	    }
-		// Single-Threading END
+		let columns = Self::read_as_columns(rdr);
+		let col_cnt = columns.len();
+		let rec_cnt = columns[0].len();
+		self.analyze_columns(profile_keys, columns);
 
 	    debug!("Successfully analyzed the csv data");
 		debug!("Analyzed {} records, {} fields", rec_cnt, self.profiles.len());
@@ -698,4 +730,155 @@ impl DataSampleParser {
 
 		Ok(true)
 	}
+}
+
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use std::fs::File;
+	use std::io::BufReader;
+
+    #[test]
+    // ensure the Data Sample Parser can be restored from archived file
+    fn test_from_file(){
+    	let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-00-dsp"));
+    	println!("Sample data is [{:?}]", dsp.generate_record()[0]);
+
+    	assert_eq!(dsp.generate_record()[0], "OK".to_string());
+    }
+
+	#[test]
+	// ensure the Data Sample Parser can read all the headers from teh csv file
+	fn test_read_headers(){
+		let mut dsp = DataSampleParser::new();
+
+	    dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+	    let headers = dsp.extract_headers();
+	   
+	    assert_eq!(headers.len(), 2);
+	}
+
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted file
+    fn test_parse_csv_file(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	assert_eq!(dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap(), 1);
+    }
+
+	#[test]
+	// ensure DataSampleParser can analyze a csv formatted text
+	fn test_parse_csv_data(){
+		let mut dsp =  DataSampleParser::new();
+		let mut data = String::from("");
+		data.push_str("\"firstname\",\"lastname\"\n");
+		data.push_str("\"Aaron\",\"Aaberg\"\n");
+		data.push_str("\"Aaron\",\"Aaby\"\n");
+		data.push_str("\"Abbey\",\"Aadland\"\n");
+		data.push_str("\"Abbie\",\"Aagaard\"\n");
+		data.push_str("\"Abby\",\"Aakre\"");
+
+		assert_eq!(dsp.analyze_csv_data(&data).unwrap(), 1);
+	}
+
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted file
+    fn test_generate_field_from_csv_file(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    	println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
+    }
+
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted file
+    fn test_generate_record_from_csv_file(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    	assert_eq!(dsp.generate_record().len(), 2);
+    }
+
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted file
+    fn test_parse_csv_file_bad(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	assert_eq!(dsp.analyze_csv_file(&String::from("./badpath/sample-01.csv")).is_err(), true);
+    }
+
+    #[test]
+    // ensure the DataSampleParser object can be saved to file
+    fn test_save(){
+    	let mut dsp =  DataSampleParser::new();
+    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-00.csv")).unwrap();
+
+    	assert_eq!(dsp.save(&String::from("./tests/samples/sample-00-dsp")).unwrap(), true);
+    }
+
+    #[test]
+    // ensure the DataSampleParser object can recognize the difference between realistic data and unrealistic generated data
+    fn test_levenshtein_test(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	assert_eq!(dsp.levenshtein_distance(&"kitten".to_string(), &"sitting".to_string()), 3 as usize);
+    }
+
+	#[test]
+	// ensure the DataSampleParser object can recognize the difference between realistic data and unrealistic generated data
+	fn test_realistic_data_test(){
+		let mut dsp =  DataSampleParser::new();
+
+		assert_eq!(dsp.realistic_test(&"kitten".to_string(), &"sitting".to_string()), 76.92307692307692 as f64);
+	}
+
+    #[test]
+    // demo test
+    fn test_demo(){
+    	let mut dsp = DataSampleParser::new();
+    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+
+    	println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
+
+    	assert!(true);
+    }
+
+    #[test]
+    // ensure the DataSampleParser object can generate test data as a csv file
+    fn test_extract_headers_from_sample(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    	let headers = dsp.extract_headers();
+
+    	assert_eq!(headers.len(), 2);
+    }
+
+    #[test]
+    // ensure the DataSampleParser object can generate test data as a csv file
+    fn test_generate_csv_test_data_from_sample(){
+    	let mut dsp =  DataSampleParser::new();
+
+    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
+
+		let generated_row_count = match File::open(format!("{}","./tests/samples/generated-01.csv")) {
+			Err(_e) => {
+				0
+			},
+			Ok(f) => {
+				let mut count = 0;
+				let bf = BufReader::new(f);
+
+				for _line in bf.lines() {
+					count += 1;
+				}
+
+				count
+			},
+		};
+
+    	assert_eq!(generated_row_count, 101);
+    }
 }

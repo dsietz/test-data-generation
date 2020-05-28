@@ -9,7 +9,7 @@ mod tests {
 
     #[test]
     fn test_pattern_definition_analyze_multithread(){
-        let words = vec!("word-one","word-two","word-three","word-four","word-five");
+        let words = vec!("word-one".to_string(),"word-two".to_string(),"word-three".to_string(),"word-four".to_string(),"word-five".to_string());
 
         let results = Xtest::analyze_entities(words);
 

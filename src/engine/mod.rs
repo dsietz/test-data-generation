@@ -57,11 +57,13 @@ use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use std::thread;
 
+use crate::Profile;
+//use async_trait::async_trait;
 
 #[allow(dead_code)]
 type PatternMap  = BTreeMap<String, char>;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents a Fact for a character in a sample data entity that has been analyzed
 pub struct Fact{
 	/// the char that the fact defines (.e.g: 'a', '1', '%', etc.)
@@ -210,7 +212,7 @@ impl Fact {
 }
 
 /// Represents a symbolic pattern of an entity (String)
-struct Pattern {
+pub struct Pattern {
 	/// The regex rule used to find upper case consonants
 	regex_consonant_upper: Regex,
 	/// The regex rule used to find lower case consonants
@@ -449,16 +451,16 @@ impl PatternDefinition {
     }
 }
 
-
+//#[async_trait]
 pub trait Engine {
-    fn analyze_entities(entities: Vec<&'static str>) -> Vec<(String, Vec<Fact>)> {
+    fn analyze_entities(entities: Vec<String>) -> Vec<(String, Vec<Fact>)> {
         let (tx, rx): (Sender<(String, Vec<Fact>)>, Receiver<(String, Vec<Fact>)>) = mpsc::channel();
         let mut children = Vec::new();
     
         for entity in entities.clone() {
             let thread_tx = tx.clone();
             let child = thread::spawn(move || {
-                thread_tx.send(PatternDefinition::new().analyze(entity)).unwrap();
+                thread_tx.send(PatternDefinition::new().analyze(&entity)).unwrap();
                 debug!("PatternDefinition::analyze thread finished for {}", entity);
             });
     
@@ -483,7 +485,31 @@ pub trait Engine {
         }
 
         results
-    }
+	}
+
+	fn profile_entities(mut profile: Profile, entities: Vec<String>) -> Result<Profile, String> {
+		let results = Self::analyze_entities(entities);
+
+		for result in results {
+			match profile.apply_facts(result.0, result.1) {
+				Ok(_) => {},
+				Err(e) => {
+					return Err(format!("Error: Couldn't apply the Pattern and Facts to the Profile. Error Message: {}", e.to_string()))
+				}
+			}
+		}
+
+		Ok(profile)
+	}
+	
+	fn profile_entities_with_container(container: EngineContainer) -> Result<Profile, String> {
+		Self::profile_entities(container.profile, container.entities)
+	}
+}
+
+pub struct EngineContainer {
+	pub profile: Profile,
+	pub entities: Vec<String>,
 }
 
 // Unit Tests
@@ -567,11 +593,21 @@ mod tests {
 
     #[test]
     fn test_pattern_definition_analyze_multithread(){
-        let words = vec!("word-one","word-two","word-three","word-four","word-five");
+        let words = vec!("word-one".to_string(),"word-two".to_string(),"word-three".to_string(),"word-four".to_string(),"word-five".to_string());
 
         let results = Xtest::analyze_entities(words);
 
         println!("{:?}", results);
         assert_eq!(results.len(), 5);
-    } 
+	} 
+	
+	#[test]
+	fn test_profile_entities() {
+		//async {
+			let profile = Profile::new();
+			let words = vec!("word-one".to_string(),"word-two".to_string(),"word-three".to_string(),"word-four".to_string(),"word-five".to_string());
+			let result = Xtest::profile_entities(profile, words);
+			assert!(result.is_ok());
+		//};
+	}
 }
