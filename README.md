@@ -6,6 +6,8 @@
 Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
+## [We've overhauled this crate and have made drastic improvements!](#head1234)
+
 ### Description
 For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or wrapped into a web service or stand-alone utility.   
 
@@ -24,20 +26,27 @@ or production environment (option #1 above)
 ---
 
 ### Table of Contents
-* [What's New](#whats-new)
-* [About](#about)
-* [Usage](#usage)
-* [How to Contribute](#how-to-contribute)
-* [License](#license)
+- [Test Data Generation](#test-data-generation)
+- [We've overhauled this crate and have made drastic improvements!](#weve-overhauled-this-crate-and-have-made-drastic-improvements)
+  - [Description](#description)
+  - [Table of Contents](#table-of-contents)
+- [What's New](#whats-new)
+- [About](#about)
+- [Usage](#usage)
+  - [Profile](#profile)
+  - [Data Sample Parser](#data-sample-parser)
+- [How to Contribute](#how-to-contribute)
+- [License](#license)
 
 ## What's New
 
-Here's whats new in 0.1.0:
+Here's whats new in 0.2.0:
+<h3><a name="announcement"></a>We've overhauled this crate and have made drastic improvements!</h3> 
 
-This project and codebase for this crate has change 
-1. Maintainance mode has been chaged to __Passively Maintained__
-2. The contributor model has changed to [Meritocracy](./CONTRIBUTING.md)
-3. Implemented rayon crate (for multi-threading items in an iterator)
++ Upgrade to Rust Edition 2018
++ Support updated versions of dependent crates
++ Simplified the crate structure and made it more intuitive
++ Improved performance of parsing sample data. ( <b>It's extremely fast!</b> ) 
 
 ## About
 
