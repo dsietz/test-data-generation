@@ -6,6 +6,8 @@
 Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
+## [We've overhauled this crate and have made drastic improvements!](#head1234)
+
 ### Description
 For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or wrapped into a web service or stand-alone utility.   
 
@@ -25,6 +27,7 @@ or production environment (option #1 above)
 
 ### Table of Contents
 - [Test Data Generation](#test-data-generation)
+- [We've overhauled this crate and have made drastic improvements!](#weve-overhauled-this-crate-and-have-made-drastic-improvements)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
 - [What's New](#whats-new)
@@ -38,7 +41,7 @@ or production environment (option #1 above)
 ## What's New
 
 Here's whats new in 0.2.0:
-<h3>We've overhauled the crate and have made drastic improvements!</h3> 
+<h3><a name="announcement"></a>We've overhauled this crate and have made drastic improvements!</h3> 
 
 + Upgrade to Rust Edition 2018
 + Support updated versions of dependent crates
