@@ -6,7 +6,7 @@
 Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
-## [We've overhauled this crate and have made drastic improvements!](#head1234)
+## [Fast test data generation!](#head1234)
 
 ### Description
 For software development teams who need realistic test data for testing their software, this Test Data Generation library is a light-weight module that implements Markov decision process machine learning to quickly and easily profile sample data, create an algorithm, and produce representative test data without the need for persistent data sources, data cleaning, or remote services. Unlike other solutions, this open source solution can be integrated into your test source code, or wrapped into a web service or stand-alone utility.   
@@ -27,7 +27,7 @@ or production environment (option #1 above)
 
 ### Table of Contents
 - [Test Data Generation](#test-data-generation)
-- [We've overhauled this crate and have made drastic improvements!](#weve-overhauled-this-crate-and-have-made-drastic-improvements)
+- [Fast test data generation!](#fast-test-data-generation)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
 - [What's New](#whats-new)
@@ -35,18 +35,15 @@ or production environment (option #1 above)
 - [Usage](#usage)
   - [Profile](#profile)
   - [Data Sample Parser](#data-sample-parser)
+- [Examples](#examples)
 - [How to Contribute](#how-to-contribute)
 - [License](#license)
 
 ## What's New
 
-Here's whats new in 0.2.0:
-<h3><a name="announcement"></a>We've overhauled this crate and have made drastic improvements!</h3> 
-
-+ Upgrade to Rust Edition 2018
-+ Support updated versions of dependent crates
-+ Simplified the crate structure and made it more intuitive
-+ Improved performance of parsing sample data. ( <b>It's extremely fast!</b> ) 
+Here's whats new in 0.2.1:
++ [Fix for issue #88](https://github.com/dsietz/test-data-generation/issues/88)
++ Added a new Demo 03 `cargo run --example 03_demo`
 
 ## About
 
@@ -163,6 +160,16 @@ fn main() {
     dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
 }
 ```
+
+## Examples
+
+This library comes with the following examples. To run the examples.
++ [Demo 1](https://github.com/dsietz/test-data-generation/blob/master/examples/01_demo.rs) : Demonstrates the basic feature of the library to generate dates and people's names from the built-in demo data sets. 
+   > `cargo run --example 01_demo`
++ [Demo 2](https://github.com/dsietz/test-data-generation/blob/master/examples/02_demo.rs) : Demonstrates the basic feature of the library to generate dates and people's names from a CSV file.
+   > `cargo run --example 02_demo`
++ [Demo 3](https://github.com/dsietz/test-data-generation/blob/master/examples/03_demo.rs) : Demonstrates the ability to conitnuously add new analyzed data to an existing profile. 
+   > `cargo run --example 03_demo`
 
 ## How to Contribute
 

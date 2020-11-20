@@ -4,7 +4,7 @@ use test_data_generation::data_sample_parser::DataSampleParser;
  
 fn main() {
 
-		// This example demonstrates the basic feature of the library to generate dates and people's names
+		// This example demonstrates the basic feature of the library to generate dates and people's names from the built-in demo data sets
 		// using demo sample that is included in the library. 
 		
 		// initalize a new DataSampelParser
