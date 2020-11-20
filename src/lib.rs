@@ -475,6 +475,9 @@ impl Profile {
 		// -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}
 		let n = self.patterns.len();
 
+		// see issue: https://github.com/dsietz/test-data-generation/issues/88
+		self.pattern_percentages.clear();
+
 		for m in 0..n {
 			self.pattern_percentages.push((self.pattern_keys[m].clone(), (self.pattern_vals[m] as f64 / self.pattern_total as f64) * 100.0));
 		}
@@ -486,6 +489,9 @@ impl Profile {
 		// calculate the cumulative sum of the pattern rankings
 		// -> [("CvccvccpSCvccvv", 28.57142857142857), ("CcvccpSCvcc", 42.857142857142854), ("CvccvccpSCvccvc", 57.14285714285714), ("CvcvcccpSCcvcv", 71.42857142857142), ("CvcvpSCvccc", 85.7142857142857), ("V~CcvvcpSCvccc", 99.99999999999997)]
 		let mut rank: f64 = 0.00;
+
+		// see issue: https://github.com/dsietz/test-data-generation/issues/88
+		self.pattern_ranks.clear();
 
 		for pttrn in self.pattern_percentages.iter() {
 			let tmp = pttrn.1 + rank;
