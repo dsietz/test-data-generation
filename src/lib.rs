@@ -141,6 +141,7 @@ extern crate rand;
 extern crate crossbeam;
 extern crate csv;
 extern crate levenshtein;
+extern crate indexmap;
 
 use crate::engine::{Fact, PatternDefinition};
 use std::collections::BTreeMap;

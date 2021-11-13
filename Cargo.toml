@@ -40,6 +40,9 @@ rand         = "0.7"
 crossbeam    = "0.7"
 csv          = "1.1"
 levenshtein  = "1.0"
+[dependencies.indexmap]
+version = "1.7.0"
+features = ["serde-1"]
 
 [profile.release]
 opt-level = 3

@@ -74,7 +74,8 @@
 //! ```
 //!
 
-use std::collections::BTreeMap;
+// use std::collections::BTreeMap;
+use indexmap::{IndexMap, serde_seq};
 use crate::configs::Configs;
 use crate::Profile;
 use crate::engine::{Engine, EngineContainer};
@@ -89,12 +90,14 @@ use csv;
 use std::error::Error;
 use csv::WriterBuilder;
 use serde_json;
+use serde_json::{Value};
 
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use std::thread;
 
-type ProfilesMap = BTreeMap<String, Profile>;
+// type ProfilesMap = BTreeMap<String, Profile>;
+type ProfilesMap = IndexMap<String, Profile>;
 
 #[derive(Serialize, Deserialize, Debug)]
 /// Represents the Parser for sample data to be used
@@ -103,7 +106,8 @@ pub struct DataSampleParser{
 	pub issues: bool,
 	/// Configs object that define the configuration settings
 	cfg: Option<Configs>,
-	/// List of Profiles objects identified by a unique profile name BTreeMap<String, Profile>
+	/// List of Profiles objects identified by a unique profile name LinkedHashMap<String, Profile>
+	#[serde(with = "indexmap::serde_seq")]
 	profiles: ProfilesMap,
 }
 
@@ -206,6 +210,23 @@ impl DataSampleParser {
 			},
 		};
 
+		let dsp: Value = serde_json::from_str(&serialized).unwrap();
+		let prfils = dsp.get("profiles").unwrap();
+		match prfils.is_array() {
+			true => {
+				println!("version 0.3.0");
+			},
+			false => {
+				println!("version 0.2.1");
+				
+				let pm:ProfilesMap = ProfilesMap::new();
+
+				for prf in prfils.as_object().iter() {
+					pm.insert(prf.get("id").unwrap().to_string(), prf);
+				}
+			},
+		}
+
 		serde_json::from_str(&serialized).unwrap()
 	}
 
@@ -265,48 +286,6 @@ impl DataSampleParser {
 		// Multi-Threading END
 	}
 
-	/// This function analyzes sample data that is a csv formatted file and returns a boolean if successful.
-	/// _NOTE:_ The csv properties are as follows:
-	///       + headers are included as first line
-	///       + double quote wrap text
-	///       + double quote escapes is enabled
-	///       + delimiter is a comma
-	///
-	///
-	/// # Arguments
-	///
-	/// * `path: &String` - The full path name of the csv formatted sample data file.</br>
-	///
-	/// # Example
-	///
-	/// ```
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::data_sample_parser::DataSampleParser;
-	///
-	/// fn main() {
-	///		// initalize a new DataSampelParser
-	///		let mut dsp = DataSampleParser::new();
-    ///
-    /// 	assert_eq!(dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap(),1);
-	/// }
-	/// ```
-	pub fn analyze_csv_file(&mut self, path: &String) -> Result<i32, String>  {
-		info!("Starting to analyzed the csv file {}",path);
-
-    	let mut file = (File::open(path).map_err(|e| {
-			error!("csv file {} couldn't be opened!",path);
-    		e.to_string()
-		}))?;
-
-		let mut data = String::new();
-    	file.read_to_string(&mut data).map_err(|e| {
-			error!("csv file {} couldn't be read!",path);
-    		e.to_string()
-		}).unwrap();
-		self.analyze_csv_data(&data)
-	}
-
 	/// This function analyzes sample data that is a csv formatted string and returns a boolean if successful.
 	/// _NOTE:_ The csv properties are as follows:
 	///       + headers are included as first line
@@ -351,8 +330,8 @@ impl DataSampleParser {
         	.from_reader(data.as_bytes());
 
 		//iterate through the headers
-		for headers in rdr.headers() {
-			for header in headers.iter() {
+		for headers in rdr.headers() {	
+			for header in headers.iter(){						
 	        	//add a Profile to the list of profiles to represent the field (indexed using the header label)
 	        	let p = Profile::new_with_id(format!("{}",header));
 				self.profiles.insert(format!("{}",header), p);
@@ -361,7 +340,6 @@ impl DataSampleParser {
 
 		//create a Vec from all the keys (headers) in the profiles list
 		let profile_keys: Vec<_> = self.profiles.keys().cloned().collect();
-		//let mut rec_cnt: u16 = <u16>::min_value();
 
 		debug!("CSV headers: {:?}",profile_keys);
 
@@ -378,6 +356,49 @@ impl DataSampleParser {
 		self.profiles.iter_mut().for_each(|p|p.1.pre_generate());
 
 		Ok(1)
+	}	
+
+	/// This function analyzes sample data that is a csv formatted file and returns a boolean if successful.
+	/// _NOTE:_ The csv properties are as follows:
+	///       + headers are included as first line
+	///       + double quote wrap text
+	///       + double quote escapes is enabled
+	///       + delimiter is a comma
+	///
+	///
+	/// # Arguments
+	///
+	/// * `path: &String` - The full path name of the csv formatted sample data file.</br>
+	///
+	/// # Example
+	///
+	/// ```
+	/// extern crate test_data_generation;
+	///
+	/// use test_data_generation::data_sample_parser::DataSampleParser;
+	///
+	/// fn main() {
+	///		// initalize a new DataSampelParser
+	///		let mut dsp = DataSampleParser::new();
+    ///
+    /// 	assert_eq!(dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap(),1);
+	/// }
+	/// ```
+	pub fn analyze_csv_file(&mut self, path: &String) -> Result<i32, String>  {
+		info!("Starting to analyzed the csv file {}",path);
+
+    	let mut file = (File::open(path).map_err(|e| {
+			error!("csv file {} couldn't be opened!",path);
+    		e.to_string()
+		}))?;
+
+		let mut data = String::new();
+    	file.read_to_string(&mut data).map_err(|e| {
+			error!("csv file {} couldn't be read!",path);
+    		e.to_string()
+		}).unwrap();
+
+		self.analyze_csv_data(&data)
 	}
 
 	/// This function generates date as strings using the a `demo` profile
@@ -749,6 +770,16 @@ mod tests {
     }
 
 	#[test]
+    // ensure the Data Sample Parser can be restored from archived file that
+	// was saved using version 0.2.1
+    fn test_from_file_v021(){
+    	let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-0.2.1-dsp"));
+    	println!("Sample data is [{:?}]", dsp.generate_record()[0]);
+
+    	assert_eq!(dsp.generate_record()[0], "OK".to_string());
+    }
+
+	#[test]
 	// ensure the Data Sample Parser can read all the headers from teh csv file
 	fn test_read_headers(){
 		let mut dsp = DataSampleParser::new();
@@ -757,6 +788,22 @@ mod tests {
 	    let headers = dsp.extract_headers();
 	   
 	    assert_eq!(headers.len(), 2);
+	}
+
+	#[test]
+	// ensure the Data Sample Parser can read all the headers from teh csv file
+	fn test_read_headers_order(){
+		let mut expected = Vec::new();
+		expected.push("column-Z");
+		expected.push("column-D",);
+		expected.push("column-A",);
+		expected.push("column-G");
+		let mut dsp = DataSampleParser::new();
+
+	    dsp.analyze_csv_file(&String::from("./tests/samples/sample-02.csv")).unwrap();
+	    let headers = dsp.extract_headers();
+	   
+	    assert_eq!(headers, expected);
 	}
 
     #[test]
