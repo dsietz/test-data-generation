@@ -211,34 +211,50 @@ impl DataSampleParser {
 			},
 		};
 
+		// Support backwards compatibility for DSP saved using prior versions
 		let mut dsp: Value = serde_json::from_str(&serialized).unwrap();
 		let prfils = dsp.get("profiles").unwrap();
+
 		match prfils.is_array() {
 			true => {
-				println!("version 0.3.0");
+				debug!("Version 0.3.0 detected. Using latest version");
 				return serde_json::from_str(&serialized).unwrap();
 			},
 			false => {
-				println!("version 0.2.1");
+				info!("Prior version 0.2.1 detected. Trying to upgrade to latest version");
 				
-				let mut pm:ProfilesMap = ProfilesMap::new();
-
-				for prf in prfils.as_object().iter() {
-					println!("{:?}", prf);
-					let id = prf.get("id").unwrap().as_str().unwrap().to_string();
-					let serl = &serde_json::to_string(prf).unwrap();
-					println!("{:?} : {:?}",id, serl);
-					pm.insert(id, Profile::from_serialized(serl));
-				}
-
-				let mut rtn = DataSampleParser::new();
-				rtn.issues = false;
-				rtn.cfg = None;
-				rtn.profiles = pm;
-
-				return rtn;
+				return Self::updgrade_to_latest_version(serialized);
 			},
 		}
+	}
+
+	fn updgrade_to_latest_version(serialized: String) -> DataSampleParser  {
+		let mut dsp: Value = serde_json::from_str(&serialized).unwrap();
+		let prfils = dsp.get("profiles").unwrap();
+		let mut pm:ProfilesMap = ProfilesMap::new();
+		let issues = dsp.get("issues").unwrap().as_bool().unwrap();
+
+		for prf in prfils.as_object().iter() {
+			for attr in prf.keys() {
+			let id = prf.get(attr).unwrap().as_object().unwrap().get("id").unwrap().as_str().unwrap().to_string();
+			let serl = &serde_json::to_string(prf.get(attr).unwrap()).unwrap();
+			println!("{:?} : {:?}",id, serl);
+			pm.insert(id, Profile::from_serialized(serl));
+			}
+		}
+
+		let mut rtn = match dsp.get("cfg").unwrap() {
+			Null => {
+				DataSampleParser::new()
+			},
+			_ => {
+				DataSampleParser::new_with(&dsp.get("cfg").unwrap().as_object().unwrap().get("file").unwrap().as_str().unwrap().to_string())
+			},
+		};
+
+		rtn.issues = issues;
+		rtn.profiles = pm;
+		return rtn;
 	}
 
 	fn analyze_columns(&mut self, profile_keys: Vec<String>, columns: Vec<Vec<String>>) {
@@ -771,6 +787,22 @@ mod tests {
 	use std::fs::File;
 	use std::io::BufReader;
 
+	#[test]
+    // ensure a new Data Sample Parser can be created
+    fn test_new(){
+    	let dsp = DataSampleParser::new();
+
+    	assert!(true);
+    }
+
+	#[test]
+    // ensure a new Data Sample Parser can be created with configurations
+    fn test_new_with(){
+		let dsp = DataSampleParser::new_with(&String::from("./config/tdg.yaml"));
+
+		assert!(true);
+	}
+
     #[test]
     // ensure the Data Sample Parser can be restored from archived file
     fn test_from_file(){
@@ -782,9 +814,19 @@ mod tests {
 
 	#[test]
     // ensure the Data Sample Parser can be restored from archived file that
-	// was saved using version 0.2.1
-    fn test_from_file_v021(){
+	// was saved using version 0.2.1 using a configuration
+    fn test_from_file_v021_with_cfg(){
     	let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-0.2.1-dsp"));
+    	println!("Sample data is [{:?}]", dsp.generate_record()[0]);
+
+    	assert_eq!(dsp.generate_record()[0], "OK".to_string());
+    }
+
+	#[test]
+    // ensure the Data Sample Parser can be restored from archived file that
+	// was saved using version 0.2.1 without a configuration
+    fn test_from_file_v021_no_cfg(){
+    	let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-0.2.1-nocfg-dsp"));
     	println!("Sample data is [{:?}]", dsp.generate_record()[0]);
 
     	assert_eq!(dsp.generate_record()[0], "OK".to_string());
