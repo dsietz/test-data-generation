@@ -42,6 +42,7 @@ or production environment (option #1 above)
 ## What's New
 
 Here's whats new in 0.3.0:
+> WARNING - Upgrading to 0.3.0 can cause breakage when loading a Data Sample Parser that was saved with a prior version, (e.g.: 0.2.1). Every effort has been made to automatically convert to the latest version of the DSP object when loading from a saved dsp file, however, it is not guaranteed.
 + [Fix for issue #90](https://github.com/dsietz/test-data-generation/issues/90)
 + 
 
