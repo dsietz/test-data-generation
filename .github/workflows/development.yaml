@@ -92,7 +92,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clean    
-      # - name: Gather coverage data
+      # - name: Gather coverage data  # Error due to https://github.com/xd009642/tarpaulin/issues/461
       #   uses: actions-rs/tarpaulin@v0.1
       #   with:
       #     version: '0.15.0'
