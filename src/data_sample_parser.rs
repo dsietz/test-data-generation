@@ -75,7 +75,8 @@
 //!
 
 // use std::collections::BTreeMap;
-use indexmap::{IndexMap, serde_seq};
+use indexmap::{IndexMap};
+use serde_json::map::Map;
 use crate::configs::Configs;
 use crate::Profile;
 use crate::engine::{Engine, EngineContainer};
@@ -90,7 +91,7 @@ use csv;
 use std::error::Error;
 use csv::WriterBuilder;
 use serde_json;
-use serde_json::{Value};
+use serde_json::{json, Value};
 
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
@@ -210,24 +211,34 @@ impl DataSampleParser {
 			},
 		};
 
-		let dsp: Value = serde_json::from_str(&serialized).unwrap();
+		let mut dsp: Value = serde_json::from_str(&serialized).unwrap();
 		let prfils = dsp.get("profiles").unwrap();
 		match prfils.is_array() {
 			true => {
 				println!("version 0.3.0");
+				return serde_json::from_str(&serialized).unwrap();
 			},
 			false => {
 				println!("version 0.2.1");
 				
-				let pm:ProfilesMap = ProfilesMap::new();
+				let mut pm:ProfilesMap = ProfilesMap::new();
 
 				for prf in prfils.as_object().iter() {
-					pm.insert(prf.get("id").unwrap().to_string(), prf);
+					println!("{:?}", prf);
+					let id = prf.get("id").unwrap().as_str().unwrap().to_string();
+					let serl = &serde_json::to_string(prf).unwrap();
+					println!("{:?} : {:?}",id, serl);
+					pm.insert(id, Profile::from_serialized(serl));
 				}
+
+				let mut rtn = DataSampleParser::new();
+				rtn.issues = false;
+				rtn.cfg = None;
+				rtn.profiles = pm;
+
+				return rtn;
 			},
 		}
-
-		serde_json::from_str(&serialized).unwrap()
 	}
 
 	fn analyze_columns(&mut self, profile_keys: Vec<String>, columns: Vec<Vec<String>>) {
