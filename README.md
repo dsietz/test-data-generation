@@ -41,11 +41,12 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.3.0:
+Here's whats new in 0.3.1:
 + [Fix for issue #90](https://github.com/dsietz/test-data-generation/issues/90)
   > Every effort has been made to automatically convert to the latest version of the DSP object when loading from a saved dsp file from a prior version, (e.g.: 0.2.1), however, it is not guaranteed.
 + [Added issue #91](https://github.com/dsietz/test-data-generation/issues/91)
   > Optional paramters for setting the delimiter when analyzing and generating csv files.
++ [Fixed issue #93](https://github.com/dsietz/test-data-generation/issues/93)  
 
 ## About
 
@@ -74,33 +75,33 @@ extern crate test_data_generation;
 use test_data_generation::profile::profile::Profile;
 
 fn main() {
-    // analyze the dataset
-	let mut data_profile =  Profile::new();
+  // analyze the dataset
+  let mut data_profile =  Profile::new();
 
-    // analyze the dataset
-	data_profile.analyze("Smith, John");
-	data_profile.analyze("Doe, John");
-	data_profile.analyze("Dale, Danny");
-	data_profile.analyze("Rickets, Ronney");
+  // analyze the dataset
+  data_profile.analyze("Smith, John");
+  data_profile.analyze("Doe, John");
+  data_profile.analyze("Dale, Danny");
+  data_profile.analyze("Rickets, Ronney");
 
-    // confirm 4 data samples were analyzed   		
-   	assert_eq!(data_profile.patterns.len(), 4);
+  // confirm 4 data samples were analyzed   		
+  assert_eq!(data_profile.patterns.len(), 4);
 
-    // prepare the generator
-    data_profile.pre_generate();
+  // prepare the generator
+  data_profile.pre_generate();
 
-    // generate some data
-   	println!("The generated name is {:?}", data_profile.generate());
+  // generate some data
+  println!("The generated name is {:?}", data_profile.generate());
 
-   	// save the profile (algorithm) for later
-   	assert_eq!(data_profile.save(&String::from("./tests/samples/sample-00-profile")).unwrap(), true);
+  // save the profile (algorithm) for later
+  assert_eq!(data_profile.save(&String::from("./tests/samples/sample-00-profile")).unwrap(), true);
 
-   	// later... create a new profile from the saved archive file
-   	let mut new_profile = Profile::from_file(&String::from("./tests/samples/sample-00-profile"));
-    new_profile.pre_generate();
+  // later... create a new profile from the saved archive file
+  let mut new_profile = Profile::from_file(&String::from("./tests/samples/sample-00-profile"));
+  new_profile.pre_generate();
 
-    // generate some data
-   	println!("The generated name is {:?}", new_profile.generate());
+  // generate some data
+  println!("The generated name is {:?}", new_profile.generate());
 }
 ```
 
@@ -114,11 +115,11 @@ extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
-    let mut dsp = DataSampleParser::new();
-    dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+  let mut dsp = DataSampleParser::new();
+  dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
 
-    println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
-    // My new name is Abbon Aady
+  println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
+  // My new name is Abbon Aady
 }
 ```
 
@@ -129,10 +130,10 @@ extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
-    let mut dsp =  DataSampleParser::new();  
-    dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+  let mut dsp =  DataSampleParser::new();  
+  dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
 
-    assert_eq!(dsp.save(&String::from("./tests/samples/sample-01-dsp")).unwrap(), true);
+  assert_eq!(dsp.save(&String::from("./tests/samples/sample-01-dsp")).unwrap(), true);
 }
 ```
 
@@ -143,7 +144,7 @@ extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
-    let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-01-dsp"));
+  let mut dsp = DataSampleParser::from_file(&String::from("./tests/samples/sample-01-dsp"));
 
 	println!("Sample data is {:?}", dsp.generate_record()[0]);
 }
@@ -156,10 +157,10 @@ extern crate test_data_generation;
 use test_data_generation::data_sample_parser::DataSampleParser;
 
 fn main() {
-    let mut dsp =  DataSampleParser::new();  
+  let mut dsp =  DataSampleParser::new();  
 
-  	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
-    dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
+  dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
+  dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"), None).unwrap();
 }
 ```
 
