@@ -16,13 +16,11 @@
 ///
 #[macro_export]
 macro_rules! levenshtein_distance {
-    ( $c:expr, $e:expr ) => {
-        {
-            use levenshtein;
+    ( $c:expr, $e:expr ) => {{
+        use levenshtein;
 
-            levenshtein::levenshtein($c, $e)
-        }
-    }
+        levenshtein::levenshtein($c, $e)
+    }};
 }
 
 /// This macro generates a random number between 0 and 100.
@@ -39,16 +37,13 @@ macro_rules! levenshtein_distance {
 /// ```
 #[macro_export]
 macro_rules! random_percentage {
-    ( $( $x:expr ),* ) => {
-        {
-    	      use rand::{thread_rng, Rng};
+    ( $( $x:expr ),* ) => {{
+        use rand::{thread_rng, Rng};
 
-		      let mut rng = thread_rng();
+        let mut rng = thread_rng();
 
-		      rng.gen_range::<f64, f64, f64>(0 as f64, 100 as f64)
-
-        }
-    };
+        rng.gen_range::<f64, f64, f64>(0 as f64, 100 as f64)
+    }};
 }
 
 /// This macro generates a random number for a given range.
@@ -70,16 +65,14 @@ macro_rules! random_percentage {
 /// ```
 #[macro_export]
 macro_rules! random_between {
-    ($a:expr, $b:expr) => {
-        {
-    	    use rand::{thread_rng, Rng};
+    ($a:expr, $b:expr) => {{
+        use rand::{thread_rng, Rng};
 
-		    let mut rng = thread_rng();
-	        let nbr = rng.gen_range::<u32, u32, u32>($a as u32, $b as u32);
+        let mut rng = thread_rng();
+        let nbr = rng.gen_range::<u32, u32, u32>($a as u32, $b as u32);
 
-            nbr
-        }
-    };
+        nbr
+    }};
 }
 
 /// This function calculates the percent difference between 2 strings.
@@ -93,19 +86,17 @@ macro_rules! random_between {
 ///
 /// ```rust
 /// # #[macro_use] extern crate test_data_generation; extern crate levenshtein;
-/// 
+///
 /// # fn main() {
 ///		assert_eq!(realistic_test!("kitten", "sitting"), 76.92307692307692 as f64);
 /// # }
 ///
 #[macro_export]
 macro_rules! realistic_test {
-    ( $c:expr, $e:expr ) => {
-        {
-            let ld: f64 = levenshtein_distance!($c, $e) as f64;
-    		let total: f64 = $c.len() as f64 + $e.len() as f64;
-    		let diff: f64 = total - ld;
-    		(1 as f64 - ((total - diff)/total)) * 100   as f64
-        }
-    }
+    ( $c:expr, $e:expr ) => {{
+        let ld: f64 = levenshtein_distance!($c, $e) as f64;
+        let total: f64 = $c.len() as f64 + $e.len() as f64;
+        let diff: f64 = total - ld;
+        (1 as f64 - ((total - diff) / total)) * 100 as f64
+    }};
 }

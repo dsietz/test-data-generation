@@ -1,9 +1,9 @@
-//! 
-//! 
+//!
+//!
 //! # Fact
-//! The Fact object is a representation of a character based on its context within a data entity. 
+//! The Fact object is a representation of a character based on its context within a data entity.
 //! Facts are created during the analyze process and then later used to generate data from the algorithm.
-//! 
+//!
 //! ## Example
 //!
 //! ```rust
@@ -22,7 +22,7 @@
 //!     fact.set_prior_key('o');
 //! }
 //! ```
-//! 
+//!
 //! # PatternDefinition
 //! The PatternDefinition provides functionality to retrieve symbols that are used in defining a pattern.
 //!
@@ -43,7 +43,7 @@
 //! extern crate test_data_generation;
 //!
 //! use test_data_generation::engine::PatternDefinition;
-//! 
+//!
 //! fn main() {
 //! 	let pttrn_def = PatternDefinition::new();
 //!     println!("Upper case vowel symbol: {:?}", pttrn_def.get(&"VowelUpper".to_string()));
@@ -53,85 +53,85 @@
 use regex::Regex;
 use serde_json;
 use std::collections::BTreeMap;
-use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 
 use crate::Profile;
 //use async_trait::async_trait;
 
 #[allow(dead_code)]
-type PatternMap  = BTreeMap<String, char>;
+type PatternMap = BTreeMap<String, char>;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 /// Represents a Fact for a character in a sample data entity that has been analyzed
-pub struct Fact{
-	/// the char that the fact defines (.e.g: 'a', '1', '%', etc.)
-	pub key: char,
-	/// the char that appears before (-1) the key in the entity
-	pub	prior_key: Option<char>,
-	/// the char that appears after (+1) the key in the entity
-	pub	next_key: Option<char>,
-	/// the PatternPlaceholder symbol that represents the type of key
-	pub	pattern_placeholder: char,
-	/// indicates if the key is the first char in the entity (0=no, 1=yes)
-	pub	starts_with: u32,
-	/// indicates if the key is the last char in the entity (0=no, 1=yes)
-	pub	ends_with: u32,
-	/// indicates the number of positions from the index zero (where the char is located in the entity from the first position)
-	pub	index_offset: u32,
+pub struct Fact {
+    /// the char that the fact defines (.e.g: 'a', '1', '%', etc.)
+    pub key: char,
+    /// the char that appears before (-1) the key in the entity
+    pub prior_key: Option<char>,
+    /// the char that appears after (+1) the key in the entity
+    pub next_key: Option<char>,
+    /// the PatternPlaceholder symbol that represents the type of key
+    pub pattern_placeholder: char,
+    /// indicates if the key is the first char in the entity (0=no, 1=yes)
+    pub starts_with: u32,
+    /// indicates if the key is the last char in the entity (0=no, 1=yes)
+    pub ends_with: u32,
+    /// indicates the number of positions from the index zero (where the char is located in the entity from the first position)
+    pub index_offset: u32,
 }
 
 impl Fact {
-	/// Constructs a new Fact
-	///
-	/// # Arguments
-	///
-	/// * `k: char` - The char that the Fact represents (also known as the `key`).</br>
-	/// * `pp: char` - The char that represents the patter placeholder for the key.</br>
-	/// * `sw: u32` - Indicates is the key is the first char in the entity. (0=no, 1=yes)</br>
-	/// * `ew: u32` - Indicates is the key is the last char in the entity. (0=no, 1=yes)</br>
-	/// * `idx_off: u32` - The index that represents the postion of the key from the beginning of the entity (zero based).</br>
-	///
-	/// # Example
-	///
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::Fact;
-	///
-	/// fn main() {
-	/// 	//fact created for the character 'r' in the string "word"
+    /// Constructs a new Fact
+    ///
+    /// # Arguments
+    ///
+    /// * `k: char` - The char that the Fact represents (also known as the `key`).</br>
+    /// * `pp: char` - The char that represents the patter placeholder for the key.</br>
+    /// * `sw: u32` - Indicates is the key is the first char in the entity. (0=no, 1=yes)</br>
+    /// * `ew: u32` - Indicates is the key is the last char in the entity. (0=no, 1=yes)</br>
+    /// * `idx_off: u32` - The index that represents the postion of the key from the beginning of the entity (zero based).</br>
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::Fact;
+    ///
+    /// fn main() {
+    /// 	//fact created for the character 'r' in the string "word"
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
-	/// }
-	/// ```
-	pub fn new(k: char, pp: char, sw: u32, ew: u32, idx_off: u32 ) -> Fact {
-		Fact{
-			key: k,
-			prior_key: None,
-			next_key: None,
-			pattern_placeholder: pp,
-			starts_with: sw,
-			ends_with: ew,
-			index_offset: idx_off,
-		}
-	}
+    /// }
+    /// ```
+    pub fn new(k: char, pp: char, sw: u32, ew: u32, idx_off: u32) -> Fact {
+        Fact {
+            key: k,
+            prior_key: None,
+            next_key: None,
+            pattern_placeholder: pp,
+            starts_with: sw,
+            ends_with: ew,
+            index_offset: idx_off,
+        }
+    }
 
-	/// Constructs a new Fact from a serialized (JSON) string of the Fact object. This is used when restoring from "archive"
-	///
-	/// # Arguments
-	///
-	/// * `serialized: &str` - The JSON string that represents the archived Fact object.</br>
-	///
-	/// # Example
-	///
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::Fact;
-	///
-	/// fn main() {
-	///		let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
+    /// Constructs a new Fact from a serialized (JSON) string of the Fact object. This is used when restoring from "archive"
+    ///
+    /// # Arguments
+    ///
+    /// * `serialized: &str` - The JSON string that represents the archived Fact object.</br>
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::Fact;
+    ///
+    /// fn main() {
+    ///		let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
     ///		let mut fact = Fact::from_serialized(&serialized);
     ///     fact.set_prior_key('a');
     ///		fact.set_next_key('e');
@@ -139,9 +139,9 @@ impl Fact {
     ///		assert_eq!(fact.pattern_placeholder, 'c');
     /// }
     /// ```
-	pub fn from_serialized(serialized: &str) -> Fact {
-		serde_json::from_str(&serialized).unwrap()
-	}
+    pub fn from_serialized(serialized: &str) -> Fact {
+        serde_json::from_str(&serialized).unwrap()
+    }
 
     /// This function converts the Fact to a serialize JSON string.
     ///
@@ -160,9 +160,9 @@ impl Fact {
     ///     // {"key":"r","prior_key":null,"next_key":null,"pattern_placeholder":"c","starts_with":0,"ends_with":0,"index_offset":2}
     /// }
     ///
-	pub fn serialize(&mut self) ->String {
-		serde_json::to_string(&self).unwrap()
-	}
+    pub fn serialize(&mut self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
 
     /// This function sets the next key attribute to the specified char.
     ///
@@ -183,9 +183,9 @@ impl Fact {
     ///     fact.set_next_key('d');
     /// }
     ///
-	pub fn set_next_key(&mut self, nk: char) {
-		self.next_key = Some(nk);
-	}
+    pub fn set_next_key(&mut self, nk: char) {
+        self.next_key = Some(nk);
+    }
 
     /// This function sets the prior key attribute to the specified char.
     ///
@@ -206,27 +206,27 @@ impl Fact {
     ///     fact.set_prior_key('o');
     /// }
     ///
-	pub fn set_prior_key(&mut self, pk: char) {
-		self.prior_key = Some(pk);
-	}
+    pub fn set_prior_key(&mut self, pk: char) {
+        self.prior_key = Some(pk);
+    }
 }
 
 /// Represents a symbolic pattern of an entity (String)
 pub struct Pattern {
-	/// The regex rule used to find upper case consonants
-	regex_consonant_upper: Regex,
-	/// The regex rule used to find lower case consonants
-	regex_consonant_lower: Regex,
-	/// The regex rule used to find upper case vowels
-	regex_vowel_upper: Regex,
-	/// The regex rule used to find lower case vowels
-	regex_vowel_lower: Regex,
-	/// The regex rule used to find numeric digits
-	regex_numeric: Regex,
-	/// The regex rule used to find punctuation
-	regex_punctuation: Regex,
-	/// The regex rule used to find white spaces
-	regex_space: Regex,
+    /// The regex rule used to find upper case consonants
+    regex_consonant_upper: Regex,
+    /// The regex rule used to find lower case consonants
+    regex_consonant_lower: Regex,
+    /// The regex rule used to find upper case vowels
+    regex_vowel_upper: Regex,
+    /// The regex rule used to find lower case vowels
+    regex_vowel_lower: Regex,
+    /// The regex rule used to find numeric digits
+    regex_numeric: Regex,
+    /// The regex rule used to find punctuation
+    regex_punctuation: Regex,
+    /// The regex rule used to find white spaces
+    regex_space: Regex,
 }
 
 impl Default for Pattern {
@@ -251,162 +251,170 @@ pub struct PatternDefinition {
 
 impl PatternDefinition {
     /// Constructs a new PatternDefinition
-	/// 
-	/// # Example
-	/// 
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::PatternDefinition;
-	///	
-	/// fn main() {
-	/// 	let pttrn_def = PatternDefinition::new();
-	/// }
-	/// ```
-	pub fn new() -> PatternDefinition {	
-        let symbols: [char; 9] = ['@','C','c','V','v','#','~','S','p'];
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::PatternDefinition;
+    ///
+    /// fn main() {
+    /// 	let pttrn_def = PatternDefinition::new();
+    /// }
+    /// ```
+    pub fn new() -> PatternDefinition {
+        let symbols: [char; 9] = ['@', 'C', 'c', 'V', 'v', '#', '~', 'S', 'p'];
         let mut pttrn_def = PatternMap::new();
 
-        pttrn_def.insert("Unknown".to_string(),        symbols[0]);
-	    pttrn_def.insert("ConsonantUpper".to_string(), symbols[1]);
-	    pttrn_def.insert("ConsonantLower".to_string(), symbols[2]);
-	    pttrn_def.insert("VowelUpper".to_string(),     symbols[3]);
-	    pttrn_def.insert("VowelLower".to_string(),     symbols[4]);
-	    pttrn_def.insert("Numeric".to_string(),        symbols[5]);
-	    pttrn_def.insert("RegExSpcChar".to_string(),   symbols[6]);
-	    pttrn_def.insert("WhiteSpace".to_string(),     symbols[7]);
-        pttrn_def.insert("Punctuation".to_string(),    symbols[8]);
+        pttrn_def.insert("Unknown".to_string(), symbols[0]);
+        pttrn_def.insert("ConsonantUpper".to_string(), symbols[1]);
+        pttrn_def.insert("ConsonantLower".to_string(), symbols[2]);
+        pttrn_def.insert("VowelUpper".to_string(), symbols[3]);
+        pttrn_def.insert("VowelLower".to_string(), symbols[4]);
+        pttrn_def.insert("Numeric".to_string(), symbols[5]);
+        pttrn_def.insert("RegExSpcChar".to_string(), symbols[6]);
+        pttrn_def.insert("WhiteSpace".to_string(), symbols[7]);
+        pttrn_def.insert("Punctuation".to_string(), symbols[8]);
 
-		PatternDefinition{
+        PatternDefinition {
             pattern_map: pttrn_def,
             pattern: Pattern::default(),
-		}
-    }	
+        }
+    }
 
     /// This function converts an entity (&str) into a tuplet (String, Vec<Fact>)</br>
-	///
-	/// # Arguments
-	///
-	/// * `entity: String` - The textual str of the value to anaylze.</br>
-	///
-	/// # Example
-	///
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::PatternDefinition;
-	///
-	/// fn main() {
-	///		let mut pttrn_def = PatternDefinition::new();
+    ///
+    /// # Arguments
+    ///
+    /// * `entity: String` - The textual str of the value to anaylze.</br>
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::PatternDefinition;
+    ///
+    /// fn main() {
+    ///		let mut pttrn_def = PatternDefinition::new();
     ///     //async {
     ///         let rslt = pttrn_def.analyze("Hello World");
     ///         assert_eq!(rslt.0, "CvccvSCvccc");
     ///     //}
-	/// }
-	/// ```
-	pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
-		// record the length of the passed value
-		//self.size = entity.len() as u32;
+    /// }
+    /// ```
+    pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
+        // record the length of the passed value
+        //self.size = entity.len() as u32;
 
-		// String to hold the pattern
-		let mut pttrn = String::new();
+        // String to hold the pattern
+        let mut pttrn = String::new();
 
-		// Vec to hold all the Facts to be returned
-		let mut facts = Vec::new();
+        // Vec to hold all the Facts to be returned
+        let mut facts = Vec::new();
 
-		// record the pattern of the passed value
-		for (i, _c) in entity.chars().enumerate() {
-			//let fact = self.factualize(&entity, i as u32);
-			let idx: u32 = i as u32;
-			let fact = self.factualize(entity, idx);
-			pttrn.push_str(&*fact.pattern_placeholder.to_string());
-			facts.push(fact);
-		}
-		
-		(pttrn, facts)
-	}
+        // record the pattern of the passed value
+        for (i, _c) in entity.chars().enumerate() {
+            //let fact = self.factualize(&entity, i as u32);
+            let idx: u32 = i as u32;
+            let fact = self.factualize(entity, idx);
+            pttrn.push_str(&*fact.pattern_placeholder.to_string());
+            facts.push(fact);
+        }
+
+        (pttrn, facts)
+    }
 
     /// This function converts a char in an entity (&str) based on the index specified into a Fact</br>
-	///
-	/// # Arguments
-	///
-	/// * `entity: String` - The textual str of the value to anaylze.</br>
-	/// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
-	///
-	/// # Example
-	///
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::PatternDefinition;
-	///
-	/// fn main() {
-	///		let mut pttrn_def = PatternDefinition::new();
-	///		let fact = pttrn_def.factualize("Word",0);
-	///     // will return a Fact that represents the char `W`
-	/// }
-	/// ```
-	pub fn factualize(&mut self, entity: &str, idx: u32) -> Fact {
-		let c = entity.chars().nth(idx as usize).unwrap();
-		let pp = self.symbolize_char(c);
-		let pk = if idx > 0 {entity.chars().nth(idx as usize -1)} else {None};
-		let nk = if idx < entity.len() as u32 -1 {entity.chars().nth(idx as usize +1)} else {None};
-		let sw = if idx == 0 {1} else {0};
-		let ew = if idx == entity.len() as u32 -1 {1} else {0};
+    ///
+    /// # Arguments
+    ///
+    /// * `entity: String` - The textual str of the value to anaylze.</br>
+    /// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::PatternDefinition;
+    ///
+    /// fn main() {
+    ///		let mut pttrn_def = PatternDefinition::new();
+    ///		let fact = pttrn_def.factualize("Word",0);
+    ///     // will return a Fact that represents the char `W`
+    /// }
+    /// ```
+    pub fn factualize(&mut self, entity: &str, idx: u32) -> Fact {
+        let c = entity.chars().nth(idx as usize).unwrap();
+        let pp = self.symbolize_char(c);
+        let pk = if idx > 0 {
+            entity.chars().nth(idx as usize - 1)
+        } else {
+            None
+        };
+        let nk = if idx < entity.len() as u32 - 1 {
+            entity.chars().nth(idx as usize + 1)
+        } else {
+            None
+        };
+        let sw = if idx == 0 { 1 } else { 0 };
+        let ew = if idx == entity.len() as u32 - 1 { 1 } else { 0 };
 
-		let mut fact = Fact::new(c,pp,sw,ew,idx);
+        let mut fact = Fact::new(c, pp, sw, ew, idx);
 
-		// only if there is a next key
-		if nk.is_some() {
-			&fact.set_next_key(nk.unwrap());
-		}
+        // only if there is a next key
+        if nk.is_some() {
+            let _ = &fact.set_next_key(nk.unwrap());
+        }
 
-		// only if there is a prior key
-		if pk.is_some() {
-			&fact.set_prior_key(pk.unwrap());
-		}
+        // only if there is a prior key
+        if pk.is_some() {
+            let _ = &fact.set_prior_key(pk.unwrap());
+        }
 
-		fact
-	}
-    
-    /// This function returns a pattern symbol that represents the type of character 
-	/// 
-	/// # Example
-	///
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::PatternDefinition;
-	///	
-	/// fn main() {
-	/// 	let pttrn_def = PatternDefinition::new();
-	///     println!("Upper case vowel symbol: {:?}", pttrn_def.get(&"VowelUpper".to_string()));
-	/// }
-	/// ```
-	pub fn get(&self, key: &str) -> char {
-		*self.pattern_map.get(key).unwrap()
+        fact
     }
-    
+
+    /// This function returns a pattern symbol that represents the type of character
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::PatternDefinition;
+    ///
+    /// fn main() {
+    /// 	let pttrn_def = PatternDefinition::new();
+    ///     println!("Upper case vowel symbol: {:?}", pttrn_def.get(&"VowelUpper".to_string()));
+    /// }
+    /// ```
+    pub fn get(&self, key: &str) -> char {
+        *self.pattern_map.get(key).unwrap()
+    }
+
     /// This function converts a char into a pattern symbol
-	///
-	/// # Example
-	///
-	/// ```rust
-	/// extern crate test_data_generation;
-	///
-	/// use test_data_generation::engine::PatternDefinition;
-	///
-	/// fn main() {
-	/// 	let pttrn_def = PatternDefinition::new();
-	/// 	println!("The pattern symbol for 'A' is {:?}", pttrn_def.symbolize_char('A'));
-	///     // The pattern symbol for 'A' is V
-	/// }
-	/// ```
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// extern crate test_data_generation;
+    ///
+    /// use test_data_generation::engine::PatternDefinition;
+    ///
+    /// fn main() {
+    /// 	let pttrn_def = PatternDefinition::new();
+    /// 	println!("The pattern symbol for 'A' is {:?}", pttrn_def.symbolize_char('A'));
+    ///     // The pattern symbol for 'A' is V
+    /// }
+    /// ```
     pub fn symbolize_char(&self, c: char) -> char {
         // if you have to escape regex special characters: &*regex::escape(&*$c.to_string())
-    	let mut symbol = self.pattern_map.get("Unknown");
+        let mut symbol = self.pattern_map.get("Unknown");
         let mut found = false;
-        
+
         if !found && self.pattern.regex_consonant_upper.is_match(&c.to_string()) {
             symbol = self.pattern_map.get("ConsonantUpper");
             found = true;
@@ -453,62 +461,66 @@ impl PatternDefinition {
 
 pub trait Engine {
     fn analyze_entities(entities: Vec<String>) -> Vec<(String, Vec<Fact>)> {
-        let (tx, rx): (Sender<(String, Vec<Fact>)>, Receiver<(String, Vec<Fact>)>) = mpsc::channel();
+        let (tx, rx): (Sender<(String, Vec<Fact>)>, Receiver<(String, Vec<Fact>)>) =
+            mpsc::channel();
         let mut children = Vec::new();
-    
+
         for entity in entities.clone() {
             let thread_tx = tx.clone();
             let child = thread::spawn(move || {
-                thread_tx.send(PatternDefinition::new().analyze(&entity)).unwrap();
+                thread_tx
+                    .send(PatternDefinition::new().analyze(&entity))
+                    .unwrap();
                 debug!("PatternDefinition::analyze thread finished for {}", entity);
             });
-    
+
             children.push(child);
         }
-    
+
         let mut results = Vec::new();
         for entity in entities {
-            results.push(
-                match rx.recv() {
-                    Ok(result) => result,
-                    Err(_) => {
-                        error!("Error: Could not anaylze the entity: {}", entity);
-                        panic!("Error: Could not anaylze the data!")
-                    }
+            results.push(match rx.recv() {
+                Ok(result) => result,
+                Err(_) => {
+                    error!("Error: Could not anaylze the entity: {}", entity);
+                    panic!("Error: Could not anaylze the data!")
                 }
-            );
+            });
         }
-        
+
         for child in children {
             child.join().expect("Error: Could not anaylze the data!");
         }
 
         results
-	}
+    }
 
-	fn profile_entities(mut profile: Profile, entities: Vec<String>) -> Result<Profile, String> {
-		let results = Self::analyze_entities(entities);
+    fn profile_entities(mut profile: Profile, entities: Vec<String>) -> Result<Profile, String> {
+        let results = Self::analyze_entities(entities);
 
-		for result in results {
-			match profile.apply_facts(result.0, result.1) {
-				Ok(_) => {},
-				Err(e) => {
-					return Err(format!("Error: Couldn't apply the Pattern and Facts to the Profile. Error Message: {}", e.to_string()))
-				}
-			}
-		}
+        for result in results {
+            match profile.apply_facts(result.0, result.1) {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(format!(
+                    "Error: Couldn't apply the Pattern and Facts to the Profile. Error Message: {}",
+                    e.to_string()
+                ))
+                }
+            }
+        }
 
-		Ok(profile)
-	}
-	
-	fn profile_entities_with_container(container: EngineContainer) -> Result<Profile, String> {
-		Self::profile_entities(container.profile, container.entities)
-	}
+        Ok(profile)
+    }
+
+    fn profile_entities_with_container(container: EngineContainer) -> Result<Profile, String> {
+        Self::profile_entities(container.profile, container.entities)
+    }
 }
 
 pub struct EngineContainer {
-	pub profile: Profile,
-	pub entities: Vec<String>,
+    pub profile: Profile,
+    pub entities: Vec<String>,
 }
 
 // Unit Tests
@@ -516,45 +528,45 @@ pub struct EngineContainer {
 mod tests {
     use super::*;
 
-    struct Xtest{}
-    impl Engine for Xtest{}
+    struct Xtest {}
+    impl Engine for Xtest {}
 
     #[test]
-    fn test_fact_new(){
+    fn test_fact_new() {
         //fact created for the character 'r' in the string "word"
-    	let _fact =  Fact::new('r','c',0,0,2);
-    	
-    	assert!(true);
+        let _fact = Fact::new('r', 'c', 0, 0, 2);
+
+        assert!(true);
     }
-    
+
     #[test]
-    fn test_fact_new_from_serialized(){
-    	let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
-    	let fact = Fact::from_serialized(&serialized);
-    	assert_eq!(fact.pattern_placeholder, 'c');
+    fn test_fact_new_from_serialized() {
+        let serialized = "{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}";
+        let fact = Fact::from_serialized(&serialized);
+        assert_eq!(fact.pattern_placeholder, 'c');
     }
-    
+
     #[test]
-    fn test_fact_serialize(){
+    fn test_fact_serialize() {
         //fact created for the character 'r' in the string "word"
-    	let mut fact =  Fact::new('r','c',0,0,2);
-    	let serialized = fact.serialize();
-    	
-		assert_eq!(serialized,"{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}");
+        let mut fact = Fact::new('r', 'c', 0, 0, 2);
+        let serialized = fact.serialize();
+
+        assert_eq!(serialized,"{\"key\":\"r\",\"prior_key\":null,\"next_key\":null,\"pattern_placeholder\":\"c\",\"starts_with\":0,\"ends_with\":0,\"index_offset\":2}");
     }
-    
+
     #[test]
-    fn test_fact_set_next_key(){
+    fn test_fact_set_next_key() {
         //fact created for the character 'r' in the string "word"
-    	let mut fact =  Fact::new('r','c',0,0,2);
-    	fact.set_next_key('d');
+        let mut fact = Fact::new('r', 'c', 0, 0, 2);
+        fact.set_next_key('d');
     }
-    
+
     #[test]
-    fn test_fact_set_prior_key(){
+    fn test_fact_set_prior_key() {
         //fact created for the character 'r' in the string "word"
-    	let mut fact =  Fact::new('r','c',0,0,2);
-    	fact.set_prior_key('o');
+        let mut fact = Fact::new('r', 'c', 0, 0, 2);
+        fact.set_prior_key('o');
     }
 
     #[test]
@@ -564,49 +576,61 @@ mod tests {
     }
 
     #[test]
-    fn test_pattern_definition_symbolize_char(){
-    	let pttrn_def = PatternDefinition::new();
+    fn test_pattern_definition_symbolize_char() {
+        let pttrn_def = PatternDefinition::new();
 
-    	assert_eq!(pttrn_def.symbolize_char('A'), 'V');
+        assert_eq!(pttrn_def.symbolize_char('A'), 'V');
     }
 
     #[test]
-    fn test_pattern_definition_factualize(){
-    	let mut pttrn_def = PatternDefinition::new();
-    	let mut fact1 = pttrn_def.factualize("Word",1);
-		let mut fact2 = Fact::new('o','v',0,0,1);
-		fact2.set_prior_key('W');
-		fact2.set_next_key('r');
+    fn test_pattern_definition_factualize() {
+        let mut pttrn_def = PatternDefinition::new();
+        let mut fact1 = pttrn_def.factualize("Word", 1);
+        let mut fact2 = Fact::new('o', 'v', 0, 0, 1);
+        fact2.set_prior_key('W');
+        fact2.set_next_key('r');
 
-    	assert_eq!(fact1.serialize(), fact2.serialize());
+        assert_eq!(fact1.serialize(), fact2.serialize());
     }
 
     #[test]
-    fn test_pattern_definition_analyze(){
-        let mut pttrn_def = PatternDefinition::new(); 
+    fn test_pattern_definition_analyze() {
+        let mut pttrn_def = PatternDefinition::new();
         let word = pttrn_def.analyze("HELlo0?^@");
-        
+
         assert_eq!(word.0, "CVCcv#pp@");
         assert_eq!(word.1.len(), 9);
     }
 
     #[test]
-    fn test_pattern_definition_analyze_multithread(){
-        let words = vec!("word-one".to_string(),"word-two".to_string(),"word-three".to_string(),"word-four".to_string(),"word-five".to_string());
+    fn test_pattern_definition_analyze_multithread() {
+        let words = vec![
+            "word-one".to_string(),
+            "word-two".to_string(),
+            "word-three".to_string(),
+            "word-four".to_string(),
+            "word-five".to_string(),
+        ];
 
         let results = Xtest::analyze_entities(words);
 
         println!("{:?}", results);
         assert_eq!(results.len(), 5);
-	} 
-	
-	#[test]
-	fn test_profile_entities() {
-		//async {
-			let profile = Profile::new();
-			let words = vec!("word-one".to_string(),"word-two".to_string(),"word-three".to_string(),"word-four".to_string(),"word-five".to_string());
-			let result = Xtest::profile_entities(profile, words);
-			assert!(result.is_ok());
-		//};
-	}
+    }
+
+    #[test]
+    fn test_profile_entities() {
+        //async {
+        let profile = Profile::new();
+        let words = vec![
+            "word-one".to_string(),
+            "word-two".to_string(),
+            "word-three".to_string(),
+            "word-four".to_string(),
+            "word-five".to_string(),
+        ];
+        let result = Xtest::profile_entities(profile, words);
+        assert!(result.is_ok());
+        //};
+    }
 }

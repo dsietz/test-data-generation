@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/dsietz/test-data-generation/badge.svg?branch=master)](https://coveralls.io/github/dsietz/test-data-generation?branch=master)
 [![Docs.rs](https://docs.rs/test-data-generation/badge.svg)](https://docs.rs/test-data-generation)
 
-Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
+Linux: [![Build Status](https://github.com/dsietz/test-data-generation/actions/workflows/master.yaml/badge.svg)](https://github.com/dsietz/test-data-generation/actions/workflows/master.yaml)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
 ## [Fast test data generation!](#head1234)
@@ -41,9 +41,11 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.2.1:
-+ [Fix for issue #88](https://github.com/dsietz/test-data-generation/issues/88)
-+ Added a new Demo 03 `cargo run --example 03_demo`
+Here's whats new in 0.3.0:
++ [Fix for issue #90](https://github.com/dsietz/test-data-generation/issues/90)
+  > Every effort has been made to automatically convert to the latest version of the DSP object when loading from a saved dsp file from a prior version, (e.g.: 0.2.1), however, it is not guaranteed.
++ [Added issue #91](https://github.com/dsietz/test-data-generation/issues/91)
+  > Optional paramters for setting the delimiter when analyzing and generating csv files.
 
 ## About
 
