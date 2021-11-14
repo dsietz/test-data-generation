@@ -366,12 +366,12 @@ impl PatternDefinition {
 
         // only if there is a next key
         if nk.is_some() {
-            &fact.set_next_key(nk.unwrap());
+            let _ = &fact.set_next_key(nk.unwrap());
         }
 
         // only if there is a prior key
         if pk.is_some() {
-            &fact.set_prior_key(pk.unwrap());
+            let _ = &fact.set_prior_key(pk.unwrap());
         }
 
         fact

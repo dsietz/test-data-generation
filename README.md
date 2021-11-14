@@ -41,9 +41,9 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.2.1:
-+ [Fix for issue #88](https://github.com/dsietz/test-data-generation/issues/88)
-+ Added a new Demo 03 `cargo run --example 03_demo`
+Here's whats new in 0.3.0:
++ [Fix for issue #90](https://github.com/dsietz/test-data-generation/issues/90)
++ 
 
 ## About
 

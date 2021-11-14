@@ -81,7 +81,6 @@ use crate::shared::CsvManipulator;
 use crate::Profile;
 use csv;
 use indexmap::IndexMap;
-use serde_json::map::Map;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
@@ -90,7 +89,7 @@ use std::result::Result;
 //use csv::StringRecord;
 use csv::WriterBuilder;
 use serde_json;
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::error::Error;
 
 use std::sync::mpsc;
@@ -219,7 +218,7 @@ impl DataSampleParser {
         };
 
         // Support backwards compatibility for DSP saved using prior versions
-        let mut dsp: Value = serde_json::from_str(&serialized).unwrap();
+        let dsp: Value = serde_json::from_str(&serialized).unwrap();
         let prfils = dsp.get("profiles").unwrap();
 
         match prfils.is_array() {
@@ -236,7 +235,7 @@ impl DataSampleParser {
     }
 
     fn updgrade_to_latest_version(serialized: String) -> DataSampleParser {
-        let mut dsp: Value = serde_json::from_str(&serialized).unwrap();
+        let dsp: Value = serde_json::from_str(&serialized).unwrap();
         let prfils = dsp.get("profiles").unwrap();
         let mut pm: ProfilesMap = ProfilesMap::new();
         let issues = dsp.get("issues").unwrap().as_bool().unwrap();
@@ -260,7 +259,7 @@ impl DataSampleParser {
         }
 
         let mut rtn = match dsp.get("cfg").unwrap() {
-            Null => DataSampleParser::new(),
+            serde_json::Value::Null => DataSampleParser::new(),
             _ => DataSampleParser::new_with(
                 &dsp.get("cfg")
                     .unwrap()
@@ -827,7 +826,7 @@ mod tests {
     #[test]
     // ensure a new Data Sample Parser can be created
     fn test_new() {
-        let dsp = DataSampleParser::new();
+        let _dsp = DataSampleParser::new();
 
         assert!(true);
     }
@@ -835,7 +834,7 @@ mod tests {
     #[test]
     // ensure a new Data Sample Parser can be created with configurations
     fn test_new_with() {
-        let dsp = DataSampleParser::new_with(&String::from("./config/tdg.yaml"));
+        let _dsp = DataSampleParser::new_with(&String::from("./config/tdg.yaml"));
 
         assert!(true);
     }

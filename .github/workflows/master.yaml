@@ -92,17 +92,20 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clean    
+      # - name: Gather coverage data  # Error due to https://github.com/xd009642/tarpaulin/issues/461
+      #   uses: actions-rs/tarpaulin@v0.1
+      #   with:
+      #     version: '0.15.0'
+      #     out-type: 'Lcov'
+      #     run-types: Tests
+      #     args: '-- --test-threads 1'  
       - name: Gather coverage data
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.15.0'
-          out-type: 'Lcov'
-          run-types: Tests
-          args: '-- --test-threads 1'  
+        uses: docker://lpenz/ghaction-rust-coverage:0.2
       - name: Coveralls upload
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          #coveralls-token: ${{ secrets.COVERALLS_TOKEN }}
           path-to-lcov: lcov.info         
           parallel: true
 
