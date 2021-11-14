@@ -67,7 +67,7 @@
 //!
 //! fn main() {
 //!     let mut dsp =  DataSampleParser::new();
-//! 
+//!
 //!     // Using the default delimiter (comma)
 //!    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
 //!    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"), None).unwrap();
@@ -97,7 +97,7 @@ use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 
-const DELIMITER:u8 = b',';
+const DELIMITER: u8 = b',';
 
 type ProfilesMap = IndexMap<String, Profile>;
 
@@ -376,7 +376,11 @@ impl DataSampleParser {
     /// 	assert_eq!(dsp.analyze_csv_data(&data, None).unwrap(),1);
     /// }
     /// ```
-    pub fn analyze_csv_data(&mut self, data: &String, delimiter: Option<u8>) -> Result<i32, String> {
+    pub fn analyze_csv_data(
+        &mut self,
+        data: &String,
+        delimiter: Option<u8>,
+    ) -> Result<i32, String> {
         debug!("Starting to analyzed the csv data {}", data);
 
         let mut rdr = csv::ReaderBuilder::new()
@@ -447,7 +451,11 @@ impl DataSampleParser {
     /// 	assert_eq!(dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap(),1);
     /// }
     /// ```
-    pub fn analyze_csv_file(&mut self, path: &String, delimiter: Option<u8>) -> Result<i32, String> {
+    pub fn analyze_csv_file(
+        &mut self,
+        path: &String,
+        delimiter: Option<u8>,
+    ) -> Result<i32, String> {
         info!("Starting to analyzed the csv file {}", path);
 
         let mut file = (File::open(path).map_err(|e| {
@@ -545,11 +553,11 @@ impl DataSampleParser {
         profil.generate()
     }
 
-    fn else_default_delimiter(delimiter: Option<u8>) -> u8{
-        match delimiter{
+    fn else_default_delimiter(delimiter: Option<u8>) -> u8 {
+        match delimiter {
             Some(d) => {
                 return d;
-            },
+            }
             None => {
                 return DELIMITER;
             }
@@ -670,7 +678,12 @@ impl DataSampleParser {
     ///     dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"), None).unwrap();
     /// }
     /// ```
-    pub fn generate_csv(&mut self, row_count: u32, path: &String, delimiter: Option<u8>) -> Result<(), Box<dyn Error>> {
+    pub fn generate_csv(
+        &mut self,
+        row_count: u32,
+        path: &String,
+        delimiter: Option<u8>,
+    ) -> Result<(), Box<dyn Error>> {
         info!("generating csv file {}", path);
 
         let mut wtr = (WriterBuilder::new()
@@ -1064,8 +1077,12 @@ mod tests {
 
         dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
-        dsp.generate_csv(100, &String::from("./tests/samples/generated-01b.csv"), Some(b'|'))
-            .unwrap();
+        dsp.generate_csv(
+            100,
+            &String::from("./tests/samples/generated-01b.csv"),
+            Some(b'|'),
+        )
+        .unwrap();
 
         let generated_row_count =
             match File::open(format!("{}", "./tests/samples/generated-01b.csv")) {
