@@ -501,10 +501,12 @@ pub trait Engine {
         for result in results {
             match profile.apply_facts(result.0, result.1) {
                 Ok(_) => {}
-                Err(e) => return Err(format!(
+                Err(e) => {
+                    return Err(format!(
                     "Error: Couldn't apply the Pattern and Facts to the Profile. Error Message: {}",
                     e.to_string()
-                )),
+                ))
+                }
             }
         }
 
