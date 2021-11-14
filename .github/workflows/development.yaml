@@ -92,13 +92,15 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clean    
+      # - name: Gather coverage data
+      #   uses: actions-rs/tarpaulin@v0.1
+      #   with:
+      #     version: '0.15.0'
+      #     out-type: 'Lcov'
+      #     run-types: Tests
+      #     args: '-- --test-threads 1'  
       - name: Gather coverage data
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.15.0'
-          out-type: 'Lcov'
-          run-types: Tests
-          args: '-- --test-threads 1'  
+        uses: docker://lpenz/ghaction-rust-coverage:0.2
       - name: Coveralls upload
         uses: coverallsapp/github-action@master
         with:
