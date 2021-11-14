@@ -25,3 +25,4 @@ Cargo.lock
 
 # Generated file due to testing
 /tests/samples/generated-01.csv
+/tests/samples/generated-01b.csv

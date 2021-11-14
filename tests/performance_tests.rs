@@ -41,7 +41,7 @@ mod tests {
         let mut dsp = DataSampleParser::new();
         let now = Instant::now();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-names.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-names.csv"), None)
             .unwrap();
 
         if now.elapsed().as_secs() > 60 {

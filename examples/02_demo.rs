@@ -9,7 +9,7 @@ fn main() {
     // initalize a new DataSampelParser
     let mut dsp = DataSampleParser::new();
 
-    dsp.analyze_csv_file(&String::from("./tests/samples/sample-names.csv"))
+    dsp.analyze_csv_file(&String::from("./tests/samples/sample-names.csv"), None)
         .unwrap();
 
     // generate some test data using the demo functions

@@ -67,9 +67,10 @@
 //!
 //! fn main() {
 //!     let mut dsp =  DataSampleParser::new();
-//!
-//!    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
-//!    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
+//! 
+//!     // Using the default delimiter (comma)
+//!    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
+//!    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"), None).unwrap();
 //! }
 //! ```
 //!
@@ -96,7 +97,8 @@ use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 
-// type ProfilesMap = BTreeMap<String, Profile>;
+const DELIMITER:u8 = b',';
+
 type ProfilesMap = IndexMap<String, Profile>;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -350,6 +352,7 @@ impl DataSampleParser {
     /// # Arguments
     ///
     /// * `data: &String` - The textual content of a csv formatted sample data file.</br>
+    /// * `delimiter: Option<u8>` - The delimiter to use, otherwise use the default.</br>
     ///
     /// # Example
     ///
@@ -369,17 +372,18 @@ impl DataSampleParser {
     ///		data.push_str("\"Abbie\",\"Aagaard\"\n");
     ///		data.push_str("\"Abby\",\"Aakre\"");
     ///
-    /// 	assert_eq!(dsp.analyze_csv_data(&data).unwrap(),1);
+    ///     // Use the default delimiter (comma)
+    /// 	assert_eq!(dsp.analyze_csv_data(&data, None).unwrap(),1);
     /// }
     /// ```
-    pub fn analyze_csv_data(&mut self, data: &String) -> Result<i32, String> {
+    pub fn analyze_csv_data(&mut self, data: &String, delimiter: Option<u8>) -> Result<i32, String> {
         debug!("Starting to analyzed the csv data {}", data);
 
         let mut rdr = csv::ReaderBuilder::new()
             .has_headers(true)
             .quote(b'"')
             .double_quote(true)
-            .delimiter(b',')
+            .delimiter(Self::else_default_delimiter(delimiter))
             .from_reader(data.as_bytes());
 
         //iterate through the headers
@@ -426,6 +430,7 @@ impl DataSampleParser {
     /// # Arguments
     ///
     /// * `path: &String` - The full path name of the csv formatted sample data file.</br>
+    /// * `delimiter: Option<u8>` - The delimiter to use, otherwise use the default.</br>
     ///
     /// # Example
     ///
@@ -438,10 +443,11 @@ impl DataSampleParser {
     ///		// initalize a new DataSampelParser
     ///		let mut dsp = DataSampleParser::new();
     ///
-    /// 	assert_eq!(dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap(),1);
+    ///     // Use the default delimiter (comma)
+    /// 	assert_eq!(dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap(),1);
     /// }
     /// ```
-    pub fn analyze_csv_file(&mut self, path: &String) -> Result<i32, String> {
+    pub fn analyze_csv_file(&mut self, path: &String, delimiter: Option<u8>) -> Result<i32, String> {
         info!("Starting to analyzed the csv file {}", path);
 
         let mut file = (File::open(path).map_err(|e| {
@@ -457,7 +463,7 @@ impl DataSampleParser {
             })
             .unwrap();
 
-        self.analyze_csv_data(&data)
+        self.analyze_csv_data(&data, delimiter)
     }
 
     /// This function generates date as strings using the a `demo` profile
@@ -539,6 +545,17 @@ impl DataSampleParser {
         profil.generate()
     }
 
+    fn else_default_delimiter(delimiter: Option<u8>) -> u8{
+        match delimiter{
+            Some(d) => {
+                return d;
+            },
+            None => {
+                return DELIMITER;
+            }
+        }
+    }
+
     /// This function returns a vector of header names
     ///
     /// # Example
@@ -552,7 +569,7 @@ impl DataSampleParser {
     ///		// initalize a new DataSampelParser
     ///		let mut dsp = DataSampleParser::new();
     ///
-    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
     ///     let headers = dsp.extract_headers();
     ///
     ///		assert_eq!(headers.len(), 2);
@@ -584,7 +601,7 @@ impl DataSampleParser {
     ///		// initalize a new DataSampelParser
     ///		let mut dsp = DataSampleParser::new();
     ///
-    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
     ///     println!("Generated data for first name {}",dsp.generate_by_field_name("firstname".to_string()));
     /// }
     /// ```
@@ -609,7 +626,7 @@ impl DataSampleParser {
     ///		// initalize a new DataSampelParser
     ///		let mut dsp = DataSampleParser::new();
     ///
-    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
     ///     println!("Generated data record: {:?}",dsp.generate_record());
     /// }
     /// ```
@@ -636,6 +653,7 @@ impl DataSampleParser {
     ///
     /// * `row_count: u32` - The number of rows to generate.</br>
     /// * `path: &String` - The full path name where to save the csv file.</br>
+    /// * `delimiter: Option<u8>` - The delimiter to use, otherwise use the default.</br>
     ///
     /// # Example
     ///
@@ -648,18 +666,18 @@ impl DataSampleParser {
     ///		// initalize a new DataSampelParser
     ///		let mut dsp = DataSampleParser::new();
     ///
-    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
-    ///     dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
+    /// 	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
+    ///     dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"), None).unwrap();
     /// }
     /// ```
-    pub fn generate_csv(&mut self, row_count: u32, path: &String) -> Result<(), Box<dyn Error>> {
+    pub fn generate_csv(&mut self, row_count: u32, path: &String, delimiter: Option<u8>) -> Result<(), Box<dyn Error>> {
         info!("generating csv file {}", path);
 
         let mut wtr = (WriterBuilder::new()
             .has_headers(true)
             .quote(b'"')
             .double_quote(true)
-            .delimiter(b',')
+            .delimiter(Self::else_default_delimiter(delimiter))
             .from_path(path)
             .map_err(|e| {
                 error!("csv file {} couldn't be created!", path);
@@ -782,7 +800,7 @@ impl DataSampleParser {
     /// fn main() {
     /// 	// analyze the dataset
     ///		let mut dsp =  DataSampleParser::new();
-    ///     dsp.analyze_csv_file(&String::from("./tests/samples/sample-00.csv")).unwrap();
+    ///     dsp.analyze_csv_file(&String::from("./tests/samples/sample-00.csv"), None).unwrap();
     ///
     ///     assert_eq!(dsp.save(&String::from("./tests/samples/sample-00-dsp")).unwrap(), true);
     /// }
@@ -875,7 +893,7 @@ mod tests {
     fn test_read_headers() {
         let mut dsp = DataSampleParser::new();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
         let headers = dsp.extract_headers();
 
@@ -892,7 +910,7 @@ mod tests {
         expected.push("column-G");
         let mut dsp = DataSampleParser::new();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-02.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-02.csv"), None)
             .unwrap();
         let headers = dsp.extract_headers();
 
@@ -905,7 +923,7 @@ mod tests {
         let mut dsp = DataSampleParser::new();
 
         assert_eq!(
-            dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+            dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
                 .unwrap(),
             1
         );
@@ -913,7 +931,7 @@ mod tests {
 
     #[test]
     // ensure DataSampleParser can analyze a csv formatted text
-    fn test_parse_csv_data() {
+    fn test_parse_csv_data_using_defaults() {
         let mut dsp = DataSampleParser::new();
         let mut data = String::from("");
         data.push_str("\"firstname\",\"lastname\"\n");
@@ -923,15 +941,29 @@ mod tests {
         data.push_str("\"Abbie\",\"Aagaard\"\n");
         data.push_str("\"Abby\",\"Aakre\"");
 
-        assert_eq!(dsp.analyze_csv_data(&data).unwrap(), 1);
+        assert_eq!(dsp.analyze_csv_data(&data, None).unwrap(), 1);
     }
 
+    #[test]
+    // ensure DataSampleParser can analyze a csv formatted text
+    fn test_parse_csv_data() {
+        let mut dsp = DataSampleParser::new();
+        let mut data = String::from("");
+        data.push_str("\"firstname\"|\"lastname\"\n");
+        data.push_str("\"Aaron\"|\"Aaberg\"\n");
+        data.push_str("\"Aaron\"|\"Aaby\"\n");
+        data.push_str("\"Abbey\"|\"Aadland\"\n");
+        data.push_str("\"Abbie\"|\"Aagaard\"\n");
+        data.push_str("\"Abby\"|\"Aakre\"");
+
+        assert_eq!(dsp.analyze_csv_data(&data, Some(b'|')).unwrap(), 1);
+    }
     #[test]
     // ensure DataSampleParser can analyze a csv formatted file
     fn test_generate_field_from_csv_file() {
         let mut dsp = DataSampleParser::new();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
         println!(
             "Generated data for first name {}",
@@ -944,7 +976,7 @@ mod tests {
     fn test_generate_record_from_csv_file() {
         let mut dsp = DataSampleParser::new();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
         assert_eq!(dsp.generate_record().len(), 2);
     }
@@ -955,7 +987,7 @@ mod tests {
         let mut dsp = DataSampleParser::new();
 
         assert_eq!(
-            dsp.analyze_csv_file(&String::from("./badpath/sample-01.csv"))
+            dsp.analyze_csv_file(&String::from("./badpath/sample-01.csv"), None)
                 .is_err(),
             true
         );
@@ -965,7 +997,7 @@ mod tests {
     // ensure the DataSampleParser object can be saved to file
     fn test_save() {
         let mut dsp = DataSampleParser::new();
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-00.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-00.csv"), None)
             .unwrap();
 
         assert_eq!(
@@ -1001,7 +1033,7 @@ mod tests {
     // demo test
     fn test_demo() {
         let mut dsp = DataSampleParser::new();
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
 
         println!(
@@ -1018,7 +1050,7 @@ mod tests {
     fn test_extract_headers_from_sample() {
         let mut dsp = DataSampleParser::new();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
         let headers = dsp.extract_headers();
 
@@ -1030,13 +1062,13 @@ mod tests {
     fn test_generate_csv_test_data_from_sample() {
         let mut dsp = DataSampleParser::new();
 
-        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+        dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
             .unwrap();
-        dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"))
+        dsp.generate_csv(100, &String::from("./tests/samples/generated-01b.csv"), Some(b'|'))
             .unwrap();
 
         let generated_row_count =
-            match File::open(format!("{}", "./tests/samples/generated-01.csv")) {
+            match File::open(format!("{}", "./tests/samples/generated-01b.csv")) {
                 Err(_e) => 0,
                 Ok(f) => {
                     let mut count = 0;

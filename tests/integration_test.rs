@@ -25,7 +25,7 @@ mod tests {
         info!("Analyzing CSV file ...");
         println!(
             "reading csv file: {}",
-            dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"))
+            dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None)
                 .unwrap()
         );
 

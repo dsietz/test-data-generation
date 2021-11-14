@@ -76,7 +76,7 @@
 //!
 //! fn main() {
 //!     let mut dsp = DataSampleParser::new();
-//!     dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+//!     dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
 //!
 //!     println!("My new name is {} {}", dsp.generate_record()[0], dsp.generate_record()[1]);
 //!     // My new name is Abbon Aady
@@ -91,7 +91,7 @@
 //!
 //! fn main() {
 //!     let mut dsp =  DataSampleParser::new();
-//!     dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
+//!     dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
 //!
 //!     assert_eq!(dsp.save(&String::from("./tests/samples/sample-01-dsp")).unwrap(), true);
 //! }
@@ -120,8 +120,9 @@
 //! fn main() {
 //!     let mut dsp =  DataSampleParser::new();
 //!
-//!    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv")).unwrap();
-//!    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv")).unwrap();
+//!     // Use the default delimiter (comma)
+//!    	dsp.analyze_csv_file(&String::from("./tests/samples/sample-01.csv"), None).unwrap();
+//!    	dsp.generate_csv(100, &String::from("./tests/samples/generated-01.csv"), None).unwrap();
 //! }
 //! ```
 #![crate_type = "lib"]
