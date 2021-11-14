@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/dsietz/test-data-generation/badge.svg?branch=master)](https://coveralls.io/github/dsietz/test-data-generation?branch=master)
 [![Docs.rs](https://docs.rs/test-data-generation/badge.svg)](https://docs.rs/test-data-generation)
 
-Linux: [![Build Status](https://travis-ci.org/dsietz/test-data-generation.svg?branch=master)](https://travis-ci.org/dsietz/test-data-generation)
+Linux: [![Build Status](https://github.com/dsietz/test-data-generation/actions/workflows/master.yaml/badge.svg)](https://github.com/dsietz/test-data-generation/actions/workflows/master.yaml)
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/uw58v5t8ynwj8s8o/branch/master?svg=true)](https://ci.appveyor.com/project/dsietz/test-data-generation/branch/master)
 
 ## [Fast test data generation!](#head1234)
