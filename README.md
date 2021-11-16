@@ -41,12 +41,13 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's what's new in 0.3.1:
+Here's what's new in 0.3.2:
 + [Fix for issue #90](https://github.com/dsietz/test-data-generation/issues/90)
   > Every effort has been made to automatically convert to the latest version of the DSP object when loading from a saved dsp file from a prior version, (e.g.: 0.2.1), however, it is not guaranteed.
 + [Added issue #91](https://github.com/dsietz/test-data-generation/issues/91)
   > Optional parameters for setting the delimiter when analyzing and generating csv files.
 + [Fixed issue #93](https://github.com/dsietz/test-data-generation/issues/93)  
++ [Fixed typos](https://github.com/dsietz/test-data-generation/pull/95)
 
 ## About
 
