@@ -43,7 +43,7 @@
 //! Load an algorithm ...
 //!
 //! Create a data sample parser from a previously saved (exported) archive file so you can generate test data based on the algorithm.</br>
-//! *NOTE:* In this example, there was only one data point in the data smaple that was analyzed (the word 'OK'). This was intentional
+//! *NOTE:* In this example, there was only one data point in the data sample that was analyzed (the word 'OK'). This was intentional
 //! so the algorithm would be guaranteed to generate that same word. This was done ensure the assert_eq! returns true.
 //!
 //! ```
