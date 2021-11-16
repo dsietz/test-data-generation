@@ -26,10 +26,8 @@ is-it-maintained-open-issues = { repository = "dsietz/test-data-generation" }
 maintenance = {status = "passively-maintained"}
 
 [dependencies]
-config       = "0.10"
-lazy_static  = "1.4"
+once_cell  = "1.8"
 log          = "0.4"
-log4rs       = "1.0"
 serde        = "1.0"
 serde_derive = "1.0"
 serde_json   = "1.0"
@@ -43,6 +41,9 @@ levenshtein  = "1.0"
 [dependencies.indexmap]
 version = "1.7.0"
 features = ["serde-1"]
+
+[dev-dependencies]
+log4rs       = "1.0"
 
 [profile.release]
 opt-level = 3
