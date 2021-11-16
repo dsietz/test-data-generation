@@ -41,11 +41,11 @@ or production environment (option #1 above)
 
 ## What's New
 
-Here's whats new in 0.3.1:
+Here's what's new in 0.3.1:
 + [Fix for issue #90](https://github.com/dsietz/test-data-generation/issues/90)
   > Every effort has been made to automatically convert to the latest version of the DSP object when loading from a saved dsp file from a prior version, (e.g.: 0.2.1), however, it is not guaranteed.
 + [Added issue #91](https://github.com/dsietz/test-data-generation/issues/91)
-  > Optional paramters for setting the delimiter when analyzing and generating csv files.
+  > Optional parameters for setting the delimiter when analyzing and generating csv files.
 + [Fixed issue #93](https://github.com/dsietz/test-data-generation/issues/93)  
 
 ## About
@@ -62,7 +62,7 @@ The algorithm is built on the bases of:
 
 ## Usage
 
-The are multiple ways to use the Test Data Generation library. It all depends on your intent.
+There are multiple ways to use the Test Data Generation library. It all depends on your intent.
 
 ### Profile
 
@@ -171,7 +171,7 @@ This library comes with the following examples. To run the examples.
    > `cargo run --example 01_demo`
 + [Demo 2](https://github.com/dsietz/test-data-generation/blob/master/examples/02_demo.rs) : Demonstrates the basic feature of the library to generate dates and people's names from a CSV file.
    > `cargo run --example 02_demo`
-+ [Demo 3](https://github.com/dsietz/test-data-generation/blob/master/examples/03_demo.rs) : Demonstrates the ability to conitnuously add new analyzed data to an existing profile. 
++ [Demo 3](https://github.com/dsietz/test-data-generation/blob/master/examples/03_demo.rs) : Demonstrates the ability to continuously add new analyzed data to an existing profile. 
    > `cargo run --example 03_demo`
 
 ## How to Contribute
