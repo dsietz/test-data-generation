@@ -372,7 +372,7 @@ impl Profile {
     ///
     /// # Arguments
     ///
-    /// * `entity: String` - The textual str of the value to anaylze.</br>
+    /// * `entity: String` - The textual str of the value to analyze.</br>
     ///
     /// # Example
     ///

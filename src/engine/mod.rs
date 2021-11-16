@@ -287,7 +287,7 @@ impl PatternDefinition {
     ///
     /// # Arguments
     ///
-    /// * `entity: String` - The textual str of the value to anaylze.</br>
+    /// * `entity: String` - The textual str of the value to analyze.</br>
     ///
     /// # Example
     ///
@@ -330,7 +330,7 @@ impl PatternDefinition {
     ///
     /// # Arguments
     ///
-    /// * `entity: String` - The textual str of the value to anaylze.</br>
+    /// * `entity: String` - The textual str of the value to analyze.</br>
     /// * `idx: u32` - The index that specifies the position of the char in the entity to convert to a Fact.</br>
     ///
     /// # Example
@@ -482,14 +482,14 @@ pub trait Engine {
             results.push(match rx.recv() {
                 Ok(result) => result,
                 Err(_) => {
-                    error!("Error: Could not anaylze the entity: {}", entity);
-                    panic!("Error: Could not anaylze the data!")
+                    error!("Error: Could not analyze the entity: {}", entity);
+                    panic!("Error: Could not analyze the data!")
                 }
             });
         }
 
         for child in children {
-            child.join().expect("Error: Could not anaylze the data!");
+            child.join().expect("Error: Could not analyze the data!");
         }
 
         results
