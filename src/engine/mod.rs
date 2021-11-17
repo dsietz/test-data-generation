@@ -60,6 +60,13 @@ use std::thread;
 use crate::Profile;
 //use async_trait::async_trait;
 
+macro_rules! regex {
+    ($re:literal $(,)?) => {{
+        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
+        RE.get_or_init(|| regex::Regex::new($re).unwrap())
+    }};
+}
+
 #[allow(dead_code)]
 type PatternMap = BTreeMap<String, char>;
 
@@ -105,6 +112,7 @@ impl Fact {
     ///    	let mut fact =  Fact::new('r','c',0,0,2);
     /// }
     /// ```
+    #[inline]
     pub fn new(k: char, pp: char, sw: u32, ew: u32, idx_off: u32) -> Fact {
         Fact {
             key: k,
@@ -139,6 +147,7 @@ impl Fact {
     ///		assert_eq!(fact.pattern_placeholder, 'c');
     /// }
     /// ```
+    #[inline]
     pub fn from_serialized(serialized: &str) -> Fact {
         serde_json::from_str(&serialized).unwrap()
     }
@@ -160,6 +169,7 @@ impl Fact {
     ///     // {"key":"r","prior_key":null,"next_key":null,"pattern_placeholder":"c","starts_with":0,"ends_with":0,"index_offset":2}
     /// }
     ///
+    #[inline]
     pub fn serialize(&mut self) -> String {
         serde_json::to_string(&self).unwrap()
     }
@@ -183,6 +193,7 @@ impl Fact {
     ///     fact.set_next_key('d');
     /// }
     ///
+    #[inline]
     pub fn set_next_key(&mut self, nk: char) {
         self.next_key = Some(nk);
     }
@@ -206,6 +217,7 @@ impl Fact {
     ///     fact.set_prior_key('o');
     /// }
     ///
+    #[inline]
     pub fn set_prior_key(&mut self, pk: char) {
         self.prior_key = Some(pk);
     }
@@ -214,31 +226,31 @@ impl Fact {
 /// Represents a symbolic pattern of an entity (String)
 pub struct Pattern {
     /// The regex rule used to find upper case consonants
-    regex_consonant_upper: Regex,
+    regex_consonant_upper: &'static Regex,
     /// The regex rule used to find lower case consonants
-    regex_consonant_lower: Regex,
+    regex_consonant_lower: &'static Regex,
     /// The regex rule used to find upper case vowels
-    regex_vowel_upper: Regex,
+    regex_vowel_upper: &'static Regex,
     /// The regex rule used to find lower case vowels
-    regex_vowel_lower: Regex,
+    regex_vowel_lower: &'static Regex,
     /// The regex rule used to find numeric digits
-    regex_numeric: Regex,
+    regex_numeric: &'static Regex,
     /// The regex rule used to find punctuation
-    regex_punctuation: Regex,
+    regex_punctuation: &'static Regex,
     /// The regex rule used to find white spaces
-    regex_space: Regex,
+    regex_space: &'static Regex,
 }
 
 impl Default for Pattern {
     fn default() -> Self {
         Pattern {
-            regex_consonant_upper: Regex::new(r"[B-DF-HJ-NP-TV-Z]").unwrap(),
-            regex_consonant_lower: Regex::new(r"[b-df-hj-np-tv-z]").unwrap(),
-            regex_vowel_upper: Regex::new(r"[A|E|I|O|U]").unwrap(),
-            regex_vowel_lower: Regex::new(r"[a|e|i|o|u]").unwrap(),
-            regex_numeric: Regex::new(r"[0-9]").unwrap(),
-            regex_punctuation: Regex::new(r"[.,\\/#!$%\\^&\\*;:{}=\\-_`~()\\?]").unwrap(),
-            regex_space: Regex::new(r"[\s]").unwrap(),
+            regex_consonant_upper: regex!(r"[B-DF-HJ-NP-TV-Z]"),
+            regex_consonant_lower: regex!(r"[b-df-hj-np-tv-z]"),
+            regex_vowel_upper: regex!(r"[A|E|I|O|U]"),
+            regex_vowel_lower: regex!(r"[a|e|i|o|u]"),
+            regex_numeric: regex!(r"[0-9]"),
+            regex_punctuation: regex!(r"[.,\\/#!$%\\^&\\*;:{}=\\-_`~()\\?]"),
+            regex_space: regex!(r"[\s]"),
         }
     }
 }
@@ -304,6 +316,7 @@ impl PatternDefinition {
     ///     //}
     /// }
     /// ```
+    #[inline]
     pub fn analyze(&mut self, entity: &str) -> (String, Vec<Fact>) {
         // record the length of the passed value
         //self.size = entity.len() as u32;
@@ -346,6 +359,7 @@ impl PatternDefinition {
     ///     // will return a Fact that represents the char `W`
     /// }
     /// ```
+    #[inline]
     pub fn factualize(&mut self, entity: &str, idx: u32) -> Fact {
         let c = entity.chars().nth(idx as usize).unwrap();
         let pp = self.symbolize_char(c);
@@ -391,6 +405,7 @@ impl PatternDefinition {
     ///     println!("Upper case vowel symbol: {:?}", pttrn_def.get(&"VowelUpper".to_string()));
     /// }
     /// ```
+    #[inline]
     pub fn get(&self, key: &str) -> char {
         *self.pattern_map.get(key).unwrap()
     }
@@ -410,6 +425,7 @@ impl PatternDefinition {
     ///     // The pattern symbol for 'A' is V
     /// }
     /// ```
+    #[inline]
     pub fn symbolize_char(&self, c: char) -> char {
         // if you have to escape regex special characters: &*regex::escape(&*$c.to_string())
         let mut symbol = self.pattern_map.get("Unknown");
