@@ -231,12 +231,12 @@ impl DataSampleParser {
             false => {
                 info!("Prior version 0.2.1 detected. Trying to upgrade to latest version");
 
-                return Self::updgrade_to_latest_version(serialized);
+                return Self::upgrade_to_latest_version(serialized);
             }
         }
     }
 
-    fn updgrade_to_latest_version(serialized: String) -> DataSampleParser {
+    fn upgrade_to_latest_version(serialized: String) -> DataSampleParser {
         let dsp: Value = serde_json::from_str(&serialized).unwrap();
         let prfils = dsp.get("profiles").unwrap();
         let mut pm: ProfilesMap = ProfilesMap::new();

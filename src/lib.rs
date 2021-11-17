@@ -669,20 +669,20 @@ impl Profile {
                                 && value.pattern_placeholder == *c
                                 && value.index_offset == idx as u32
                             {
-                                facts.push(value.key.clone());
+                                facts.push(value.key);
 
                                 // if the value.key's prior char matches the prior generated char, then weight the value.key
                                 // to increase the chance of it being used when generated
                                 if value.prior_key.unwrap_or(' ') == prior_char {
-                                    facts.push(value.key.clone());
-                                    facts.push(value.key.clone());
+                                    facts.push(value.key);
+                                    facts.push(value.key);
                                 }
 
                                 // if the value.key's index_offset matches the current index, then weight the value.key
                                 // to increase the chance of it being used when generated
                                 if value.index_offset == idx as u32 {
-                                    facts.push(value.key.clone());
-                                    facts.push(value.key.clone());
+                                    facts.push(value.key);
+                                    facts.push(value.key);
                                 }
                             }
                         }
@@ -808,8 +808,8 @@ impl Profile {
     ///
     /// # Arguments
     ///
-    /// * `control: &String` - The string to compare against. This would be the real data from the data sample.</br>
-    /// * `experiment: &String` - The string to compare. This would be the generated data for which you want to find the percent difference.</br>
+    /// * `control: &str` - The string to compare against. This would be the real data from the data sample.</br>
+    /// * `experiment: &str` - The string to compare. This would be the generated data for which you want to find the percent difference.</br>
     ///
     /// #Example
     ///
@@ -824,7 +824,7 @@ impl Profile {
     ///     assert_eq!(profile.realistic_test(&"kitten".to_string(), &"sitting".to_string()), 76.92307692307692 as f64);
     /// }
     ///
-    pub fn realistic_test(&mut self, control: &String, experiment: &String) -> f64 {
+    pub fn realistic_test(&mut self, control: &str, experiment: &str) -> f64 {
         realistic_test!(control, experiment)
     }
 
