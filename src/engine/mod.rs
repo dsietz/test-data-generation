@@ -244,13 +244,13 @@ pub struct Pattern {
 impl Default for Pattern {
     fn default() -> Self {
         Pattern {
-            regex_consonant_upper: regex!(r"[B-DF-HJ-NP-TV-Z]"),
-            regex_consonant_lower: regex!(r"[b-df-hj-np-tv-z]"),
-            regex_vowel_upper: regex!(r"[A|E|I|O|U]"),
-            regex_vowel_lower: regex!(r"[a|e|i|o|u]"),
-            regex_numeric: regex!(r"[0-9]"),
-            regex_punctuation: regex!(r"[.,\\/#!$%\\^&\\*;:{}=\\-_`~()\\?]"),
-            regex_space: regex!(r"[\s]"),
+            regex_consonant_upper: regex!(r"(?-u)[B-DF-HJ-NP-TV-Z]"),
+            regex_consonant_lower: regex!(r"(?-u)[b-df-hj-np-tv-z]"),
+            regex_vowel_upper: regex!(r"(?-u)[A|E|I|O|U]"),
+            regex_vowel_lower: regex!(r"(?-u)[a|e|i|o|u]"),
+            regex_numeric: regex!(r"(?-u)[0-9]"),
+            regex_punctuation: regex!(r"(?-u)[.,\\/#!$%\\^&\\*;:{}=\\-_`~()\\?]"),
+            regex_space: regex!(r"(?-u)[\s]"),
         }
     }
 }
