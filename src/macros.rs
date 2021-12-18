@@ -41,7 +41,7 @@ macro_rules! random_percentage {
         use rand::{thread_rng, Rng};
 
         let mut rng = thread_rng();
-        let nbr:f64 = rng.gen_range(0_f64..100_f64);
+        let nbr: f64 = rng.gen_range(0_f64..100_f64);
 
         nbr
     }};
@@ -70,7 +70,7 @@ macro_rules! random_between {
         use rand::{thread_rng, Rng};
 
         let mut rng = thread_rng();
-        let nbr:u32 = rng.gen_range($a as u32..$b as u32);
+        let nbr: u32 = rng.gen_range($a as u32..$b as u32);
 
         nbr
     }};
