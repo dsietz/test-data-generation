@@ -280,6 +280,7 @@ impl DataSampleParser {
         return rtn;
     }
 
+    #[inline]
     fn analyze_columns(&mut self, profile_keys: Vec<String>, columns: Vec<Vec<String>>) {
         let col_cnt = columns.len();
         let (tx, rx): (
@@ -394,8 +395,8 @@ impl DataSampleParser {
         for headers in rdr.headers() {
             for header in headers.iter() {
                 //add a Profile to the list of profiles to represent the field (indexed using the header label)
-                let p = Profile::new_with_id(format!("{}", header));
-                self.profiles.insert(format!("{}", header), p);
+                let p = Profile::new_with_id(header.to_string());
+                self.profiles.insert(header.to_string(), p);
             }
         }
 
