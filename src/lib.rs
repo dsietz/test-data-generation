@@ -291,7 +291,7 @@ impl Profile {
     ///
     /// # Arguments
     ///
-    /// * `field: String` - The full path of the export file , excluding the file extension, (e.g.: "./test/data/custom-names").</br>
+    /// * `path: &str` - The full path of the export file , excluding the file extension, (e.g.: "./test/data/custom-names").</br>
     ///
     /// #Example
     ///
@@ -424,6 +424,7 @@ impl Profile {
     ///		assert_eq!(profile.apply_facts(results.0, results.1).unwrap(), 1);
     /// }
     /// ```
+    #[inline]
     pub fn apply_facts(&mut self, pattern: String, facts: Vec<Fact>) -> Result<i32, String> {
         // balance the storing of facts across all the vectors that can be processed in parallel
         let mut i = 0;
@@ -433,7 +434,7 @@ impl Profile {
             }
 
             self.facts[i as usize].push(f);
-            i = i + 1;
+            i += 1;
         }
 
         // store the pattern
@@ -478,10 +479,11 @@ impl Profile {
     ///    	assert_eq!(profile.pattern_ranks, test);
     /// }
     /// ```
+    #[inline]
     pub fn cum_patternmap(&mut self) {
         // Reference: https://users.rust-lang.org/t/cannot-infer-an-appropriate-lifetime-for-autoref/13360/3
 
-        debug!("calucating the cumulative percentage of occurences for data point patterns...");
+        debug!("calculating the cumulative percentage of occurences for data point patterns...");
 
         // calculate the percentage by patterns
         // -> {"CcvccpSCvcc": 14.285714285714285, "CvccvccpSCvccvc": 14.285714285714285, "CvccvccpSCvccvv": 28.57142857142857, "CvcvcccpSCcvcv": 14.285714285714285, "CvcvpSCvccc": 14.285714285714285, "V~CcvvcpSCvccc": 14.285714285714285}
@@ -540,8 +542,9 @@ impl Profile {
     ///     // The size ranks are [(3, 50), (4, 83.33333333333333), (5, 100)]
     /// }
     /// ```
+    #[inline]
     pub fn cum_sizemap(&mut self) {
-        debug!("calucating the cumulative percentage of occurences for data point sizes...");
+        debug!("calculating the cumulative percentage of occurences for data point sizes...");
         // calculate the percentage by sizes
         // -> {11: 28.57142857142857, 14: 14.285714285714285, 15: 57.14285714285714}
         let mut size_ranks = SizeRankMap::new();
@@ -556,13 +559,13 @@ impl Profile {
         // sort the ranks by percentages in decreasing order
         // -> [(15, 57.14285714285714), (11, 28.57142857142857), (14, 14.285714285714285)]
         let mut sizes = size_ranks.iter().collect::<Vec<_>>();
-        sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(&a).unwrap());
+        sizes.sort_by(|&(_, a), &(_, b)| b.partial_cmp(a).unwrap());
 
         // calculate the cumulative sum of the size rankings
         // -> [(15, 57.14285714285714), (11, 85.71428571428571), (14, 100)]
         self.size_ranks = sizes
             .iter()
-            .scan((0 as u32, 0.00 as f64), |state, &(&k, &v)| {
+            .scan((0_u32, 0.00_f64), |state, &(&k, &v)| {
                 *state = (k, state.1 + &v);
                 Some(*state)
             })
@@ -592,6 +595,7 @@ impl Profile {
     ///		print!("The test data {:?} was generated.", profile.generate());
     /// }
     /// ```
+    #[inline]
     pub fn generate(&mut self) -> String {
         // 1. get a random number
         let s: f64 = random_percentage!();
@@ -611,9 +615,7 @@ impl Profile {
             .clone();
 
         // lastly, generate the test data using facts that adhere to the pattern
-        let generated = self.generate_from_pattern(pattern.0);
-
-        generated
+        self.generate_from_pattern(pattern.0)
     }
 
     /// This function generates realistic test data based on the sample data that was analyzed.
@@ -643,6 +645,7 @@ impl Profile {
     ///     assert_eq!(generated.len(), 10);
     /// }
     /// ```
+    #[inline]
     pub fn generate_from_pattern(&self, pattern: String) -> String {
         let pattern_chars = pattern.chars().collect::<Vec<char>>();
         let mut generated = String::new();
@@ -707,7 +710,7 @@ impl Profile {
 
                 if rnd_start >= rnd_end {
                     //generated.push(fact_options[0 as usize]);
-                    fact_options[0 as usize]
+                    fact_options[0_usize]
                 } else {
                     let x: u32 = random_between!(rnd_start, rnd_end);
                     //prev_char = fact_options[x as usize];
@@ -770,7 +773,7 @@ impl Profile {
                 percent_similarity.iter().sum::<f64>() as f64 / percent_similarity.len() as f64;
             debug!("Percent similarity is {} ...", &percent);
 
-            if percent >= 80 as f64 {
+            if percent >= 80_f64 {
                 self.analyze(&experiment);
             }
         }
@@ -824,6 +827,7 @@ impl Profile {
     ///     assert_eq!(profile.realistic_test(&"kitten".to_string(), &"sitting".to_string()), 76.92307692307692 as f64);
     /// }
     ///
+    #[inline]
     pub fn realistic_test(&mut self, control: &str, experiment: &str) -> f64 {
         realistic_test!(control, experiment)
     }
@@ -838,6 +842,7 @@ impl Profile {
     ///         The recommended number of processors is 1 per 10K data points (e.g.: profiling 20K names should be handled by 2 processors)</br>
     ///         NOTE: The default number of processors is 4.
     ///
+    #[inline]
     fn new_facts(p: u8) -> Vec<Vec<Fact>> {
         let mut vec_main = Vec::new();
 
